@@ -1,5 +1,7 @@
-package test;
+package test.controller;
 
+import test.DTO.Message;
+import test.entity.Device;
 import test.library.AbstractHttpMappingHandler;
 import test.library.annotation.*;
 import test.library.json.JsonParser;
@@ -13,6 +15,7 @@ import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
+// не должно быть никакой реализации, только вызов функций из класов service
 public class HelloHttpHandler extends AbstractHttpMappingHandler {
     //  Эти переменные пока static(на данный момент они одинаковые для всех пользователей).
     private static Map<String, Device> userDevices = new HashMap<>();
@@ -27,12 +30,13 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
     public DefaultFullHttpResponse userData() {
         String login = currentMessage.getLogin();
         String password = currentMessage.getPassword();
+
         String responseContent = "{login: '" + login + "', password: '" + password + "'}";
         return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(responseContent, StandardCharsets.UTF_8));
     }
 
-    @Get("/test/get/deviceInformation")
+    @Get("/test/get/listOfDevices")
     public DefaultFullHttpResponse deviceInformation() {
         return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(currentMessage.deviceInformation(userDevices), StandardCharsets.UTF_8));

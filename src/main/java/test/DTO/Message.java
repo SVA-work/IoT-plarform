@@ -1,7 +1,11 @@
-package test;
+package test.DTO;
+
+import test.entity.Device;
 
 import java.util.Map;
 
+// в DTO не должно быть реализации функций, это просто объект несущий инфу
+// перенести эти функции в папку service (UserInfoService)
 public class Message {
 
     private String login;
@@ -36,6 +40,7 @@ public class Message {
                 "Пожалуйста, отправьте ваш логин и пароль в следующем запросе, чтобы войти в систему.";
     }
 
+    // через config порт
     public String successfulEntry() {
         return "Вы успешно вошли в систему.\n" +
         "Список доступных команд:\n" +
@@ -61,19 +66,21 @@ public class Message {
         return "Неверный пароль или логин.\n";
     }
 
+    // получать порт через cofig
     public String actionsWithoutLogin() {
         return "Вы не вошли в систему.\n" +
         "Это можно сделать по адресу: \n" +
         "http://localhost:8090/test/post/entry";
     }
 
+    //лучше переименовать
     public String deviceInformation(Map<String, Device> userDevices) {
         if (userDevices.size() == 0) {
             return "У вас больше нет устройств.";
         }
         StringBuilder info = new StringBuilder();
         for (Map.Entry<String, Device> entry : userDevices.entrySet()) {
-            info.append(entry.getValue().id).append("\n");
+            info.append(entry.getValue().getId()).append("\n");
         }
         return info.toString();
     }
@@ -82,7 +89,7 @@ public class Message {
         StringBuilder info = new StringBuilder("Устройство успешно добавлено.\n");
         info.append("Список ваших устройств:\n");
         for (Map.Entry<String, Device> entry : userDevices.entrySet()) {
-            info.append(entry.getValue().id).append("\n");
+            info.append(entry.getValue().getId()).append("\n");
         }
         return info.toString();
     }
@@ -94,8 +101,9 @@ public class Message {
         StringBuilder info = new StringBuilder("Устройство успешно удалено.\n");
         info.append("Список ваших устройств:\n");
         for (Map.Entry<String, Device> entry : userDevices.entrySet()) {
-            info.append(entry.getValue().id).append("\n");
+            info.append(entry.getValue().getId()).append("\n");
         }
         return info.toString();
     }
+    // в трех функциях одиннаковый код
 }
