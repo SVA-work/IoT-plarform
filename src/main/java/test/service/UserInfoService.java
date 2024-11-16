@@ -3,6 +3,7 @@ package test.service;
 import test.config.ServerConfig;
 
 import test.entity.Device;
+import test.entity.User;
 import test.DTO.Message;
 import java.util.Map;
 
@@ -49,38 +50,36 @@ public class UserInfoService {
            ServerConfig.LINK_ENTRY;
   }
 
-  public String ListOfDevices(Map<String, Device> userDevices) {
-    if (userDevices.size() == 0) {
-      return "У вас больше нет устройств.";
-    }
+  public String ListOfDevices() {
+    //  Если у пользователя нет устройств в БД
+      return "У вас нет устройств.";
     StringBuilder info = new StringBuilder();
-    return(deviceOutput(userDevices, info).toString());
+    return(deviceOutput(info).toString());
+  }
+
+  public Boolean verified(User currentUser) {
+    return currentUser.getVerified();
   }
   //  Нужно добавить устройство в БД
-  public String addDevice(Map<String, Device> userDevices, Device newDevice) {
-    userDevices.put(newDevice.getId(), newDevice);
+  public String addDevice(String deviceId) {
+    //  добавление устройства
     StringBuilder info = new StringBuilder("Устройство успешно добавлено.\n");
     info.append("Список ваших устройств:\n");
-    return(deviceOutput(userDevices, info).toString());
+    return(deviceOutput(info).toString());
   }
   //  Нужно удалить устройство из БД
-  public String deleteDevice(Map<String, Device> userDevices, Device deleteDevice) {
-    Device check = userDevices.remove(deleteDevice.getId());
-    if (check == null) {
+  public String deleteDevice(String deviceId) {
+    //  если устройств нет
       return "У вас нет такого устройства.";
-    }
-    if (userDevices.size() == 0) {
+    //  если после удаления не осталось устройств
       return "У вас больше нет устройств.";
-    }
     StringBuilder info = new StringBuilder("Устройство успешно удалено.\n");
     info.append("Список ваших устройств:\n");
-    return(deviceOutput(userDevices, info).toString());
+    return(deviceOutput(info).toString());
   }
   //  Нужен вывод списка устройств пользователя через БД
-  public StringBuilder deviceOutput(Map<String, Device> userDevices, StringBuilder info) {
-    for (Map.Entry<String, Device> entry : userDevices.entrySet()) {
-      info.append(entry.getValue().getId()).append("\n");
-    }
+  public StringBuilder deviceOutput(StringBuilder info) {
+    info.append();
     return info;
   }
   //  Нужна проверка существования логина и пароля пользователя в БД

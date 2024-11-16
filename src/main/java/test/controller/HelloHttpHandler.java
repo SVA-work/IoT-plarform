@@ -1,7 +1,7 @@
 package test.controller;
 
 import test.DTO.Message;
-import test.entity.Device;
+import test.entity.*;
 import test.library.AbstractHttpMappingHandler;
 import test.library.annotation.*;
 import test.library.json.JsonParser;
@@ -16,6 +16,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class HelloHttpHandler extends AbstractHttpMappingHandler {
   private static Message currentMessage;
+  private static User currentUser = new User();
   private static UserInfoService user = new UserInfoService();
 
   public HelloHttpHandler(JsonParser parser) {
@@ -31,7 +32,7 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   @Get("/test/get/listOfDevices")
   public DefaultFullHttpResponse deviceInformation() {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.ListOfDevices(currentMessage.getUserDevices()), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.ListOfDevices(), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post")
@@ -50,7 +51,7 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   @Post("/test/post/entry")
   public DefaultFullHttpResponse entery(@RequestBody Message message) {
     if (user.userVerification(message, currentMessage)) {
-      currentMessage.setVerified(true);
+      currentUser.setVerified(true);
       return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
           Unpooled.copiedBuffer(user.successfulEntry(), StandardCharsets.UTF_8));
     } else {
@@ -60,10 +61,10 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   }
 
   @Post("/test/post/addDevice")
-  public DefaultFullHttpResponse addDevices(@RequestBody Device newDevice) {
-    if (currentMessage.getVerified()) {
+  public DefaultFullHttpResponse addDevices(@RequestBody Message message) {
+    if (user.verified(currentUser)) {
       return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-          Unpooled.copiedBuffer(user.addDevice(currentMessage.getUserDevices(), newDevice), StandardCharsets.UTF_8));
+          Unpooled.copiedBuffer(user.addDevice(message.getDeviceId()), StandardCharsets.UTF_8));
     } else {
       return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
           Unpooled.copiedBuffer(user.actionsWithoutLogin(), StandardCharsets.UTF_8));
@@ -71,8 +72,8 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   }
 
   @Post("/test/post/deleteDevice")
-  public DefaultFullHttpResponse deleteDevices(@RequestBody Device deleteDevice) {
+  public DefaultFullHttpResponse deleteDevices(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.deleteDevice(currentMessage.getUserDevices(), deleteDevice), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.deleteDevice(message.getDeviceId()), StandardCharsets.UTF_8));
   }
 }

@@ -1,15 +1,9 @@
 package test.DTO;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import test.entity.Device;
-
 public class Message {
-  private boolean verified = false;
+  private String deviceId;
   private String login;
   private String password;
-  private Map<String, Device> userDevices = new HashMap<>();
 
   public Message() {
   }
@@ -30,19 +24,11 @@ public class Message {
     this.password = password;
   }
 
-  public void setVerified(boolean verified) {
-    this.verified = verified;
+  public void setDeviceId(String deviceId) {
+    this.deviceId = deviceId;
   }
 
-  public Boolean getVerified() {
-    return verified;
-  }
-
-  public void setUserDevices(Map<String, Device> userDevices) {
-    this.userDevices = userDevices;
-  }
-
-  public Map<String, Device> getUserDevices() {
-    return userDevices;
+  public String getDeviceId() {
+    return deviceId;
   }
 }
