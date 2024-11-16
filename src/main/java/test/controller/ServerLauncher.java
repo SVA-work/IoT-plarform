@@ -1,5 +1,7 @@
 package test.controller;
 
+import test.config.*;
+
 import test.library.json.JsonParserDefault;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -15,7 +17,6 @@ import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 
-// вынести в config все константы
 public class ServerLauncher {
 
   public static void main(String[] args) throws Exception {
@@ -31,15 +32,14 @@ public class ServerLauncher {
                   channel.pipeline()
                           .addLast("HttpServerCodec", new HttpServerCodec())
                           .addLast("HttpServerKeepAlive", new HttpServerKeepAliveHandler())
-                          .addLast("HttpObjectAggregator", new HttpObjectAggregator(10 * 1024 * 102, true))
+                          .addLast("HttpObjectAggregator", new HttpObjectAggregator(ServerConfig.MAX_CONTENT_LENGHT, true))
                           .addLast("HttpChunkedWrite", new ChunkedWriteHandler())
                           .addLast("HelloHttpHandler", new HelloHttpHandler(new JsonParserDefault()));
                 }
               })
-              .option(ChannelOption.SO_BACKLOG, 128)
+              .option(ChannelOption.SO_BACKLOG, ServerConfig.MAX_BACK_LOG_SIZE)
               .childOption(ChannelOption.SO_KEEPALIVE, true);
-      // Порт 8090, не 8080 :)
-      ChannelFuture future = boot.bind(8090).sync();
+      ChannelFuture future = boot.bind(ServerConfig.PORT).sync();
 
       future.channel().closeFuture().sync();
     } finally {

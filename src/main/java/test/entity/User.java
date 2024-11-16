@@ -9,6 +9,16 @@ public class User implements Serializable {
   private String password;
   private List<Device> devices;
   private String telegramToken;
+  private boolean verified = false;
+
+
+  public void setVerified(boolean verified) {
+    this.verified = verified;
+  }
+
+  public Boolean getVerified() {
+    return verified;
+  }
 
   public int getId() {
     return id;
