@@ -32,17 +32,16 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   @Get("/test/get/listOfDevices")
   public DefaultFullHttpResponse deviceInformation() {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.ListOfDevices(), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.listOfDevices(), StandardCharsets.UTF_8));
   }
 
-  @Post("/test/post")
-  public DefaultFullHttpResponse save(@RequestBody Message message) {
+  @Post("/test/post/registration")
+  public DefaultFullHttpResponse registration(@RequestBody Message message) {
     if (currentMessage != null) {
       return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
           Unpooled.copiedBuffer("Вы уже зарегистрировались.", StandardCharsets.UTF_8));
     } else {
       currentMessage = message;
-      System.out.println(user.successfulRegistration(currentMessage));
       return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
           Unpooled.copiedBuffer(user.successfulRegistration(currentMessage), StandardCharsets.UTF_8));
     }
@@ -64,7 +63,7 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   public DefaultFullHttpResponse addDevices(@RequestBody Message message) {
     if (user.verified(currentUser)) {
       return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-          Unpooled.copiedBuffer(user.addDevice(message.getDeviceId()), StandardCharsets.UTF_8));
+          Unpooled.copiedBuffer(user.addDevice(message), StandardCharsets.UTF_8));
     } else {
       return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
           Unpooled.copiedBuffer(user.actionsWithoutLogin(), StandardCharsets.UTF_8));
@@ -74,6 +73,6 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   @Post("/test/post/deleteDevice")
   public DefaultFullHttpResponse deleteDevices(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.deleteDevice(message.getDeviceId()), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.deleteDevice(message), StandardCharsets.UTF_8));
   }
 }
