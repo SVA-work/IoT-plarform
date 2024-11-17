@@ -1,7 +1,6 @@
 package test.controller;
 
 import test.DTO.Message;
-import test.entity.*;
 import test.library.AbstractHttpMappingHandler;
 import test.library.annotation.*;
 import test.library.json.JsonParser;
@@ -15,59 +14,34 @@ import java.nio.charset.StandardCharsets;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class HelloHttpHandler extends AbstractHttpMappingHandler {
-  private static Message currentMessage;
-  private static User currentUser = new User();
   private static UserInfoService user = new UserInfoService();
 
   public HelloHttpHandler(JsonParser parser) {
     super(parser);
   }
 
-  @Get("/test/get/userData")
-  public DefaultFullHttpResponse userData() {
-    return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.userData(currentMessage), StandardCharsets.UTF_8));
-  }
-
   @Get("/test/get/listOfDevices")
-  public DefaultFullHttpResponse deviceInformation() {
+  public DefaultFullHttpResponse deviceInformation(@QueryParam("login") String login) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.listOfDevices(), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.listOfDevices(login), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/registration")
   public DefaultFullHttpResponse registration(@RequestBody Message message) {
-    if (currentMessage != null) {
-      return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-          Unpooled.copiedBuffer("Вы уже зарегистрировались.", StandardCharsets.UTF_8));
-    } else {
-      currentMessage = message;
-      return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-          Unpooled.copiedBuffer(user.successfulRegistration(currentMessage), StandardCharsets.UTF_8));
-    }
+    return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+        Unpooled.copiedBuffer(user.successfulRegistration(message), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/entry")
   public DefaultFullHttpResponse entery(@RequestBody Message message) {
-    if (user.userVerification(message, currentMessage)) {
-      currentUser.setVerified(true);
-      return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-          Unpooled.copiedBuffer(user.successfulEntry(), StandardCharsets.UTF_8));
-    } else {
-      return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-          Unpooled.copiedBuffer(user.failedEntry(), StandardCharsets.UTF_8));
-    }
+    return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+        Unpooled.copiedBuffer(user.userVerification(message), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/addDevice")
   public DefaultFullHttpResponse addDevices(@RequestBody Message message) {
-    if (user.verified(currentUser)) {
-      return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-          Unpooled.copiedBuffer(user.addDevice(message), StandardCharsets.UTF_8));
-    } else {
-      return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-          Unpooled.copiedBuffer(user.actionsWithoutLogin(), StandardCharsets.UTF_8));
-    }
+    return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+        Unpooled.copiedBuffer(user.addDevice(message), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/deleteDevice")
