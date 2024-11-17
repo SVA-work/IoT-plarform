@@ -11,7 +11,6 @@ public class UserInfoService {
   }
 
   public String userData(Message message) {
-    System.out.println(1);
     if (message == null) return actionsWithoutLogin();
     return "{login: " + message.getLogin() + ", password: " + message.getPassword() + "}";
   }

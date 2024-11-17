@@ -20,6 +20,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 public class ServerLauncher {
 
   public static void main(String[] args) throws Exception {
+    System.out.println(1);
     NioEventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
     try {
