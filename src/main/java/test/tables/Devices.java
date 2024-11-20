@@ -1,0 +1,95 @@
+package test.tabels.;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Devices extends BaseTable implements TableOperations {
+    public Devices() throws SQLException {
+        super("devices");
+    }
+
+    @Override
+    public void CreateTable() throws SQLException {
+        super.ExecuteSqlStatement("CREATE TABLE IF NOT EXISTS devices(" +
+                "device_id INTEGER PRIMARY KEY," +
+                "user_id INTEGER NOT NULL," +
+                "token VARCHAR(255) NOT NULL)", "Создана таблица " + tableName);
+    }
+
+    @Override
+    public void CreateForeignKeys() throws SQLException {
+        super.ExecuteSqlStatement(" ALTER TABLE devices ADD FOREIGN KEY (user_id) REFERENCES users(user_id)",
+                "Cоздан внешний ключ devices.user_id -> users_id");
+    }
+
+    @Override
+    public void GetAll() throws SQLException {
+        String selectAllUsers = "SELECT * FROM " + tableName;
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = statement.executeQuery(selectAllUsers);
+
+        resultSet.first();
+        for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
+            System.out.print(resultSet.getMetaData().getColumnName(i) + "\t\t\t");
+        }
+        System.out.println();
+
+        resultSet.beforeFirst();
+        while (resultSet.next()) {
+            for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
+                System.out.print(resultSet.getString(i) + "\t\t\t");
+            }
+            System.out.println();
+        }
+    }
+
+    @Override
+    public void GetByIdUser(int id) throws SQLException {
+    }
+
+    @Override
+    public void Update(int id, String row, String column, String information) throws SQLException {
+        String updateUser = "UPDATE " + tableName + " SET " + column + " = " + information + " WHERE " + row + " = " + id;
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(updateUser);
+    }
+
+    @Override
+    public void Delete(int id, String row) throws SQLException {
+        String deleteUser = "DELETE FROM " + tableName + " WHERE " + row + " = " + id;
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(deleteUser);
+    }
+
+    @Override
+    public void CreateUser() throws SQLException {
+    }
+
+    @Override
+    public void GetByIdDevices(int id) throws SQLException {
+        String sql = "SELECT * FROM devices WHERE user_id = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, id);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()) {
+            String userId = resultSet.getString("user_id");
+            String token = resultSet.getString("token");
+            System.out.println(id + " " + userId + " " + token);
+        }
+    }
+
+    @Override
+    public void CreateDevices() throws SQLException {
+        String insertDevice = "INSERT INTO devices (device_id, user_id, token) VALUES (?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(insertDevice);
+
+        preparedStatement.setInt(1, 1);
+        preparedStatement.setInt(2, 1);
+        preparedStatement.setString(3, "token_token");
+
+        preparedStatement.executeUpdate();
+    }
+}
