@@ -64,3 +64,26 @@ public class Database {
     //users.CreateUser();
 
   }
+
+  public void GetAllAndGetByIdAndUpdateAndDeleteDevices() throws SQLException {
+    //devices.GetAll();
+    //devices.GetByIdDevices(id);
+    //devices.Update(id, row, colum, information);
+    // devices.Delete(id);
+    // devices.CreateDevices();
+  }
+
+  public static void main(String[] args) {
+    try {
+      Database database = new Database();
+      database.CreateTablesAndForeignKeys();
+      database.GetAllAndGetByIdAndUpdateAndDeleteUsers();
+      database.GetAllAndGetByIdAndUpdateAndDeleteDevices();
+    } catch (SQLException e) {
+      e.printStackTrace();
+      System.out.println("Ошибка SQL !");
+    } catch (ClassNotFoundException e) {
+      System.out.println("JDBC драйвер для СУБД не найден!");
+    }
+  }
+}
