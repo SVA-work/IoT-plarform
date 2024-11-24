@@ -1,5 +1,12 @@
 package test.controller;
 
+import test.tables.Devices;
+import test.tables.Users;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 public class Database {
 
   public static final String driver = "org.postgresql.Driver";
