@@ -1,4 +1,6 @@
-package test.tabels;
+package test.tables;
+
+import test.DAO.TableOperations;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
