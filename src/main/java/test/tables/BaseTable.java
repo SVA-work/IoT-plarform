@@ -1,6 +1,6 @@
 package test.tables;
 
-import test.Database;
+import test.controller.Database;
 
 import java.io.Closeable;
 import java.sql.Connection;
