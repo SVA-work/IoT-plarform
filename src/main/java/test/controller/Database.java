@@ -1,4 +1,59 @@
 package test.controller;
 
 public class Database {
-}
+
+  public static final String driver = "org.postgresql.Driver";
+  public static final String url = "jdbc:postgresql://localhost:5433/test03";
+  public static final String user = "postgres";
+  public static final String password = "NzPFzab5";
+
+  Users users;
+  Devices devices;
+
+  public static Connection GetConnection() throws SQLException {
+    Connection connection = null;
+    try {
+      connection = DriverManager.getConnection(url, user, password);
+    } catch (SQLException e) {
+      System.out.println("Соединение не удалось");
+      e.printStackTrace();
+    }
+
+    if (connection != null) {
+      System.out.println("Вы успешно подключились к базе данных");
+    } else {
+      System.out.println("Не удалось подключиться к базе данных");
+    }
+
+    return connection;
+  }
+
+  public Database() throws SQLException, ClassNotFoundException {
+    try {
+      Class.forName(driver);
+    } catch (ClassNotFoundException e) {
+      System.out.println("PostgreSQL JDBC Driver не найден. Включите его в путь к вашей библиотеке");
+      e.printStackTrace();
+      return;
+    }
+    System.out.println("Драйвер PostgreSQL JDBC успешно подключен");
+
+    users = new Users();
+    devices = new Devices();
+  }
+
+  public void CreateTablesAndForeignKeys() throws SQLException {
+    //users.CreateTable();
+    //devices.CreateTable();
+    //devices.CreateForeignKeys();
+  }
+
+  public void GetAllAndGetByIdAndUpdateAndDeleteUsers() throws SQLException {
+    //users.GetAll();
+    //users.GetByIdUser(id);
+    //users.Update(id, row, colum, information);
+    //users.GetAll();
+    //users.Delete(id);
+    //users.CreateUser();
+
+  }
