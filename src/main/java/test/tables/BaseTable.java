@@ -1,4 +1,4 @@
-package test.tabels.;
+package test.tables;
 
 import test.Database;
 
