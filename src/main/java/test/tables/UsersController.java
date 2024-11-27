@@ -128,6 +128,7 @@ public class UsersController extends BaseTable{
     } catch (SQLException e) {
       System.out.println("Failed to execute SQL query %s " + e.getMessage());
     }
+    return response;
   }
 
   @Override
