@@ -23,11 +23,17 @@ public class DevicesController extends BaseTable {
     super.ExecuteSqlStatement(" ALTER TABLE devices ADD FOREIGN KEY (user_id) REFERENCES users(user_id)");
   }
 
-    @Override
-    public Message[] GetAll() throws SQLException {
-        String selectAllUsers = "SELECT * FROM " + tableName;
-        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        ResultSet resultSet = statement.executeQuery(selectAllUsers);
+  public Message[] getAll(Message message) {
+    String selectAllUsers = "SELECT * FROM " + tableName;
+    Statement statement = null;
+    try {
+      statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+      ResultSet resultSet = statement.executeQuery(selectAllUsers);
+    } catch (SQLException e) {
+      System.out.println("Failed to execute SQL query %s" + e.getMessage());
+    }
+    return null;
+  }
 
         resultSet.first();
         for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
