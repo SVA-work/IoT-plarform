@@ -88,20 +88,7 @@ public class DevicesController extends BaseTable {
       System.out.println("Failed to execute SQL query %s" + e.getMessage());
       return null;
     }
-
-    @Override
-    public Message GetByIdDevices(int id) throws SQLException {
-        String sql = "SELECT * FROM devices WHERE user_id = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, id);
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        while (resultSet.next()) {
-            String userId = resultSet.getString("user_id");
-            String token = resultSet.getString("token");
-            System.out.println(id + " " + userId + " " + token);
-        }
-    }
+  }
 
     @Override
     public boolean CreateDevices() throws SQLException {
