@@ -38,9 +38,13 @@ public class BaseTable implements Closeable {
         ExecuteSqlStatement(sql, null);
     }
 
-    void ReopenConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            connection = Database.GetConnection();
-        }
+  void ReopenConnection() {
+    try {
+      if (connection == null || connection.isClosed()) {
+        connection = Database.GetConnection();
+      }
+    } catch (SQLException e) {
+      System.out.println("Unable to reconnect to the database because the current connection is either unavailable or closed.");
     }
+  }
 }
