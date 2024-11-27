@@ -67,8 +67,7 @@ public class UsersController extends BaseTable{
     }
   }
 
-  @Override
-  public Message GetByIdUser(int id) throws SQLException {
+  public Message getById(Message message, int id) {
     String sql = "SELECT * FROM users WHERE user_id = ?";
     PreparedStatement preparedStatement = connection.prepareStatement(sql);
     preparedStatement.setInt(1, id);
