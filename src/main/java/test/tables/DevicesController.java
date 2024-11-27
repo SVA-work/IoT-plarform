@@ -83,8 +83,10 @@ public class DevicesController extends BaseTable {
       statement = connection.createStatement();
       statement.executeUpdate(deleteUser);
 
-    @Override
-    public boolean CreateUser() throws SQLException {
+      return message;
+    } catch (SQLException e) {
+      System.out.println("Failed to execute SQL query %s" + e.getMessage());
+      return null;
     }
 
     @Override
