@@ -25,14 +25,19 @@ public class BaseTable implements Closeable {
         }
     }
 
-    void ExecuteSqlStatement(String sql, String description) throws SQLException {
-        ReopenConnection();
-        Statement statement = connection.createStatement();
-        statement.execute(sql);
-        statement.close();
-        if (description != null)
-            System.out.println(description);
+  void ExecuteSqlStatement(String sql, String description) {
+    ReopenConnection();
+    Statement statement = null;
+    try {
+      statement = connection.createStatement();
+      statement.execute(sql);
+      statement.close();
+      if (description != null)
+        System.out.println(description);
+    } catch (SQLException e) {
+      System.out.println(String.format("Failed to execute SQL query %s", e.getMessage()));
     }
+  }
 
   void ExecuteSqlStatement(String sql) {
     ExecuteSqlStatement(sql, null);
