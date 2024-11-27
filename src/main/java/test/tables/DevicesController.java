@@ -56,8 +56,17 @@ public class DevicesController extends BaseTable {
     }
   }
 
-    @Override
-    public Message GetByIdUser(int id) throws SQLException {
+  public Message update(Message message, String column, String newInformation) {
+    String updateUser = "UPDATE devices SET " + column + " = " + newInformation + " WHERE device_id = " + message.getDeviceId();
+    Statement statement = null;
+    try {
+      statement = connection.createStatement();
+      statement.executeUpdate(updateUser);
+
+      return message;
+    } catch (SQLException e) {
+      System.out.println("Failed to execute SQL query %s" + e.getMessage());
+      return null;
     }
 
     @Override
