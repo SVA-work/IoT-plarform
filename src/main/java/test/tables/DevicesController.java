@@ -90,14 +90,14 @@ public class DevicesController extends BaseTable {
     }
   }
 
-    @Override
-    public boolean CreateDevices() throws SQLException {
-        String insertDevice = "INSERT INTO devices (device_id, user_id, token) VALUES (?, ?, ?)";
-        PreparedStatement preparedStatement = connection.prepareStatement(insertDevice);
-
-        preparedStatement.setInt(1, 1);
-        preparedStatement.setInt(2, 1);
-        preparedStatement.setString(3, "token_token");
+  public Message create(Message message) {
+    String insertDevice = "INSERT INTO devices (device_id, user_id, token) VALUES (?, ?, ?)";
+    PreparedStatement preparedStatement = null;
+    try {
+      preparedStatement = connection.prepareStatement(insertDevice);
+      preparedStatement.setInt(1, 1);
+      preparedStatement.setInt(2, 1);
+      preparedStatement.setString(3, "token_token");
 
         preparedStatement.executeUpdate();
     }
