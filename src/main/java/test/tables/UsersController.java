@@ -12,14 +12,14 @@ public class UsersController extends BaseTable{
     super("users");
   }
 
-  @Override
-  public void CreateTable() throws SQLException {
-    super.ExecuteSqlStatement("CREATE TABLE IF NOT EXISTS users(" +
-            "user_id INTEGER PRIMARY KEY," +
-            "login VARCHAR(255) NOT NULL," +
-            "password VARCHAR(255) NOT NULL," +
-            "device VARCHAR(255), " +
-            "telegram_token VARCHAR(255) NOT NULL)", "Создана таблица " + tableName);
+  public void createTable() {
+      super.ExecuteSqlStatement("CREATE TABLE IF NOT EXISTS users(" +
+              "user_id INTEGER PRIMARY KEY," +
+              "login VARCHAR(255) NOT NULL," +
+              "password VARCHAR(255) NOT NULL," +
+              "device VARCHAR(255), " +
+              "telegram_token VARCHAR(255) NOT NULL)", "Создана таблица " + tableName);
+
   }
 
   @Override
