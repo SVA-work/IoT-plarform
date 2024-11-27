@@ -43,14 +43,18 @@ public class DevicesController extends BaseTable {
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
 
-        resultSet.beforeFirst();
-        while (resultSet.next()) {
-            for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                System.out.print(resultSet.getString(i) + "\t\t\t");
-            }
-            System.out.println();
-        }
+      Message response = new Message();
+      while (resultSet.next()) {
+        response.setUserId(resultSet.getString("user_id"));
+        response.setTelegramToken(resultSet.getString("token"));
+      }
+
+      return response;
+    } catch (SQLException e) {
+      System.out.println("Failed to execute SQL query %s" + e.getMessage());
+      return  null;
     }
+  }
 
     @Override
     public Message GetByIdUser(int id) throws SQLException {
