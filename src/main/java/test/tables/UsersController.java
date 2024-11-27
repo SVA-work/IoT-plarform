@@ -69,9 +69,13 @@ public class UsersController extends BaseTable{
 
   public Message getById(Message message, int id) {
     String sql = "SELECT * FROM users WHERE user_id = ?";
-    PreparedStatement preparedStatement = connection.prepareStatement(sql);
-    preparedStatement.setInt(1, id);
-    ResultSet resultSet = preparedStatement.executeQuery();
+    PreparedStatement preparedStatement = null;
+    Message response = new Message();
+
+    try {
+      preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, id);
+      ResultSet resultSet = preparedStatement.executeQuery();
 
     Message response = new Message();
     while (resultSet.next()) {
