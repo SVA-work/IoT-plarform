@@ -19,11 +19,9 @@ public class DevicesController extends BaseTable {
             "token VARCHAR(255) NOT NULL)");
   }
 
-    @Override
-    public void CreateForeignKeys() throws SQLException {
-        super.ExecuteSqlStatement(" ALTER TABLE devices ADD FOREIGN KEY (user_id) REFERENCES users(user_id)",
-                "Cоздан внешний ключ devices.user_id -> users_id");
-    }
+  public void createForeignKeys() {
+    super.ExecuteSqlStatement(" ALTER TABLE devices ADD FOREIGN KEY (user_id) REFERENCES users(user_id)");
+  }
 
     @Override
     public Message[] GetAll() throws SQLException {
