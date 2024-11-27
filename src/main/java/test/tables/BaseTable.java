@@ -34,9 +34,9 @@ public class BaseTable implements Closeable {
             System.out.println(description);
     }
 
-    void ExecuteSqlStatement(String sql) throws SQLException {
-        ExecuteSqlStatement(sql, null);
-    }
+  void ExecuteSqlStatement(String sql) {
+    ExecuteSqlStatement(sql, null);
+  }
 
   void ReopenConnection() {
     try {
