@@ -111,8 +111,10 @@ public class UsersController extends BaseTable{
     }
   }
 
-  @Override
-  public boolean CreateUser() {
+
+  public Message create(Message message) {
+    Message response = new Message();
+
     try {
       String insertUser = "INSERT INTO users (user_id, login, password, device, telegram_token) VALUES (?, ?, ?, ?, ?)";
       PreparedStatement preparedStatement = connection.prepareStatement(insertUser);
