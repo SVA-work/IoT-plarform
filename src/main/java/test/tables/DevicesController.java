@@ -7,10 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DevicesController extends BaseTable implements TableOperations {
-    public DevicesController() throws SQLException {
-        super("devices");
-    }
+public class DevicesController extends BaseTable {
+  public DevicesController() {
+    super("devices");
+  }
 
     @Override
     public void CreateTable() throws SQLException {
