@@ -35,9 +35,26 @@ public class UsersController extends BaseTable{
       Statement statement = null;
 
 
-    resultSet.first();
-    for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-      System.out.print(resultSet.getMetaData().getColumnName(i) + "\t\t\t");
+      statement = connection.createStatement();
+      String query = "SELECT COUNT(*) FROM " + tableName;
+      ResultSet resultSet = statement.executeQuery(query);
+
+      int rowCount = 0;
+      if (resultSet.next()) {
+        rowCount = resultSet.getInt(1);
+      }
+
+      System.out.println(rowCount);
+      Message[] result = new Message[rowCount];
+
+      System.out.println(message.getUserId());
+      System.out.println(message.getLogin());
+      System.out.println(message.getPassword());
+
+      return result;
+    } catch (SQLException e) {
+      System.out.println("Failed to execute SQL query %s" + e.getMessage());
+      return null;
     }
     System.out.println();
 
