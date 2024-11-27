@@ -12,7 +12,7 @@ public class Database {
   public static final String driver = "org.postgresql.Driver";
   public static final String url = "jdbc:postgresql://localhost:5433/test";
   public static final String user = "postgres";
-  public static final String password = "NzPFzab5";
+  public static final String password = "scoups";
 
   UsersController users;
   DevicesController devices;
