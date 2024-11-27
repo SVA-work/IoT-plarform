@@ -1,7 +1,7 @@
 package test.controller;
 
-import test.tables.Devices;
-import test.tables.Users;
+import test.tables.DevicesController;
+import test.tables.UsersController;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,8 +14,8 @@ public class Database {
   public static final String user = "postgres";
   public static final String password = "NzPFzab5";
 
-  Users users;
-  Devices devices;
+  UsersController users;
+  DevicesController devices;
 
   public static Connection GetConnection() throws SQLException {
     Connection connection = null;
@@ -45,8 +45,8 @@ public class Database {
     }
     System.out.println("Драйвер PostgreSQL JDBC успешно подключен");
 
-    users = new Users();
-    devices = new Devices();
+    users = new UsersController();
+    devices = new DevicesController();
   }
 
   public void CreateTablesAndForeignKeys() throws SQLException {

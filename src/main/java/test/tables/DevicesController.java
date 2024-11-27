@@ -1,14 +1,14 @@
 package test.tables;
 
-import test.DAO.TableOperations;
+import test.DTO.Message;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Devices extends BaseTable implements TableOperations {
-    public Devices() throws SQLException {
+public class DevicesController extends BaseTable implements TableOperations {
+    public DevicesController() throws SQLException {
         super("devices");
     }
 
@@ -27,7 +27,7 @@ public class Devices extends BaseTable implements TableOperations {
     }
 
     @Override
-    public void GetAll() throws SQLException {
+    public Message[] GetAll() throws SQLException {
         String selectAllUsers = "SELECT * FROM " + tableName;
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
         ResultSet resultSet = statement.executeQuery(selectAllUsers);
@@ -48,29 +48,29 @@ public class Devices extends BaseTable implements TableOperations {
     }
 
     @Override
-    public void GetByIdUser(int id) throws SQLException {
+    public Message GetByIdUser(int id) throws SQLException {
     }
 
     @Override
-    public void Update(int id, String row, String column, String information) throws SQLException {
+    public boolean Update(int id, String row, String column, String information) throws SQLException {
         String updateUser = "UPDATE " + tableName + " SET " + column + " = " + information + " WHERE " + row + " = " + id;
         Statement statement = connection.createStatement();
         statement.executeUpdate(updateUser);
     }
 
     @Override
-    public void Delete(int id, String row) throws SQLException {
+    public boolean Delete(int id, String row) throws SQLException {
         String deleteUser = "DELETE FROM " + tableName + " WHERE " + row + " = " + id;
         Statement statement = connection.createStatement();
         statement.executeUpdate(deleteUser);
     }
 
     @Override
-    public void CreateUser() throws SQLException {
+    public boolean CreateUser() throws SQLException {
     }
 
     @Override
-    public void GetByIdDevices(int id) throws SQLException {
+    public Message GetByIdDevices(int id) throws SQLException {
         String sql = "SELECT * FROM devices WHERE user_id = ?";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1, id);
@@ -84,7 +84,7 @@ public class Devices extends BaseTable implements TableOperations {
     }
 
     @Override
-    public void CreateDevices() throws SQLException {
+    public boolean CreateDevices() throws SQLException {
         String insertDevice = "INSERT INTO devices (device_id, user_id, token) VALUES (?, ?, ?)";
         PreparedStatement preparedStatement = connection.prepareStatement(insertDevice);
 
