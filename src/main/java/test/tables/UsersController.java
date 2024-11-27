@@ -22,8 +22,9 @@ public class UsersController extends BaseTable{
 
   }
 
-  @Override
-  public void CreateForeignKeys() throws SQLException {
+  public void getAll() {
+    Message response = new Message();
+    getAll(response);
   }
 
   // что это выводит
