@@ -117,11 +117,11 @@ public class UsersController extends BaseTable{
       String insertUser = "INSERT INTO users (user_id, login, password, device, telegram_token) VALUES (?, ?, ?, ?, ?)";
       PreparedStatement preparedStatement = connection.prepareStatement(insertUser);
 
-      preparedStatement.setInt(1, 1);
-      preparedStatement.setString(2, "login_user");
-      preparedStatement.setString(3, "password_user");
-      preparedStatement.setString(4, "devices_user");
-      preparedStatement.setString(5, "telegram_token_");
+      preparedStatement.setInt(1, 4);
+      preparedStatement.setString(2, "login_u");
+      preparedStatement.setString(3, "password_r");
+      preparedStatement.setString(4, "devices_u");
+      preparedStatement.setString(5, "telegram_to");
 
       preparedStatement.executeUpdate();
 
