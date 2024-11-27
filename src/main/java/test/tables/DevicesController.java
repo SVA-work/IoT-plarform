@@ -12,13 +12,12 @@ public class DevicesController extends BaseTable {
     super("devices");
   }
 
-    @Override
-    public void CreateTable() throws SQLException {
-        super.ExecuteSqlStatement("CREATE TABLE IF NOT EXISTS devices(" +
-                "device_id INTEGER PRIMARY KEY," +
-                "user_id INTEGER NOT NULL," +
-                "token VARCHAR(255) NOT NULL)", "Создана таблица " + tableName);
-    }
+  public void createTable() {
+    super.ExecuteSqlStatement("CREATE TABLE IF NOT EXISTS devices(" +
+            "device_id INTEGER PRIMARY KEY," +
+            "user_id INTEGER NOT NULL," +
+            "token VARCHAR(255) NOT NULL)");
+  }
 
     @Override
     public void CreateForeignKeys() throws SQLException {
