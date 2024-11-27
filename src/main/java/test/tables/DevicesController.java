@@ -68,13 +68,7 @@ public class DevicesController extends BaseTable {
       System.out.println("Failed to execute SQL query %s" + e.getMessage());
       return null;
     }
-
-    @Override
-    public boolean Update(int id, String row, String column, String information) throws SQLException {
-        String updateUser = "UPDATE " + tableName + " SET " + column + " = " + information + " WHERE " + row + " = " + id;
-        Statement statement = connection.createStatement();
-        statement.executeUpdate(updateUser);
-    }
+  }
 
   public Message delete(Message message, int id) {
     String deleteUser = "DELETE FROM users WHERE device_id = " + id;
