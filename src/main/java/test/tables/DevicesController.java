@@ -35,11 +35,13 @@ public class DevicesController extends BaseTable {
     return null;
   }
 
-        resultSet.first();
-        for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-            System.out.print(resultSet.getMetaData().getColumnName(i) + "\t\t\t");
-        }
-        System.out.println();
+  public Message getById(Message message, int id) {
+    String sql = "SELECT * FROM devices WHERE user_id = ?";
+    PreparedStatement preparedStatement = null;
+    try {
+      preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, id);
+      ResultSet resultSet = preparedStatement.executeQuery();
 
         resultSet.beforeFirst();
         while (resultSet.next()) {
