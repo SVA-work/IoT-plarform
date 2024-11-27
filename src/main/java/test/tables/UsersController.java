@@ -124,7 +124,12 @@ public class UsersController extends BaseTable{
       preparedStatement.setString(5, "telegram_token_");
 
       preparedStatement.executeUpdate();
-      return true;
+
+      message.setLogin(preparedStatement.getGeneratedKeys().getString("user_id"));
+      message.setLogin(preparedStatement.getGeneratedKeys().getString("login"));
+      message.setLogin(preparedStatement.getGeneratedKeys().getString("password"));
+      message.setLogin(preparedStatement.getGeneratedKeys().getString("device"));
+      message.setLogin(preparedStatement.getGeneratedKeys().getString("telegram_token"));
     } catch (SQLException e) {
       System.out.println("Failed to execute SQL query %s " + e.getMessage());
     }
