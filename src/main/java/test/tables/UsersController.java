@@ -26,11 +26,13 @@ public class UsersController extends BaseTable{
   public void CreateForeignKeys() throws SQLException {
   }
 
-  @Override // что это выводит
-  public Message[] GetAll() throws SQLException {
-    String selectAllUsers = "SELECT * FROM " + tableName;
-    Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-    ResultSet resultSet = statement.executeQuery(selectAllUsers);
+  // что это выводит
+  private Message[] getAll(Message message) {
+
+    try {
+      String selectAllUsers = "SELECT * FROM " + tableName;
+      Statement statement = null;
+
 
     resultSet.first();
     for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
