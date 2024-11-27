@@ -99,6 +99,16 @@ public class DevicesController extends BaseTable {
       preparedStatement.setInt(2, 1);
       preparedStatement.setString(3, "token_token");
 
-        preparedStatement.executeUpdate();
+      preparedStatement.executeUpdate();
+
+      message.setLogin(preparedStatement.getGeneratedKeys().getString("device_id"));
+      message.setLogin(preparedStatement.getGeneratedKeys().getString("user_id"));
+      message.setLogin(preparedStatement.getGeneratedKeys().getString("token"));
+
+      return message;
+    } catch (SQLException e) {
+      System.out.println("Failed to execute SQL query %s" + e.getMessage());
+      return null;
     }
+  }
 }
