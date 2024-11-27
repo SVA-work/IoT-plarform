@@ -126,7 +126,7 @@ public class UsersController extends BaseTable{
       preparedStatement.executeUpdate();
       return true;
     } catch (SQLException e) {
-      return false;
+      System.out.println("Failed to execute SQL query %s " + e.getMessage());
     }
   }
 
