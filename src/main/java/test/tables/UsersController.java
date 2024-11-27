@@ -7,8 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class UsersController extends BaseTable implements TableOperations {
-  public UsersController() throws SQLException {
+public class UsersController extends BaseTable{
+  public UsersController() {
     super("users");
   }
 
