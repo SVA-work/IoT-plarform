@@ -11,10 +11,10 @@ public class BaseTable implements Closeable {
     Connection connection;
     String tableName;
 
-    BaseTable(String tableName) throws SQLException {
-        this.tableName = tableName;
-        this.connection = Database.GetConnection();
-    }
+  BaseTable(String tableName) {
+    this.tableName = tableName;
+    this.connection = Database.GetConnection();
+  }
 
     public void close() {
         try {
