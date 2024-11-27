@@ -76,12 +76,12 @@ public class DevicesController extends BaseTable {
         statement.executeUpdate(updateUser);
     }
 
-    @Override
-    public boolean Delete(int id, String row) throws SQLException {
-        String deleteUser = "DELETE FROM " + tableName + " WHERE " + row + " = " + id;
-        Statement statement = connection.createStatement();
-        statement.executeUpdate(deleteUser);
-    }
+  public Message delete(Message message, int id) {
+    String deleteUser = "DELETE FROM users WHERE device_id = " + id;
+    Statement statement = null;
+    try {
+      statement = connection.createStatement();
+      statement.executeUpdate(deleteUser);
 
     @Override
     public boolean CreateUser() throws SQLException {
