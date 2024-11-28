@@ -28,7 +28,6 @@ public class Database {
       }
     } catch (SQLException e) {
       System.out.println("Соединение не удалось");
-      e.printStackTrace();
     }
 
     if (connection != null) {
