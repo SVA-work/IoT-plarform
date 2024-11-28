@@ -17,7 +17,7 @@ public class Database {
   UsersController users;
   DevicesController devices;
 
-  public static Connection GetConnection() {
+  public static Connection getConnection() {
     Connection connection = null;
     try {
       connection = DriverManager.getConnection(url, user, password);
