@@ -37,7 +37,6 @@ public class Database {
       Class.forName(driver);
     } catch (ClassNotFoundException e) {
       System.out.println("PostgreSQL JDBC Driver не найден. Включите его в путь к вашей библиотеке");
-      e.printStackTrace();
       return;
     }
     System.out.println("Драйвер PostgreSQL JDBC успешно подключен");
