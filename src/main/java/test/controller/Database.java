@@ -32,7 +32,7 @@ public class Database {
     return connection;
   }
 
-  public Database() throws SQLException, ClassNotFoundException {
+  public Database() throws ClassNotFoundException {
     try {
       Class.forName(driver);
     } catch (ClassNotFoundException e) {
