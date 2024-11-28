@@ -156,4 +156,15 @@ public class UsersController extends AbstractController<Message, Integer> {
         }
         return response;
     }
+
+    private static PreparedStatement getPreparedStatement(Message entity, String sql) throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+        preparedStatement.setString(2, entity.getLogin());
+        preparedStatement.setString(3, entity.getPassword());
+        preparedStatement.setString(4, entity.getDeviceId());
+        preparedStatement.setString(5, entity.getTelegramToken());
+        return preparedStatement;
+    }
 }
