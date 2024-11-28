@@ -1,5 +1,6 @@
 package test.controller;
 
+import test.DTO.Message;
 import test.tables.DevicesController;
 import test.tables.UsersController;
 
