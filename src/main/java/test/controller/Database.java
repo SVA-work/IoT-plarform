@@ -21,6 +21,11 @@ public class Database {
     Connection connection = null;
     try {
       connection = DriverManager.getConnection(url, user, password);
+      if (connection != null) {
+        System.out.println("Вы успешно подключились к базе данных");
+      } else {
+        System.out.println("Не удалось подключиться к базе данных");
+      }
     } catch (SQLException e) {
       System.out.println("Соединение не удалось");
       e.printStackTrace();
