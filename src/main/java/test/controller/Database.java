@@ -64,12 +64,7 @@ public class Database {
     message.setDeviceId("1");
     message.setTelegramToken("whyscoups");
     System.out.println(users.create(message).isSuccessful());
-
-
-
  */
-
-
   }
 
   public void GetAllAndGetByIdAndUpdateAndDeleteDevices() {
@@ -90,9 +85,6 @@ public class Database {
     message.setColumnTitle("user_id");
     System.out.println(devices.update(message).getToken());
     System.out.println(devices.getById(2).getUserId());
-
-  System.out.println(devices.delete(2).isSuccessful());
-
  */
   }
 
@@ -106,5 +98,4 @@ public class Database {
       System.out.println("JDBC драйвер для СУБД не найден!");
     }
   }
-
 }

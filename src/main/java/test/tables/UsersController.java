@@ -1,8 +1,13 @@
+package test.tables;
 
 import test.DTO.Message;
 import test.controller.Database;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +37,7 @@ public class UsersController extends AbstractController<Message, Integer> {
     }
 
     @Override
-    public Message createForeignKeys()  {
+    public Message createForeignKeys() {
         Message response = new Message();
         response.setSuccessful(false);
         return response;
@@ -87,7 +92,7 @@ public class UsersController extends AbstractController<Message, Integer> {
 
     @Override
     public Message update(Message entity) {
-        String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle()  + " = ? WHERE " + tableID + " = ?";
+        String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
         Message response = new Message();
         try {
             Connection connection = Database.getConnection();
@@ -138,10 +143,16 @@ public class UsersController extends AbstractController<Message, Integer> {
 
     @Override
     public Message create(Message entity) {
-        String sql = "INSERT INTO " + tableName +  " (user_id, login, password, device, telegram_token) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + tableName + " (user_id, login, password, device, telegram_token) VALUES (?, ?, ?, ?, ?)";
         Message response = new Message();
         try {
-            PreparedStatement preparedStatement = getPreparedStatement(entity, sql);
+            Connection connection = Database.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+            preparedStatement.setString(2, entity.getLogin());
+            preparedStatement.setString(3, entity.getPassword());
+            preparedStatement.setString(4, entity.getDeviceId());
+            preparedStatement.setString(5, entity.getTelegramToken());
             preparedStatement.executeUpdate();
             response.setSuccessful(true);
         } catch (SQLException e) {
@@ -149,16 +160,5 @@ public class UsersController extends AbstractController<Message, Integer> {
             response.setSuccessful(false);
         }
         return response;
-    }
-
-    private static PreparedStatement getPreparedStatement(Message entity, String sql) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-        preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-        preparedStatement.setString(2, entity.getLogin());
-        preparedStatement.setString(3, entity.getPassword());
-        preparedStatement.setString(4, entity.getDeviceId());
-        preparedStatement.setString(5, entity.getTelegramToken());
-        return preparedStatement;
     }
 }
