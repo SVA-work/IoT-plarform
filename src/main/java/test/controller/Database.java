@@ -29,13 +29,6 @@ public class Database {
     } catch (SQLException e) {
       System.out.println("Соединение не удалось");
     }
-
-    if (connection != null) {
-      System.out.println("Вы успешно подключились к базе данных");
-    } else {
-      System.out.println("Не удалось подключиться к базе данных");
-    }
-
     return connection;
   }
 
