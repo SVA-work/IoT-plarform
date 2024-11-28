@@ -141,13 +141,7 @@ public class UsersController extends AbstractController<Message, Integer> {
         String sql = "INSERT INTO " + tableName +  " (user_id, login, password, device, telegram_token) VALUES (?, ?, ?, ?, ?)";
         Message response = new Message();
         try {
-            Connection connection = Database.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-            preparedStatement.setString(2, entity.getLogin());
-            preparedStatement.setString(3, entity.getPassword());
-            preparedStatement.setString(4, entity.getDeviceId());
-            preparedStatement.setString(5, entity.getTelegramToken());
+            PreparedStatement preparedStatement = getPreparedStatement(entity, sql);
             preparedStatement.executeUpdate();
             response.setSuccessful(true);
         } catch (SQLException e) {
