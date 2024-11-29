@@ -4,27 +4,35 @@ import test.config.ServerConfig;
 
 import test.entity.User;
 import test.DTO.Message;
+import test.tables.DevicesController;
+import test.tables.UsersController;
+
+import java.util.List;
+import java.util.Objects;
 
 public class UserInfoService {
+
+  private final UsersController usersController = new UsersController();
+  private final DevicesController devicesController = new DevicesController();
 
   public UserInfoService() {
   }
 
   public String userData(Message message) {
-    System.out.println(1);
     if (message == null) return actionsWithoutLogin();
-    return "{login: " + message.getLogin() + ", password: " + message.getPassword() + "}";
+    if (userVerification(message)) {
+      return "{login: " + message.getLogin() + ", password: " + message.getPassword() + "}";
+    }
+    return "No user";
   }
 
   public String successfulRegistration(Message message) {
-    return "Вы успешно зарегистрировались.\n" +
-            "Ваш логин: " + message.getLogin() + "\n" +
-            "Ваш пароль: " + message.getPassword();
-  }
-
-  public String entry() {
-    return "Здравствуйте! Вы уже зарегистрированы.\n" +
-            "Пожалуйста, отправьте ваш логин и пароль в следующем запросе, чтобы войти в систему.";
+    if (userVerification(message)) {
+      return "Вы успешно зарегистрировались.\n" +
+              "Ваш логин: " + message.getLogin() + "\n" +
+              "Ваш пароль: " + message.getPassword();
+    }
+    return "Что-то пошло не так, попробуйте еще раз.";
   }
 
   public String successfulEntry() {
@@ -50,11 +58,21 @@ public class UserInfoService {
             ServerConfig.LINK_ENTRY;
   }
 
-  public String listOfDevices() {
-    //  Если у пользователя нет устройств в БД
+  // Позже выводить правила для всех устройств вместе с именем
+  public String listOfDevices(Message message) {
+    List<Message> allDevices = devicesController.getAll();
+    StringBuilder info = new StringBuilder();
+    boolean hasAnyDevice = false;
+    for (Message deviceMessage : allDevices) {
+      if (Objects.equals(deviceMessage.getUserId(), message.getUserId())) {
+        info.append(deviceMessage.getToken()).append('\n');
+        hasAnyDevice = true;
+      }
+    }
+    if (hasAnyDevice) {
+      return info.toString();
+    }
     return "У вас нет устройств.";
-//    StringBuilder info = new StringBuilder();
-//    return (deviceOutput(info).toString());
   }
 
   public Boolean verified(User currentUser) {
@@ -63,35 +81,43 @@ public class UserInfoService {
 
   //  Нужно добавить устройство в БД
   public String addDevice(Message message) {
-    //  добавление устройства
-    StringBuilder info = new StringBuilder("Устройство успешно добавлено.\n");
-    info.append("Список ваших устройств:\n");
-    return (deviceOutput(info).toString());
+    devicesController.create(message);
+    return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevices(message);
   }
 
   //  Нужно удалить устройство из БД
   public String deleteDevice(Message message) {
-    //  если устройств нет
-    return "У вас нет такого устройства.";
-    //  если после удаления не осталось устройств
-//    return "У вас больше нет устройств.";
-//    StringBuilder info = new StringBuilder("Устройство успешно удалено.\n");
-//    info.append("Список ваших устройств:\n");
-//    return (deviceOutput(info).toString());
-  }
-
-  //  Нужен вывод списка устройств пользователя через БД
-  public StringBuilder deviceOutput(StringBuilder info) {
-//    info.append();
-    return info;
+    List<Message> allDevices = devicesController.getAll();
+    boolean hasDeletedAnyDevice = false;
+    for (Message deviceMessage : allDevices) {
+      if (Objects.equals(deviceMessage.getUserId(), message.getUserId()) &&
+              Objects.equals(deviceMessage.getDeviceId(), message.getDeviceId())) {
+        devicesController.delete(message);
+        hasDeletedAnyDevice = true;
+        break;
+      }
+    }
+    if (!hasDeletedAnyDevice) {
+      return "У вас нет такого устройства.";
+    }
+    String infoAboutDevices = listOfDevices(message);
+    if (Objects.equals(infoAboutDevices, "")) {
+      return "У вас больше нет устройств.";
+    }
+    StringBuilder info = new StringBuilder("Устройство успешно добавлено.\n");
+    info.append("Список ваших устройств:\n");
+    info.append(infoAboutDevices);
+    return (info.toString());
   }
 
   //  Нужна проверка существования логина и пароля пользователя в БД
-  public Boolean userVerification(Message message, Message currentMessage) {
-    if (message.getLogin().equals(currentMessage.getLogin()) && message.getPassword().equals(currentMessage.getPassword())) {
-      return true;
-    } else {
-      return false;
+  public Boolean userVerification(Message message) {
+    for (Message currentMessage : usersController.getAll()) {
+      if (message.getLogin().equals(currentMessage.getLogin()) &&
+              message.getPassword().equals(currentMessage.getPassword())) {
+        return true;
+      }
     }
+    return false;
   }
 }
