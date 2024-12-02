@@ -68,7 +68,7 @@ public class UserInfoService {
     StringBuilder info = new StringBuilder();
     boolean hasAnyDevice = false;
     for (Message deviceMessage : allDevices) {
-      if (Objects.equals(deviceMessage.getUserId(), message.getUserId())) {
+      if (Objects.equals(usersController.getById(deviceMessage).getLogin(), message.getLogin())) {
         info.append(deviceMessage.getToken()).append('\n');
         hasAnyDevice = true;
       }

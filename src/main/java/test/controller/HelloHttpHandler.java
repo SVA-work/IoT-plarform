@@ -21,7 +21,9 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   }
 
   @Get("/test/get/listOfDevices")
-  public DefaultFullHttpResponse deviceInformation(@RequestBody Message message) {
+  public DefaultFullHttpResponse deviceInformation(@QueryParam("login") String login) {
+    Message message = new Message();
+    message.setLogin(login);
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
         Unpooled.copiedBuffer(user.listOfDevices(message), StandardCharsets.UTF_8));
   }
