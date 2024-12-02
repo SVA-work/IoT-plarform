@@ -1,6 +1,8 @@
 package test.service;
 
 import test.config.ServerConfig;
+
+import test.entity.User;
 import test.DTO.Message;
 import test.tables.DevicesController;
 import test.tables.UsersController;
@@ -15,7 +17,7 @@ public class UserInfoService {
 
   public UserInfoService() {
   }
-  
+
   public String userData(Message message) {
     if (message == null) return actionsWithoutLogin();
     if (userVerification(message)) {
@@ -77,12 +79,13 @@ public class UserInfoService {
     return currentUser.getVerified();
   }
 
+  //  Нужно добавить устройство в БД
   public String addDevice(Message message) {
     devicesController.create(message);
     return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevices(message);
-
   }
 
+  //  Нужно удалить устройство из БД
   public String deleteDevice(Message message) {
     List<Message> allDevices = devicesController.getAll();
     boolean hasDeletedAnyDevice = false;
