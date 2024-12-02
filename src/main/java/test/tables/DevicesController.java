@@ -150,8 +150,10 @@ public class DevicesController extends AbstractController<Message, Integer> {
       Connection connection = Database.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
-      preparedStatement.setInt(2, Integer.parseInt(entity.getUserId()));
-      preparedStatement.setString(3, entity.getToken());
+      //preparedStatement.setInt(2, Integer.parseInt(entity.getUserId()));
+      preparedStatement.setInt(2, 1);
+      //preparedStatement.setString(3, entity.getToken());
+      preparedStatement.setString(3, "1");
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
     } catch (SQLException e) {

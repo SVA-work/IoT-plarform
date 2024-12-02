@@ -3,13 +3,15 @@ package test.service;
 import org.junit.jupiter.api.Test;
 import test.DTO.Message;
 import test.config.ServerConfig;
+import test.tables.DevicesController;
+import test.tables.UsersController;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserInfoServiceTest {
-
+  
   @Test
-  public void testSuccessfulRegistration() {
+  public void testRegistration() {
     Message message = new Message();
     UserInfoService userInfoService = new UserInfoService();
 
@@ -36,14 +38,15 @@ class UserInfoServiceTest {
   public void testAddingDevice() {
     Message message = new Message();
     UserInfoService userInfoService = new UserInfoService();
-
     message.setDeviceId("1");
     String result = userInfoService.addDevice(message);
-
+    userInfoService.deleteDevice(message);
     assertEquals(result,
             "Устройство успешно добавлено.\n" +
-            //"Список ваших устройств:\n");
-            "Список ваших устройств:");
+            "Список ваших устройств:\n" + 
+            "1\n" +
+            "");
+
   }
 
   @Test

@@ -3,6 +3,7 @@ package test.controller;
 import test.config.*;
 
 import test.library.json.JsonParserDefault;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -25,6 +26,8 @@ public class ServerLauncher {
     EventLoopGroup workerGroup = new NioEventLoopGroup();
     try {
       ServerBootstrap boot = new ServerBootstrap();
+      Database database = new Database();
+      database.databaseConnection();
       boot.group(bossGroup, workerGroup)
               .channel(NioServerSocketChannel.class)
               .childHandler(new ChannelInitializer<SocketChannel>() {
