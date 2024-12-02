@@ -1,11 +1,24 @@
 package test.DTO;
 
 public class Message {
+  private String userId;
   private String deviceId;
   private String login;
   private String password;
+  private String telegramToken;
+  private String token;
+  private boolean successful;
+  private String columnTitle;
 
   public Message() {
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public void setUserId(String userId) {
+    this.userId = userId;
   }
 
   public String getLogin() {
@@ -30,5 +43,37 @@ public class Message {
 
   public String getDeviceId() {
     return deviceId;
+  }
+
+  public String getTelegramToken() {
+    return telegramToken;
+  }
+
+  public void setTelegramToken(String telegramToken) {
+    this.telegramToken = telegramToken;
+  }
+
+  public String getToken() {
+    return token;
+  }
+
+  public void setToken(String token) {
+    this.token = token;
+  }
+
+  public boolean isSuccessful() {
+    return successful;
+  }
+
+  public void setSuccessful(boolean successful) {
+    this.successful = successful;
+  }
+
+  public String getColumnTitle() {
+    return columnTitle;
+  }
+
+  public void setColumnTitle(String columnTitle) {
+    this.columnTitle = columnTitle;
   }
 }

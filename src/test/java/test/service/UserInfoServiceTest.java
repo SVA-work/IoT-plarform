@@ -28,7 +28,7 @@ class UserInfoServiceTest {
     UserInfoService userInfoService = new UserInfoService();
     Message message = new Message();
     message.setLogin("123");
-    String result = userInfoService.listOfDevices("123");
+    String result = userInfoService.listOfDevices(message);
     assertEquals(result, "У вас нет устройств.");
   }
 

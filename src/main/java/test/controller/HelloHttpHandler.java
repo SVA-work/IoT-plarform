@@ -14,16 +14,16 @@ import java.nio.charset.StandardCharsets;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class HelloHttpHandler extends AbstractHttpMappingHandler {
-  private static UserInfoService user = new UserInfoService();
+  private static final UserInfoService user = new UserInfoService();
 
   public HelloHttpHandler(JsonParser parser) {
     super(parser);
   }
 
   @Get("/test/get/listOfDevices")
-  public DefaultFullHttpResponse deviceInformation(@QueryParam("login") String login) {
+  public DefaultFullHttpResponse deviceInformation(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.listOfDevices(login), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.listOfDevices(message), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/registration")
@@ -35,7 +35,7 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   @Post("/test/post/entry")
   public DefaultFullHttpResponse entery(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.userVerification(message), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.successfulEntry(message), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/addDevice")
