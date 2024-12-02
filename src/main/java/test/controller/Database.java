@@ -10,9 +10,9 @@ import java.sql.SQLException;
 
 public class Database {
   public static final String driver = "org.postgresql.Driver";
-  public static final String url = "jdbc:postgresql://localhost:5433/test";
+  public static final String url = "jdbc:postgresql://localhost:5433/postgres";
   public static final String user = "postgres";
-  public static final String password = "scoups";
+  public static final String password = "Safari";
 
   UsersController users;
   DevicesController devices;
@@ -46,9 +46,9 @@ public class Database {
   }
 
   public void CreateTablesAndForeignKeys(){
-    //System.out.println(users.createTable().isSuccessful());
-    //System.out.println(devices.createTable().isSuccessful());
-    //System.out.println(devices.createForeignKeys().isSuccessful());
+    System.out.println(users.createTable().isSuccessful());
+    System.out.println(devices.createTable().isSuccessful());
+    System.out.println(devices.createForeignKeys().isSuccessful());
   }
 
   public void GetAllAndGetByIdAndUpdateAndDeleteUsers() {

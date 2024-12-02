@@ -9,6 +9,7 @@ public class Message {
   private String token;
   private boolean successful;
   private String columnTitle;
+  private String temperature;
 
   public Message() {
   }
@@ -75,5 +76,13 @@ public class Message {
 
   public void setColumnTitle(String columnTitle) {
     this.columnTitle = columnTitle;
+  }
+
+  public String getTemperature() {
+    return temperature;
+  }
+
+  public void setTemperature(String temperature) {
+    this.temperature = temperature;
   }
 }

@@ -14,30 +14,34 @@ import java.nio.charset.StandardCharsets;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class HelloHttpHandler extends AbstractHttpMappingHandler {
-  private static final UserInfoService user = new UserInfoService();
+  private static UserInfoService user = new UserInfoService();
 
   public HelloHttpHandler(JsonParser parser) {
     super(parser);
   }
 
+  @Get("/test/get/deviceRules")
+  public DefaultFullHttpResponse AvailableDeviceRules() {
+    return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+        Unpooled.copiedBuffer(user.getDeviceRules(), StandardCharsets.UTF_8));
+  }
+
   @Get("/test/get/listOfDevices")
   public DefaultFullHttpResponse deviceInformation(@QueryParam("login") String login) {
-    Message message = new Message();
-    message.setLogin(login);
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.listOfDevices(message), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.listOfDevices(login), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/registration")
   public DefaultFullHttpResponse registration(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.successfulRegistration(message), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.registration(message), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/entry")
   public DefaultFullHttpResponse entery(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.successfulEntry(message), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.userVerification(message), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/addDevice")
@@ -50,5 +54,11 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   public DefaultFullHttpResponse deleteDevices(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
         Unpooled.copiedBuffer(user.deleteDevice(message), StandardCharsets.UTF_8));
+  }
+
+  @Post("/test/post/applyRule")
+  public DefaultFullHttpResponse applyRule(@RequestBody Message message) {
+    return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+        Unpooled.copiedBuffer(user.applyRule(message), StandardCharsets.UTF_8));
   }
 }

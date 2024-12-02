@@ -15,7 +15,7 @@ class UserInfoServiceTest {
 
     message.setLogin("123");
     message.setPassword("123");
-    String result = userInfoService.successfulRegistration(message);
+    String result = userInfoService.registration(message);
 
     assertEquals(result,
             "Вы успешно зарегистрировались.\n" +
@@ -28,7 +28,7 @@ class UserInfoServiceTest {
     UserInfoService userInfoService = new UserInfoService();
     Message message = new Message();
     message.setLogin("123");
-    String result = userInfoService.listOfDevices(message);
+    String result = userInfoService.listOfDevices("123");
     assertEquals(result, "У вас нет устройств.");
   }
 

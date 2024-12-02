@@ -61,7 +61,7 @@ class HelloHttpHandlerTest {
     UserInfoService userInfoService = new UserInfoService();
     Message message = new Message();
     message.setLogin("123");
-    String result = userInfoService.listOfDevices(message);
+    String result = userInfoService.listOfDevices("123");
     assertEquals(response.toString(), result);
   }
 
@@ -101,7 +101,7 @@ class HelloHttpHandlerTest {
     UserInfoService userInfoService = new UserInfoService();
     message.setLogin("123");
     message.setPassword("123");
-    String result = userInfoService.successfulRegistration(message);
+    String result = userInfoService.registration(message);
   
     assertEquals(response.toString(), result);
   }
@@ -139,7 +139,7 @@ class HelloHttpHandlerTest {
     UserInfoService user = new UserInfoService();
     message.setLogin("123");
     message.setPassword("123");
-    String result = user.successfulRegistration(message);
+    String result = user.registration(message);
   
     assertEquals(response.toString(), result);
   }
