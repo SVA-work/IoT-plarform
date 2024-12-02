@@ -4,7 +4,6 @@ import java.util.List;
 
 public abstract class AbstractController <Message> {
   public abstract Message createTable();
-  public abstract Message createForeignKeys();
   public abstract List<Message> getAll();
   public abstract Message getById(Message message);
   public abstract Message update(Message entity);

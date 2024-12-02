@@ -9,6 +9,7 @@ public class Message {
   private String token;
   private String ruleId;
   private String rule;
+  private String telegramTokenId;
   private boolean successful;
   private String columnTitle;
 
@@ -77,6 +78,14 @@ public class Message {
 
   public void setRule(String rule) {
     this.rule = rule;
+  }
+
+  public String getTelegramTokenId() {
+    return telegramTokenId;
+  }
+
+  public void setTelegramTokenId(String telegramTokenId) {
+    this.telegramTokenId = telegramTokenId;
   }
 
   public boolean isSuccessful() {

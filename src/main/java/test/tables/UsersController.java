@@ -17,7 +17,7 @@ public class UsersController extends AbstractController<Message> {
   @Override
   public Message createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
-            "user_id INTEGER PRIMARY KEY," +
+            "user_id SERIAL PRIMARY KEY," +
             "login VARCHAR(255) NOT NULL," +
             "password VARCHAR(255) NOT NULL," +
             "telegram_token VARCHAR(255) NOT NULL)";
@@ -31,13 +31,6 @@ public class UsersController extends AbstractController<Message> {
       System.out.println(e.getMessage());
       response.setSuccessful(false);
     }
-    return response;
-  }
-
-  @Override
-  public Message createForeignKeys() {
-    Message response = new Message();
-    response.setSuccessful(false);
     return response;
   }
 
@@ -85,6 +78,31 @@ public class UsersController extends AbstractController<Message> {
       System.out.println(e.getMessage());
     }
     return response;
+  }
+
+  public List<Message> deviceOfUser(Message message) {
+    int id = Integer.parseInt(message.getUserId());
+    String sql = "SELECT d.* " +
+            "FROM devices d " +
+            "JOIN users u ON d.user_id = u.user_id " +
+            "WHERE u.user_id = ?";
+    List<Message> list = new ArrayList<>();
+    try {
+      Connection connection = DatabaseConnection.getConnection();
+      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, id);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      while (resultSet.next()) {
+        Message response = new Message();
+        response.setDeviceId(resultSet.getString("device_id"));
+        response.setToken(resultSet.getString("token"));
+        list.add(response);
+      }
+      resultSet.close();
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    }
+    return list;
   }
 
   @Override
@@ -140,15 +158,14 @@ public class UsersController extends AbstractController<Message> {
 
   @Override
   public Message create(Message entity) {
-    String sql = "INSERT INTO " + tableName + " (user_id, login, password, telegram_token) VALUES (?, ?, ?, ?)";
+    String sql = "INSERT INTO " + tableName + " (login, password, telegram_token) VALUES (?, ?, ?)";
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-      preparedStatement.setString(2, entity.getLogin());
-      preparedStatement.setString(3, entity.getPassword());
-      preparedStatement.setString(4, entity.getTelegramToken());
+      preparedStatement.setString(1, entity.getLogin());
+      preparedStatement.setString(2, entity.getPassword());
+      preparedStatement.setString(3, entity.getTelegramToken());
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
     } catch (SQLException e) {

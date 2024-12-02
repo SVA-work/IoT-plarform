@@ -16,26 +16,10 @@ public class DevicesController extends AbstractController<Message> {
 
   @Override
   public Message createTable() {
-    String sql = "CREATE TABLE IF NOT EXISTS devices(" +
-            "device_id INTEGER PRIMARY KEY," +
-            "user_id INTEGER NOT NULL," +
+    String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
+            "device_id SERIAL PRIMARY KEY," +
+            "user_id INTEGER REFERENCES users(user_id)," +
             "token VARCHAR(255) NOT NULL)";
-    Message response = new Message();
-    try {
-      Connection connection = DatabaseConnection.getConnection();
-      Statement statement = connection.createStatement();
-      statement.executeUpdate(sql);
-      response.setSuccessful(true);
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
-      response.setSuccessful(false);
-    }
-    return response;
-  }
-
-  @Override
-  public Message createForeignKeys() {
-    String sql = " ALTER TABLE devices ADD FOREIGN KEY (user_id) REFERENCES users(user_id)";
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
@@ -93,6 +77,31 @@ public class DevicesController extends AbstractController<Message> {
     return response;
   }
 
+  public List<Message> ruleOfDevice(Message message) {
+    int id = Integer.parseInt(message.getDeviceId());
+    String sql = "SELECT r.* " +
+            "FROM rules r " +
+            "JOIN devices d ON r.device_id = d.device_id " +
+            "WHERE d.device_id = ?";
+    List<Message> list = new ArrayList<>();
+    try {
+      Connection connection = DatabaseConnection.getConnection();
+      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, id);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      while (resultSet.next()) {
+        Message response = new Message();
+        response.setDeviceId(resultSet.getString("rule_id"));
+        response.setToken(resultSet.getString("rule"));
+        list.add(response);
+      }
+      resultSet.close();
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    }
+    return list;
+  }
+
   @Override
   public Message update(Message entity) {
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
@@ -142,14 +151,13 @@ public class DevicesController extends AbstractController<Message> {
 
   @Override
   public Message create(Message entity) {
-    String sql = "INSERT INTO " + tableName + " (device_id, user_id, token) VALUES (?, ?, ?)";
+    String sql = "INSERT INTO " + tableName + " (user_id, token) VALUES (?, ?)";
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
-      preparedStatement.setInt(2, Integer.parseInt(entity.getUserId()));
-      preparedStatement.setString(3, entity.getToken());
+      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+      preparedStatement.setString(2, entity.getToken());
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
     } catch (SQLException e) {

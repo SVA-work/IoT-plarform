@@ -16,9 +16,6 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import test.tables.DatabaseConnection;
-import test.tables.RulesController;
-import test.tables.UsersController;
 
 
 public class ServerLauncher {
@@ -29,7 +26,6 @@ public class ServerLauncher {
     EventLoopGroup workerGroup = new NioEventLoopGroup();
     try {
       ServerBootstrap boot = new ServerBootstrap();
-      DatabaseConnection.getConnection();
       boot.group(bossGroup, workerGroup)
               .channel(NioServerSocketChannel.class)
               .childHandler(new ChannelInitializer<SocketChannel>() {

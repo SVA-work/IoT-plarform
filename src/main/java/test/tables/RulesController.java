@@ -17,25 +17,9 @@ public class RulesController extends AbstractController<Message>{
   @Override
   public Message createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
-            "rule_id INTEGER PRIMARY KEY," +
-            "device_id INTEGER NOT NULL," +
+            "rule_id SERIAL PRIMARY KEY," +
+            "device_id INTEGER REFERENCES devices(device_id)," +
             "rule VARCHAR(255) NOT NULL)";
-    Message response = new Message();
-    try {
-      Connection connection = DatabaseConnection.getConnection();
-      Statement statement = connection.createStatement();
-      statement.executeUpdate(sql);
-      response.setSuccessful(true);
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
-      response.setSuccessful(false);
-    }
-    return response;
-  }
-
-  @Override
-  public Message createForeignKeys() {
-    String sql = " ALTER TABLE rules ADD FOREIGN KEY (device_id) REFERENCES devices(device_id)";
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
@@ -143,14 +127,13 @@ public class RulesController extends AbstractController<Message>{
 
   @Override
   public Message create(Message entity) {
-    String sql = "INSERT INTO " + tableName + " (rule_id, device_id, rule) VALUES (?, ?)";
+    String sql = "INSERT INTO " + tableName + " (device_id, rule) VALUES (?, ?)";
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getRuleId()));
-      preparedStatement.setInt(2, Integer.parseInt(entity.getDeviceId()));
-      preparedStatement.setString(3, entity.getRule());
+      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
+      preparedStatement.setString(2, entity.getRule());
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
     } catch (SQLException e) {
