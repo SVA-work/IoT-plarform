@@ -2,7 +2,6 @@ package test.service;
 
 import test.config.ServerConfig;
 
-import test.entity.User;
 import test.DTO.Message;
 import test.tables.DevicesController;
 import test.tables.UsersController;
@@ -18,48 +17,72 @@ public class UserInfoService {
   public UserInfoService() {
   }
 
-  public String userData(Message message) {
-    if (message == null) return actionsWithoutLogin();
-    if (userVerification(message)) {
-      return "{login: " + message.getLogin() + ", password: " + message.getPassword() + "}";
-    }
-    return "No user";
+  public String registration(Message message) {
+      if (existenceUser(message)) {
+        return "Пользователь с таким логином уже существует.";
+      }
+    usersController.create(message);
+    return "Вы успешно зарегистрировались.\n" +
+            "Ваш логин: " + message.getLogin() + "\n" +
+            "Ваш пароль: " + message.getPassword();
   }
 
-  public String successfulRegistration(Message message) {
-    if (userVerification(message)) {
-      return "Вы успешно зарегистрировались.\n" +
-              "Ваш логин: " + message.getLogin() + "\n" +
-              "Ваш пароль: " + message.getPassword();
+  public boolean existenceUser(Message message) {
+    for (Message currentMessage : usersController.getAll()) {
+      if (message.getLogin().equals(currentMessage.getLogin())) {
+        return true;
+      }
     }
-    return "Что-то пошло не так, попробуйте еще раз.";
+    return false;
+  }
+
+  public boolean existenceUserDevice(Message message) {
+    List<Message> allDevices = devicesController.getAll();
+    for (Message currentMessage : allDevices) {
+      if (message.getLogin().equals(currentMessage.getLogin()) &&
+            message.getDeviceId().equals(currentMessage.getDeviceId())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public String userVerification(Message message) {
+    for (Message currentMessage : usersController.getAll()) {
+      System.out.println(1111);
+      if (message.getLogin().equals(currentMessage.getLogin()) &&
+              message.getPassword().equals(currentMessage.getPassword())) {
+        return successfulEntry();
+      }
+    }
+    return failedEntry();
   }
 
   public String successfulEntry() {
     return "Вы успешно вошли в систему.\n" +
             "Список доступных команд:\n" +
-            "1)Добавить устройство.\n" +
+            "1) Добавить устройство.\n" +
             "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
             ServerConfig.LINK_ADD_DEVICE + "\n" +
-            "2)Удалить устройство.\n" +
+            "2) Удалить устройство.\n" +
             "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
             ServerConfig.LINK_DELETE_DEVICE + "\n" +
-            "3)Посмотреть список устройств.\n" +
-            ServerConfig.LINK_GET_DEVICE_INFORMATION;
+            "3) Посмотреть список устройств.\n" +
+            ServerConfig.LINK_GET_DEVICE_INFORMATION + "\n" +
+            "4) Посмотреть список доступных правил для устройств." +
+            "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
+            ServerConfig.LINK_DEVICE_RULES + "\n";
   }
 
   public String failedEntry() {
     return "Неверный пароль или логин.\n";
   }
 
-  public String actionsWithoutLogin() {
-    return "Вы не вошли в систему.\n" +
-            "Это можно сделать по адресу: \n" +
-            ServerConfig.LINK_ENTRY;
-  }
-
   // Позже выводить правила для всех устройств вместе с именем
-  public String listOfDevices(Message message) {
+  public String listOfDevices(String login) {
+    //  Принимаем логин, а работаем с id
+    Message message = new Message();
+    message.setLogin(login);
     List<Message> allDevices = devicesController.getAll();
     StringBuilder info = new StringBuilder();
     boolean hasAnyDevice = false;
@@ -75,17 +98,11 @@ public class UserInfoService {
     return "У вас нет устройств.";
   }
 
-  public Boolean verified(User currentUser) {
-    return currentUser.getVerified();
-  }
-
-  //  Нужно добавить устройство в БД
   public String addDevice(Message message) {
     devicesController.create(message);
-    return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevices(message);
+    return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevices(message.getLogin());
   }
 
-  //  Нужно удалить устройство из БД
   public String deleteDevice(Message message) {
     List<Message> allDevices = devicesController.getAll();
     boolean hasDeletedAnyDevice = false;
@@ -100,7 +117,7 @@ public class UserInfoService {
     if (!hasDeletedAnyDevice) {
       return "У вас нет такого устройства.";
     }
-    String infoAboutDevices = listOfDevices(message);
+    String infoAboutDevices = listOfDevices(message.getLogin());
     if (Objects.equals(infoAboutDevices, "")) {
       return "У вас больше нет устройств.";
     }
@@ -110,14 +127,32 @@ public class UserInfoService {
     return (info.toString());
   }
 
-  //  Нужна проверка существования логина и пароля пользователя в БД
-  public Boolean userVerification(Message message) {
-    for (Message currentMessage : usersController.getAll()) {
-      if (message.getLogin().equals(currentMessage.getLogin()) &&
-              message.getPassword().equals(currentMessage.getPassword())) {
-        return true;
+  public String getDeviceRules() {
+    StringBuilder info = new StringBuilder();
+    info.append("1) Датчик температуры. \n" +
+        "Отправьте запрос на адрес: " + ServerConfig.LINK_DEVICE_RULES + "\n" +
+        "Укажите id устройства и приемлемую для вас температуры в таком формате: {login: 99, deviceId: 123, temperature: 15-20}");
+    return info.toString();
+  }
+
+  //public String setDeviceRules() {
+  //}
+
+  public String applyRule(Message message) {
+    String login = message.getLogin();
+    String DeviceId = message.getDeviceId();
+    String[] temperature = message.getTemperature().split("-");
+    String lowTemperature = temperature[0];
+    String hightTemperature = temperature[1];
+    if (existenceUser(message)) {
+      if (existenceUserDevice(message)) {
+        //  добавить правила к этому устройству
+        return "Правила успешно добавлены.";
+      } else {
+        return "У вас нет такого устройства.";
       }
+    } else {
+      return "Пользователя с таким логином не существует.";
     }
-    return false;
   }
 }

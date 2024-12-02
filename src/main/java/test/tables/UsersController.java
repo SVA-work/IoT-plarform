@@ -150,11 +150,14 @@ public class UsersController extends AbstractController<Message, Integer> {
     try {
       Connection connection = Database.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+      //preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+      preparedStatement.setInt(1, 10);
       preparedStatement.setString(2, entity.getLogin());
       preparedStatement.setString(3, entity.getPassword());
-      preparedStatement.setString(4, entity.getDeviceId());
-      preparedStatement.setString(5, entity.getTelegramToken());
+      //preparedStatement.setString(4, entity.getDeviceId());
+      preparedStatement.setString(4, "0");
+      //preparedStatement.setString(5, entity.getTelegramToken());
+      preparedStatement.setString(5, "0");
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
     } catch (SQLException e) {
