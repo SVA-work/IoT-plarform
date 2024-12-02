@@ -155,11 +155,16 @@ public class DevicesController extends AbstractController<Message> {
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
       preparedStatement.setString(2, entity.getToken());
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
+      ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+      if (generatedKeys.next()) {
+        long deviceId = generatedKeys.getLong(1);
+        response.setDeviceId(String.valueOf(deviceId));
+      }
     } catch (SQLException e) {
       System.out.println(e.getMessage());
       response.setSuccessful(false);

@@ -162,11 +162,16 @@ public class UsersController extends AbstractController<Message> {
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setString(1, entity.getLogin());
       preparedStatement.setString(2, entity.getPassword());
       preparedStatement.setString(3, entity.getTelegramToken());
       preparedStatement.executeUpdate();
+      ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+      if (generatedKeys.next()) {
+        long userId = generatedKeys.getLong(1);
+        response.setUserId(String.valueOf(userId));
+      }
       response.setSuccessful(true);
     } catch (SQLException e) {
       System.out.println(e.getMessage());

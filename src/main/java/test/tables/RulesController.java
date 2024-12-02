@@ -131,11 +131,16 @@ public class RulesController extends AbstractController<Message>{
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
       preparedStatement.setString(2, entity.getRule());
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
+      ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+      if (generatedKeys.next()) {
+        long ruleId = generatedKeys.getLong(1);
+        response.setRuleId(String.valueOf(ruleId));
+      }
     } catch (SQLException e) {
       System.out.println(e.getMessage());
       response.setSuccessful(false);
