@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import io.netty.bootstrap.ServerBootstrap;
+
 public class Database {
   public static final String driver = "org.postgresql.Driver";
   public static final String url = "jdbc:postgresql://localhost:5433/postgres";
@@ -88,14 +90,14 @@ public class Database {
  */
   }
 
-  public static void main(String[] args) {
+  public static void databaseConnection(Database database) {
     try {
-      Database database = new Database();
       database.CreateTablesAndForeignKeys();
       database.GetAllAndGetByIdAndUpdateAndDeleteUsers();
       database.GetAllAndGetByIdAndUpdateAndDeleteDevices();
-    } catch (ClassNotFoundException e) {
+    } catch (SQLException e) {
       System.out.println("JDBC драйвер для СУБД не найден!");
+      return;
     }
   }
 }

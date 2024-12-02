@@ -49,7 +49,6 @@ public class UserInfoService {
 
   public String userVerification(Message message) {
     for (Message currentMessage : usersController.getAll()) {
-      System.out.println(1111);
       if (message.getLogin().equals(currentMessage.getLogin()) &&
               message.getPassword().equals(currentMessage.getPassword())) {
         return successfulEntry();
@@ -71,7 +70,7 @@ public class UserInfoService {
             ServerConfig.LINK_GET_DEVICE_INFORMATION + "\n" +
             "4) Посмотреть список доступных правил для устройств." +
             "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
-            ServerConfig.LINK_DEVICE_RULES + "\n";
+            ServerConfig.LINK_DEVICE_RULES;
   }
 
   public String failedEntry() {
@@ -80,14 +79,13 @@ public class UserInfoService {
 
   // Позже выводить правила для всех устройств вместе с именем
   public String listOfDevices(String login) {
-    //  Принимаем логин, а работаем с id
     Message message = new Message();
     message.setLogin(login);
     List<Message> allDevices = devicesController.getAll();
     StringBuilder info = new StringBuilder();
     boolean hasAnyDevice = false;
     for (Message deviceMessage : allDevices) {
-      if (Objects.equals(deviceMessage.getUserId(), message.getUserId())) {
+      if (Objects.equals(deviceMessage.getLogin(), message.getLogin())) {
         info.append(deviceMessage.getToken()).append('\n');
         hasAnyDevice = true;
       }
@@ -107,6 +105,7 @@ public class UserInfoService {
     List<Message> allDevices = devicesController.getAll();
     boolean hasDeletedAnyDevice = false;
     for (Message deviceMessage : allDevices) {
+      // по логину
       if (Objects.equals(deviceMessage.getUserId(), message.getUserId()) &&
               Objects.equals(deviceMessage.getDeviceId(), message.getDeviceId())) {
         devicesController.delete(message);
@@ -155,4 +154,5 @@ public class UserInfoService {
       return "Пользователя с таким логином не существует.";
     }
   }
+  //  метод для удаление пользователя
 }

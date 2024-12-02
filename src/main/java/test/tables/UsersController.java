@@ -14,6 +14,7 @@ import java.util.List;
 public class UsersController extends AbstractController<Message, Integer> {
   private final String tableName = "users";
   private final String tableID = "user_id";
+  private static int userId = 1;
 
   @Override
   public Message createTable() {
@@ -140,6 +141,7 @@ public class UsersController extends AbstractController<Message, Integer> {
       System.out.println(e.getMessage());
       response.setSuccessful(false);
     }
+    userId -= 1;
     return response;
   }
 
@@ -151,7 +153,8 @@ public class UsersController extends AbstractController<Message, Integer> {
       Connection connection = Database.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       //preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-      preparedStatement.setInt(1, 10);
+      preparedStatement.setInt(1, userId);
+      userId += 1;
       preparedStatement.setString(2, entity.getLogin());
       preparedStatement.setString(3, entity.getPassword());
       //preparedStatement.setString(4, entity.getDeviceId());

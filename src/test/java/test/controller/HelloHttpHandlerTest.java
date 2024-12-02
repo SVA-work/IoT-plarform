@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import test.DTO.Message;
 import test.config.ServerConfig;
 import test.service.UserInfoService;
+import test.tables.DevicesController;
+import test.tables.UsersController;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -14,6 +16,9 @@ import java.util.Scanner;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HelloHttpHandlerTest {
+
+  private final UsersController usersController = new UsersController();
+  private final DevicesController devicesController = new DevicesController();
 
   @BeforeAll
   static void server() {
@@ -57,14 +62,12 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
     UserInfoService userInfoService = new UserInfoService();
     Message message = new Message();
     message.setLogin("123");
     String result = userInfoService.listOfDevices("123");
     assertEquals(response.toString(), result);
   }
-
 
   @Test
   void registration() {
@@ -96,18 +99,26 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+    // вызвать метод для удаления пользователя по логину
+    Message deleteMessage1 = new Message();
+    deleteMessage1.setLogin("123");
+    usersController.delete(deleteMessage1);
 
     Message message = new Message();
     UserInfoService userInfoService = new UserInfoService();
     message.setLogin("123");
     message.setPassword("123");
     String result = userInfoService.registration(message);
-  
+    // вызвать метод для удаления пользователя по логину
+    Message deleteMessage2 = new Message();
+    deleteMessage2.setLogin("123");
+    usersController.delete(deleteMessage2);
+
     assertEquals(response.toString(), result);
   }
 
   @Test
-  void entry() {
+  void userVerification() {
     StringBuilder response = new StringBuilder();
     try {
       URL url = new URL(ServerConfig.LINK_ENTRY);
@@ -135,12 +146,13 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
     Message message = new Message();
     UserInfoService user = new UserInfoService();
     message.setLogin("123");
     message.setPassword("123");
-    String result = user.registration(message);
-  
+    String result = user.userVerification(message);
+
     assertEquals(response.toString(), result);
   }
 
@@ -173,12 +185,23 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
+    Message deleteMessage1 = new Message();
+    deleteMessage1.setLogin("123");
+    deleteMessage1.setDeviceId("123");
+    devicesController.delete(deleteMessage1);
+
     Message message = new Message();
     UserInfoService user = new UserInfoService();
     message.setLogin("123");
     message.setDeviceId("123");
     String result = user.addDevice(message);
-  
+
+    Message deleteMessage2 = new Message();
+    deleteMessage2.setLogin("123");
+    deleteMessage2.setDeviceId("123");
+    devicesController.delete(deleteMessage2);
+
     assertEquals(response.toString(), result);
   }
 
@@ -211,12 +234,13 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+
     Message message = new Message();
     UserInfoService user = new UserInfoService();
     message.setLogin("123");
     message.setDeviceId("123");
     String result = user.deleteDevice(message);
-  
+
     assertEquals(response.toString(), result);
   }
 }
