@@ -2,7 +2,7 @@ package test.tables;
 
 import java.util.List;
 
-public abstract class AbstractController <Message, Integer> {
+public abstract class AbstractController <Message> {
   public abstract Message createTable();
   public abstract Message createForeignKeys();
   public abstract List<Message> getAll();
