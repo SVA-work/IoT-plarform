@@ -16,11 +16,6 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import test.tables.DevicesController;
-import test.tables.RulesController;
-import test.tables.TelegramTokenController;
-import test.tables.UsersController;
-
 
 public class ServerLauncher {
 
