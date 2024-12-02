@@ -35,17 +35,21 @@ public class UserInfoService {
     return "Что-то пошло не так, попробуйте еще раз.";
   }
 
-  public String successfulEntry() {
-    return "Вы успешно вошли в систему.\n" +
-            "Список доступных команд:\n" +
-            "1)Добавить устройство.\n" +
-            "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
-            ServerConfig.LINK_ADD_DEVICE + "\n" +
-            "2)Удалить устройство.\n" +
-            "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
-            ServerConfig.LINK_DELETE_DEVICE + "\n" +
-            "3)Посмотреть список устройств.\n" +
-            ServerConfig.LINK_GET_DEVICE_INFORMATION;
+  public String successfulEntry(Message message) {
+    if (userVerification(message)) {
+      return "Вы успешно вошли в систему.\n" +
+              "Список доступных команд:\n" +
+              "1)Добавить устройство.\n" +
+              "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
+              ServerConfig.LINK_ADD_DEVICE + "\n" +
+              "2)Удалить устройство.\n" +
+              "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
+              ServerConfig.LINK_DELETE_DEVICE + "\n" +
+              "3)Посмотреть список устройств.\n" +
+              ServerConfig.LINK_GET_DEVICE_INFORMATION;
+    } else {
+      return "Неверный логин или пароль";
+    }
   }
 
   public String failedEntry() {
