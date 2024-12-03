@@ -10,4 +10,5 @@ public class ServerConfig {
     public static final String LINK_ENTRY = "http://localhost:" + PORT + "/test/post/entry";
     public static final String LINK_REGISTRATION = "http://localhost:" + PORT + "/test/post/registration";
     public static final String LINK_DEVICE_RULES = "http://localhost:" + PORT + "/test/get/deviceRules";
+    public static final String LINK_APPLY_RULE = "http://localhost:" + PORT + "/test/post/applyRule";
 }

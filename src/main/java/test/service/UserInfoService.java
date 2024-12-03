@@ -3,16 +3,18 @@ package test.service;
 import test.config.ServerConfig;
 
 import test.DTO.Message;
-import test.tables.DevicesController;
-import test.tables.UsersController;
+import test.tables.DevicesRepository;
+import test.tables.UsersRepository;
+import test.tables.RulesRepository;
 
 import java.util.List;
 import java.util.Objects;
 
 public class UserInfoService {
 
-  private final UsersController usersController = new UsersController();
-  private final DevicesController devicesController = new DevicesController();
+  private final UsersRepository usersController = new UsersRepository();
+  private final DevicesRepository devicesController = new DevicesRepository();
+  private final RulesRepository rulesController = new RulesRepository();
 
   public UserInfoService() {
   }
@@ -105,8 +107,7 @@ public class UserInfoService {
     List<Message> allDevices = devicesController.getAll();
     boolean hasDeletedAnyDevice = false;
     for (Message deviceMessage : allDevices) {
-      // по логину
-      if (Objects.equals(deviceMessage.getUserId(), message.getUserId()) &&
+      if (Objects.equals(deviceMessage.getLogin(), message.getLogin()) &&
               Objects.equals(deviceMessage.getDeviceId(), message.getDeviceId())) {
         devicesController.delete(message);
         hasDeletedAnyDevice = true;
@@ -130,7 +131,7 @@ public class UserInfoService {
     StringBuilder info = new StringBuilder();
     info.append("1) Датчик температуры. \n" +
         "Отправьте запрос на адрес: " + ServerConfig.LINK_DEVICE_RULES + "\n" +
-        "Укажите id устройства и приемлемую для вас температуры в таком формате: {login: 99, deviceId: 123, temperature: 15-20}");
+        "Укажите id устройства и приемлемую для вас температуры в таком формате: {login: 99, deviceId: 123, lowTemperature: 15, hightTemperature: 20}");
     return info.toString();
   }
 
@@ -138,14 +139,9 @@ public class UserInfoService {
   //}
 
   public String applyRule(Message message) {
-    String login = message.getLogin();
-    String DeviceId = message.getDeviceId();
-    String[] temperature = message.getTemperature().split("-");
-    String lowTemperature = temperature[0];
-    String hightTemperature = temperature[1];
     if (existenceUser(message)) {
       if (existenceUserDevice(message)) {
-        //  добавить правила к этому устройству
+        rulesController.create(message);
         return "Правила успешно добавлены.";
       } else {
         return "У вас нет такого устройства.";
@@ -154,5 +150,4 @@ public class UserInfoService {
       return "Пользователя с таким логином не существует.";
     }
   }
-  //  метод для удаление пользователя
 }

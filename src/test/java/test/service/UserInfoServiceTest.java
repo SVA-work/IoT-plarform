@@ -2,9 +2,6 @@ package test.service;
 
 import org.junit.jupiter.api.Test;
 import test.DTO.Message;
-import test.config.ServerConfig;
-import test.tables.DevicesController;
-import test.tables.UsersController;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,13 +12,13 @@ class UserInfoServiceTest {
     Message message = new Message();
     UserInfoService userInfoService = new UserInfoService();
 
-    message.setLogin("123");
+    message.setLogin("122");
     message.setPassword("123");
     String result = userInfoService.registration(message);
 
     assertEquals(result,
             "Вы успешно зарегистрировались.\n" +
-                    "Ваш логин: 123\n" +
+                    "Ваш логин: 122\n" +
                     "Ваш пароль: 123");
   }
 

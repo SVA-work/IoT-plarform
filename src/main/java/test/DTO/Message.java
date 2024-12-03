@@ -2,14 +2,18 @@ package test.DTO;
 
 public class Message {
   private String userId;
-  private String deviceId;
   private String login;
   private String password;
   private String telegramToken;
+  private String deviceId;
   private String token;
+  private String ruleId;
+  private String rule;
+  private String telegramTokenId;
   private boolean successful;
   private String columnTitle;
-  private String temperature;
+  private String lowTemperature;
+  private String hightTemperature;
 
   public Message() {
   }
@@ -38,14 +42,6 @@ public class Message {
     this.password = password;
   }
 
-  public void setDeviceId(String deviceId) {
-    this.deviceId = deviceId;
-  }
-
-  public String getDeviceId() {
-    return deviceId;
-  }
-
   public String getTelegramToken() {
     return telegramToken;
   }
@@ -54,12 +50,44 @@ public class Message {
     this.telegramToken = telegramToken;
   }
 
+  public String getDeviceId() {
+    return deviceId;
+  }
+
+  public void setDeviceId(String deviceId) {
+    this.deviceId = deviceId;
+  }
+
   public String getToken() {
     return token;
   }
 
   public void setToken(String token) {
     this.token = token;
+  }
+
+  public String getRuleId() {
+    return ruleId;
+  }
+
+  public void setRuleId(String ruleId) {
+    this.ruleId = ruleId;
+  }
+
+  public String getRule() {
+    return rule;
+  }
+
+  public void setRule(String rule) {
+    this.rule = rule;
+  }
+
+  public String getTelegramTokenId() {
+    return telegramTokenId;
+  }
+
+  public void setTelegramTokenId(String telegramTokenId) {
+    this.telegramTokenId = telegramTokenId;
   }
 
   public boolean isSuccessful() {
@@ -78,11 +106,19 @@ public class Message {
     this.columnTitle = columnTitle;
   }
 
-  public String getTemperature() {
-    return temperature;
+  public String getHightTemperature() {
+    return hightTemperature;
   }
 
-  public void setTemperature(String temperature) {
-    this.temperature = temperature;
+  public void setHightTemperature(String hightTemperature) {
+    this.hightTemperature = hightTemperature;
+  }
+
+  public String getTemperature() {
+    return hightTemperature;
+  }
+
+  public void setLowTemperature(String lowTemperature) {
+    this.lowTemperature = lowTemperature;
   }
 }
