@@ -111,7 +111,7 @@ public class DevicesRepository extends AbstractRepository<Message> {
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       switch (entity.getColumnTitle()) {
         case "user_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-        default -> preparedStatement.setString(1, entity.getToken());
+        case "token" -> preparedStatement.setString(1, entity.getToken());
       }
       preparedStatement.setInt(2, Integer.parseInt(entity.getDeviceId()));
       preparedStatement.executeUpdate();
