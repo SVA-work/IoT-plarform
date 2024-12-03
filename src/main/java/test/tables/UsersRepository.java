@@ -10,16 +10,16 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RulesController extends AbstractController<Message>{
-  private final String tableName = "rules";
-  private final String tableID = "rule_id";
+public class UsersRepository extends AbstractRepository<Message> {
+  private final String tableName = "users";
+  private final String tableID = "user_id";
 
   @Override
   public Message createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
-            "rule_id SERIAL PRIMARY KEY," +
-            "device_id INTEGER REFERENCES devices(device_id)," +
-            "rule VARCHAR(255) NOT NULL)";
+            "user_id SERIAL PRIMARY KEY," +
+            "login VARCHAR(255) NOT NULL," +
+            "password VARCHAR(255) NOT NULL)";
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
@@ -43,9 +43,9 @@ public class RulesController extends AbstractController<Message>{
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
         Message response = new Message();
-        response.setRuleId(resultSet.getString(tableID));
-        response.setDeviceId(resultSet.getString("device_id"));
-        response.setRule(resultSet.getString("rule"));
+        response.setUserId(resultSet.getString(tableID));
+        response.setLogin(resultSet.getString("login"));
+        response.setPassword(resultSet.getString("password"));
         list.add(response);
       }
       resultSet.close();
@@ -57,7 +57,7 @@ public class RulesController extends AbstractController<Message>{
 
   @Override
   public Message getById(Message message) {
-    int id = Integer.parseInt(message.getDeviceId());
+    int id = Integer.parseInt(message.getUserId());
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
     Message response = new Message();
     try {
@@ -66,9 +66,65 @@ public class RulesController extends AbstractController<Message>{
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
-        response.setRuleId(resultSet.getString(tableID));
+        response.setUserId(resultSet.getString(tableID));
+        response.setLogin(resultSet.getString("login"));
+        response.setPassword(resultSet.getString("password"));
+      }
+      resultSet.close();
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    }
+    return response;
+  }
+
+  public List<Message> deviceOfUser(Message message) {
+    int id = Integer.parseInt(message.getUserId());
+    String sql = "SELECT d.* " +
+            "FROM devices d " +
+            "JOIN users u ON d.user_id = u.user_id " +
+            "WHERE u.user_id = ?";
+    List<Message> list = new ArrayList<>();
+    try {
+      Connection connection = DatabaseConnection.getConnection();
+      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, id);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      while (resultSet.next()) {
+        Message response = new Message();
         response.setDeviceId(resultSet.getString("device_id"));
-        response.setRule(resultSet.getString("rule"));
+        response.setToken(resultSet.getString("token"));
+        list.add(response);
+      }
+      resultSet.close();
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    }
+    return list;
+  }
+
+  @Override
+  public Message update(Message entity) {
+    String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
+    Message response = new Message();
+
+    try {
+      Connection connection = DatabaseConnection.getConnection();
+      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      switch (entity.getColumnTitle()) {
+        case "login" -> preparedStatement.setString(1, entity.getLogin());
+        case "password" -> preparedStatement.setString(1, entity.getPassword());
+      }
+      preparedStatement.setInt(2, Integer.parseInt(entity.getUserId()));
+      preparedStatement.executeUpdate();
+
+      sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
+      preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+      ResultSet resultSet = preparedStatement.executeQuery();
+      if (resultSet.next()) {
+        response.setUserId(resultSet.getString(tableID));
+        response.setLogin(resultSet.getString("login"));
+        response.setPassword(resultSet.getString("password"));
       }
       resultSet.close();
     } catch (SQLException e) {
@@ -78,38 +134,8 @@ public class RulesController extends AbstractController<Message>{
   }
 
   @Override
-  public Message update(Message entity) {
-    String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    Message response = new Message();
-    try {
-      Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      switch (entity.getColumnTitle()) {
-        case "device_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
-        case "rule" -> preparedStatement.setString(1, entity.getRule());
-      }
-      preparedStatement.setInt(2, Integer.parseInt(entity.getRuleId()));
-      preparedStatement.executeUpdate();
-
-      sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-      preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getRuleId()));
-      ResultSet resultSet = preparedStatement.executeQuery();
-
-      if (resultSet.next()) {
-        response.setRuleId(resultSet.getString(tableID));
-        response.setDeviceId(resultSet.getString("device_id"));
-        response.setRule(resultSet.getString("rule"));
-      }
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
-    }
-    return response;
-  }
-
-  @Override
   public Message delete(Message message) {
-    int id = Integer.parseInt(message.getRuleId());
+    int id = Integer.parseInt(message.getUserId());
     Message response = new Message();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
@@ -127,20 +153,20 @@ public class RulesController extends AbstractController<Message>{
 
   @Override
   public Message create(Message entity) {
-    String sql = "INSERT INTO " + tableName + " (device_id, rule) VALUES (?, ?)";
+    String sql = "INSERT INTO " + tableName + " (login, password) VALUES (?, ?)";
     Message response = new Message();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
-      preparedStatement.setString(2, entity.getRule());
+      preparedStatement.setString(1, entity.getLogin());
+      preparedStatement.setString(2, entity.getPassword());
       preparedStatement.executeUpdate();
-      response.setSuccessful(true);
       ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
       if (generatedKeys.next()) {
-        long ruleId = generatedKeys.getLong(1);
-        response.setRuleId(String.valueOf(ruleId));
+        long userId = generatedKeys.getLong(1);
+        response.setUserId(String.valueOf(userId));
       }
+      response.setSuccessful(true);
     } catch (SQLException e) {
       System.out.println(e.getMessage());
       response.setSuccessful(false);

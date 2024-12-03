@@ -2,7 +2,7 @@ package test.tables;
 
 import java.util.List;
 
-public abstract class AbstractController <Message> {
+public abstract class AbstractRepository<Message> {
   public abstract Message createTable();
   public abstract List<Message> getAll();
   public abstract Message getById(Message message);
