@@ -19,37 +19,42 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   public HelloHttpHandler(JsonParser parser) {
     super(parser);
   }
-
+  // тесты есть
   @Get("/test/get/deviceRules")
   public DefaultFullHttpResponse AvailableDeviceRules() {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
         Unpooled.copiedBuffer(user.getDeviceRules(), StandardCharsets.UTF_8));
   }
 
+  // тесты есть
   @Get("/test/get/listOfDevices")
   public DefaultFullHttpResponse deviceInformation(@QueryParam("login") String login) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
         Unpooled.copiedBuffer(user.listOfDevices(login), StandardCharsets.UTF_8));
   }
 
+  // тесты есть
   @Post("/test/post/registration")
   public DefaultFullHttpResponse registration(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
         Unpooled.copiedBuffer(user.registration(message), StandardCharsets.UTF_8));
   }
 
+  // тесты есть
   @Post("/test/post/entry")
   public DefaultFullHttpResponse entery(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
         Unpooled.copiedBuffer(user.userVerification(message), StandardCharsets.UTF_8));
   }
 
+  // тесты есть
   @Post("/test/post/addDevice")
   public DefaultFullHttpResponse addDevices(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
         Unpooled.copiedBuffer(user.addDevice(message), StandardCharsets.UTF_8));
   }
 
+  // тесты есть
   @Post("/test/post/deleteDevice")
   public DefaultFullHttpResponse deleteDevices(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
