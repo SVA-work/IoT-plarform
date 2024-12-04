@@ -77,7 +77,7 @@ public class UsersRepository extends AbstractRepository<Message> {
     return response;
   }
 
-  public List<Message> deviceOfUser(Message message) {
+  public List<Message> devicesOfUser(Message message) {
     int id = Integer.parseInt(message.getUserId());
     String sql = "SELECT d.* " +
             "FROM devices d " +

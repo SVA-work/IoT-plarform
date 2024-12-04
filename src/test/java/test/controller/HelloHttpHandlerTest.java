@@ -67,7 +67,7 @@ class HelloHttpHandlerTest {
     UserInfoService userInfoService = new UserInfoService();
     Message message = new Message();
     message.setLogin("123");
-    String result = userInfoService.listOfDevices("123");
+    String result = userInfoService.listOfDevicesOfUser("123");
     assertEquals(response.toString(), result);
   }
 

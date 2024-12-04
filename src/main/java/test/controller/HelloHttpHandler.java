@@ -26,10 +26,10 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
         Unpooled.copiedBuffer(user.getDeviceRules(), StandardCharsets.UTF_8));
   }
 
-  @Get("/test/get/listOfDevices")
+  @Get("/test/get/listOfDevicesOfUser")
   public DefaultFullHttpResponse deviceInformation(@QueryParam("login") String login) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.listOfDevices(login), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.listOfDevicesOfUser(login), StandardCharsets.UTF_8));
   }
 
   @Post("/test/post/registration")

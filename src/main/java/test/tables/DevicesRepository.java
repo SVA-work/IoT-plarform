@@ -77,7 +77,7 @@ public class DevicesRepository extends AbstractRepository<Message> {
     return response;
   }
 
-  public List<Message> ruleOfDevice(Message message) {
+  public List<Message> rulesOfDevice(Message message) {
     int id = Integer.parseInt(message.getDeviceId());
     String sql = "SELECT r.* " +
             "FROM rules r " +
