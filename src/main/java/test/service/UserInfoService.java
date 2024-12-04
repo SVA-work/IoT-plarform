@@ -12,25 +12,25 @@ import java.util.Objects;
 
 public class UserInfoService {
 
-  private final UsersRepository usersController = new UsersRepository();
-  private final DevicesRepository devicesController = new DevicesRepository();
-  private final RulesRepository rulesController = new RulesRepository();
+  private final UsersRepository usersRepository = new UsersRepository();
+  private final DevicesRepository devicesRepository = new DevicesRepository();
+  private final RulesRepository rulesRepository = new RulesRepository();
 
   public UserInfoService() {
   }
 
   public String registration(Message message) {
-      if (existenceUser(message)) {
-        return "Пользователь с таким логином уже существует.";
-      }
-    usersController.create(message);
+    if (existenceUser(message)) {
+      return "Пользователь с таким логином уже существует.";
+    }
+    usersRepository.create(message);
     return "Вы успешно зарегистрировались.\n" +
             "Ваш логин: " + message.getLogin() + "\n" +
             "Ваш пароль: " + message.getPassword();
   }
 
   public boolean existenceUser(Message message) {
-    for (Message currentMessage : usersController.getAll()) {
+    for (Message currentMessage : usersRepository.getAll()) {
       if (message.getLogin().equals(currentMessage.getLogin())) {
         return true;
       }
@@ -39,10 +39,10 @@ public class UserInfoService {
   }
 
   public boolean existenceUserDevice(Message message) {
-    List<Message> allDevices = devicesController.getAll();
+    List<Message> allDevices = usersRepository.devicesOfUser(message);
     for (Message currentMessage : allDevices) {
       if (message.getLogin().equals(currentMessage.getLogin()) &&
-            message.getDeviceId().equals(currentMessage.getDeviceId())) {
+              message.getDeviceId().equals(currentMessage.getDeviceId())) {
         return true;
       }
     }
@@ -50,7 +50,7 @@ public class UserInfoService {
   }
 
   public String userVerification(Message message) {
-    for (Message currentMessage : usersController.getAll()) {
+    for (Message currentMessage : usersRepository.getAll()) {
       if (message.getLogin().equals(currentMessage.getLogin()) &&
               message.getPassword().equals(currentMessage.getPassword())) {
         return successfulEntry();
@@ -80,17 +80,22 @@ public class UserInfoService {
   }
 
   // Позже выводить правила для всех устройств вместе с именем
-  public String listOfDevices(String login) {
+  public String listOfDevicesOfUser(String userLogin) {
     Message message = new Message();
-    message.setLogin(login);
-    List<Message> allDevices = devicesController.getAll();
+    message.setLogin(userLogin);
+
+    message.setUserId(getUserIdByLogin(userLogin));
+
+    List<Message> allDevicesOfUser = usersRepository.devicesOfUser(message);
+
     StringBuilder info = new StringBuilder();
     boolean hasAnyDevice = false;
-    for (Message deviceMessage : allDevices) {
-      if (Objects.equals(deviceMessage.getLogin(), message.getLogin())) {
-        info.append(deviceMessage.getToken()).append('\n');
-        hasAnyDevice = true;
+    for (Message deviceMessage : allDevicesOfUser) {
+      info.append(deviceMessage.getToken()).append('\n');
+      for (Message ruleMessage : devicesRepository.rulesOfDevice(deviceMessage)) {
+        info.append("  ").append(ruleMessage.getToken()).append("\n");
       }
+      hasAnyDevice = true;
     }
     if (hasAnyDevice) {
       return info.toString();
@@ -99,17 +104,19 @@ public class UserInfoService {
   }
 
   public String addDevice(Message message) {
-    devicesController.create(message);
-    return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevices(message.getLogin());
+    message.setUserId(getUserIdByLogin(message.getLogin()));
+    devicesRepository.create(message);
+    return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(message.getLogin());
   }
 
   public String deleteDevice(Message message) {
-    List<Message> allDevices = devicesController.getAll();
+    message.setUserId(getUserIdByLogin(message.getLogin()));
+    List<Message> allDevicesOfUser = usersRepository.devicesOfUser(message);
+
     boolean hasDeletedAnyDevice = false;
-    for (Message deviceMessage : allDevices) {
-      if (Objects.equals(deviceMessage.getLogin(), message.getLogin()) &&
-              Objects.equals(deviceMessage.getDeviceId(), message.getDeviceId())) {
-        devicesController.delete(message);
+    for (Message deviceMessage : allDevicesOfUser) {
+      if (Objects.equals(deviceMessage.getToken(), message.getToken())) {
+        devicesRepository.delete(deviceMessage);
         hasDeletedAnyDevice = true;
         break;
       }
@@ -117,21 +124,20 @@ public class UserInfoService {
     if (!hasDeletedAnyDevice) {
       return "У вас нет такого устройства.";
     }
-    String infoAboutDevices = listOfDevices(message.getLogin());
-    if (Objects.equals(infoAboutDevices, "")) {
+
+    String infoAboutDevices = listOfDevicesOfUser(message.getLogin());
+    if (Objects.equals(infoAboutDevices, "У вас нет устройств.")) {
       return "У вас больше нет устройств.";
     }
-    StringBuilder info = new StringBuilder("Устройство успешно добавлено.\n");
-    info.append("Список ваших устройств:\n");
-    info.append(infoAboutDevices);
-    return (info.toString());
+    return ("Список ваших устройств:\n" +
+            infoAboutDevices);
   }
 
   public String getDeviceRules() {
     StringBuilder info = new StringBuilder();
     info.append("1) Датчик температуры. \n" +
-        "Отправьте запрос на адрес: " + ServerConfig.LINK_DEVICE_RULES + "\n" +
-        "Укажите id устройства и приемлемую для вас температуры в таком формате: {login: 99, deviceId: 123, lowTemperature: 15, hightTemperature: 20}");
+            "Отправьте запрос на адрес: " + ServerConfig.LINK_DEVICE_RULES + "\n" +
+            "Укажите id устройства и приемлемую для вас температуры в таком формате: {login: 99, deviceId: 123, lowTemperature: 15, hightTemperature: 20}");
     return info.toString();
   }
 
@@ -141,7 +147,11 @@ public class UserInfoService {
   public String applyRule(Message message) {
     if (existenceUser(message)) {
       if (existenceUserDevice(message)) {
-        rulesController.create(message);
+
+        message.setDeviceId(getDeviceIdByToken(message.getLogin(), message.getToken()));
+
+        rulesRepository.create(message);
+
         return "Правила успешно добавлены.";
       } else {
         return "У вас нет такого устройства.";
@@ -150,4 +160,27 @@ public class UserInfoService {
       return "Пользователя с таким логином не существует.";
     }
   }
+
+  private String getUserIdByLogin(String userLogin) {
+    for (Message currentMessage : usersRepository.getAll()) {
+      if (userLogin.equals(currentMessage.getLogin())) {
+        return currentMessage.getUserId();
+      }
+    }
+    return null;
+  }
+
+  private String getDeviceIdByToken(String userLogin, String deviceToken) {
+    for (Message userMessage : usersRepository.getAll()) {
+      if (userLogin.equals(userMessage.getLogin())) {
+        for (Message deviceMessage : usersRepository.devicesOfUser(userMessage)) {
+          if (deviceToken.equals(deviceMessage.getToken())) {
+            return deviceMessage.getDeviceId();
+          }
+        }
+      }
+    }
+    return null;
+  }
+
 }
