@@ -114,8 +114,8 @@ public class Message {
     this.hightTemperature = hightTemperature;
   }
 
-  public String getTemperature() {
-    return hightTemperature;
+  public String getLowTemperature() {
+    return lowTemperature;
   }
 
   public void setLowTemperature(String lowTemperature) {
