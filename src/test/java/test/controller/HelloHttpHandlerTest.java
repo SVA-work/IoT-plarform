@@ -2,7 +2,6 @@ package test.controller;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import test.DTO.Message;
 import test.config.ServerConfig;
 import test.service.UserInfoService;
 

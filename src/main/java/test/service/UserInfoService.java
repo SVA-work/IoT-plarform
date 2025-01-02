@@ -3,17 +3,16 @@ package test.service;
 import test.config.ServerConfig;
 
 import test.entity.User;
-import test.DTO.Message;
-import test.tables.DevicesController;
-import test.tables.UsersController;
+import test.tables.DevicesRepository;
+import test.tables.UsersRepository;
 
 import java.util.List;
 import java.util.Objects;
 
 public class UserInfoService {
 
-  private final UsersController usersController = new UsersController();
-  private final DevicesController devicesController = new DevicesController();
+  private final UsersRepository usersController = new UsersRepository();
+  private final DevicesRepository devicesController = new DevicesRepository();
 
   public UserInfoService() {
   }

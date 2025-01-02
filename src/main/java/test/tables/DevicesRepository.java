@@ -1,6 +1,8 @@
 package test.tables;
 
-import test.DTO.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import test.DTO.DeviceDto;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -10,39 +12,41 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DevicesRepository extends AbstractRepository<Message> {
+public class DevicesRepository extends AbstractRepository<DeviceDto> {
   private final String tableName = "devices";
   private final String tableID = "device_id";
 
+  private static final Logger LOG = LoggerFactory.getLogger(DevicesRepository.class);
+
   @Override
-  public Message createTable() {
+  public DeviceDto createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "device_id SERIAL PRIMARY KEY," +
             "user_id INTEGER REFERENCES users(user_id)," +
             "token VARCHAR(255) NOT NULL)";
-    Message response = new Message();
+    DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
       response.setSuccessful(true);
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Соединение не удалось", e);
       response.setSuccessful(false);
     }
     return response;
   }
 
   @Override
-  public List<Message> getAll() {
+  public List<DeviceDto> getAll() {
     String sql = "SELECT * FROM " + tableName;
-    List<Message> list = new ArrayList<>();
+    List<DeviceDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
-        Message response = new Message();
+        DeviceDto response = new DeviceDto();
         response.setDeviceId(resultSet.getString(tableID));
         response.setUserId(resultSet.getString("user_id"));
         response.setToken(resultSet.getString("token"));
@@ -50,16 +54,16 @@ public class DevicesRepository extends AbstractRepository<Message> {
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось получить информацию из таблицы devices", e);
     }
     return list;
   }
 
   @Override
-  public Message getById(Message message) {
-    int id = Integer.parseInt(message.getDeviceId());
+  public DeviceDto getById(DeviceDto UserDto) {
+    int id = Integer.parseInt(UserDto.getDeviceId());
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-    Message response = new Message();
+    DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -72,40 +76,40 @@ public class DevicesRepository extends AbstractRepository<Message> {
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось получить информацию об устройстве", e);
     }
     return response;
   }
 
-  public List<Message> ruleOfDevice(Message message) {
+  public List<DeviceDto> ruleOfDevice(DeviceDto message) {
     int id = Integer.parseInt(message.getDeviceId());
     String sql = "SELECT r.* " +
             "FROM rules r " +
             "JOIN devices d ON r.device_id = d.device_id " +
             "WHERE d.device_id = ?";
-    List<Message> list = new ArrayList<>();
+    List<DeviceDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
-        Message response = new Message();
+        DeviceDto response = new DeviceDto();
         response.setDeviceId(resultSet.getString("rule_id"));
         response.setToken(resultSet.getString("rule"));
         list.add(response);
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось получить информацию об правилах устройства", e);
     }
     return list;
   }
 
   @Override
-  public Message update(Message entity) {
+  public DeviceDto update(DeviceDto entity) {
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    Message response = new Message();
+    DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -126,15 +130,15 @@ public class DevicesRepository extends AbstractRepository<Message> {
         response.setToken(resultSet.getString("token"));
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось изменить данные об устройстве", e);
     }
     return response;
   }
 
   @Override
-  public Message delete(Message message) {
+  public DeviceDto delete(DeviceDto message) {
     int id = Integer.parseInt(message.getDeviceId());
-    Message response = new Message();
+    DeviceDto response = new DeviceDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
       Connection connection = DatabaseConnection.getConnection();
@@ -143,16 +147,16 @@ public class DevicesRepository extends AbstractRepository<Message> {
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось удалить устройство", e);
       response.setSuccessful(false);
     }
     return response;
   }
 
   @Override
-  public Message create(Message entity) {
+  public DeviceDto create(DeviceDto entity) {
     String sql = "INSERT INTO " + tableName + " (user_id, token) VALUES (?, ?)";
-    Message response = new Message();
+    DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -166,7 +170,7 @@ public class DevicesRepository extends AbstractRepository<Message> {
         response.setDeviceId(String.valueOf(deviceId));
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось создать устройство", e);
       response.setSuccessful(false);
     }
     return response;

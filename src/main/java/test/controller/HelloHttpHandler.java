@@ -1,6 +1,5 @@
 package test.controller;
 
-import test.DTO.Message;
 import test.library.AbstractHttpMappingHandler;
 import test.library.annotation.*;
 import test.library.json.JsonParser;

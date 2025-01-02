@@ -1,8 +1,6 @@
 package test.service;
 
 import org.junit.jupiter.api.Test;
-import test.DTO.Message;
-import test.config.ServerConfig;
 
 import static org.junit.jupiter.api.Assertions.*;
 

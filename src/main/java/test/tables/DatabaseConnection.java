@@ -1,41 +1,38 @@
 package test.tables;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import test.config.DbConfig;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-  public static final String driver = "org.postgresql.Driver";
-  public static final String localHost = "5433";
-  public static final String databaseName = "test4";
-  public static final String url = "jdbc:postgresql://localhost:" + localHost + "/" + databaseName;
-  public static final String user = "postgres";
-  public static final String password = "scoups";
+  private static final Logger LOG = LoggerFactory.getLogger(DatabaseConnection.class);
 
   public static Connection getConnection() {
     Connection connection = null;
     try {
-      connection = DriverManager.getConnection(url, user, password);
+      connection = DriverManager.getConnection(DbConfig.url, DbConfig.user, DbConfig.password);
       if (connection != null) {
-        System.out.println("Вы успешно подключились к базе данных");
+        LOG.info("Вы успешно подключились к базе данных");
       } else {
-        System.out.println("Не удалось подключиться к базе данных");
+        LOG.info("Не удалось подключиться к базе данных");
       }
     } catch (SQLException e) {
-      System.out.println("Соединение не удалось");
+      LOG.info("Соединение не удалось");
     }
     return connection;
   }
 
   public DatabaseConnection() {
     try {
-      Class.forName(driver);
+      Class.forName(DbConfig.driver);
     } catch (ClassNotFoundException e) {
-      System.out.println("PostgreSQL JDBC Driver не найден. Включите его в путь к вашей библиотеке");
+      LOG.info("PostgreSQL JDBC Driver не найден. Включите его в путь к вашей библиотеке");
       return;
     }
-    System.out.println("Драйвер PostgreSQL JDBC успешно подключен");
+    LOG.info("Драйвер PostgreSQL JDBC успешно подключен");
   }
-
 }
-

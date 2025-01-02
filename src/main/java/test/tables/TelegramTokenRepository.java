@@ -1,43 +1,51 @@
 package test.tables;
 
-import test.DTO.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import test.DTO.TelegramTokenDto;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TelegramTokenRepository extends AbstractRepository<Message>{
+public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto>{
   private final String tableName = "telegram_tokens";
   private final String tableID = "telegram_token_id";
 
-  public Message createTable() {
+  private static final Logger LOG = LoggerFactory.getLogger(TelegramTokenRepository.class);
+
+  public TelegramTokenDto createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "telegram_token_id SERIAL PRIMARY KEY," +
             "user_id INTEGER REFERENCES users(user_id)," +
             "telegram_token VARCHAR(255) NOT NULL)";
-    Message response = new Message();
+    TelegramTokenDto response = new TelegramTokenDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
       response.setSuccessful(true);
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Соединение не удалось", e);
       response.setSuccessful(false);
     }
     return response;
   }
 
   @Override
-  public List<Message> getAll() {
+  public List<TelegramTokenDto> getAll() {
     String sql = "SELECT * FROM " + tableName;
-    List<Message> list = new ArrayList<>();
+    List<TelegramTokenDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
-        Message response = new Message();
+        TelegramTokenDto response = new TelegramTokenDto();
         response.setTelegramTokenId(resultSet.getString(tableID));
         response.setUserId(resultSet.getString("user_id"));
         response.setTelegramToken(resultSet.getString("telegram_token"));
@@ -45,16 +53,16 @@ public class TelegramTokenRepository extends AbstractRepository<Message>{
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось получить информацию из таблицы telegram_tokens", e);
     }
     return list;
   }
 
   @Override
-  public Message getById(Message message) {
-    int id = Integer.parseInt(message.getDeviceId());
+  public TelegramTokenDto getById(TelegramTokenDto message) {
+    int id = Integer.parseInt(message.getTelegramTokenId());
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-    Message response = new Message();
+    TelegramTokenDto response = new TelegramTokenDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -67,15 +75,15 @@ public class TelegramTokenRepository extends AbstractRepository<Message>{
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось получить информацию о telegram-токене.", e);
     }
     return response;
   }
 
   @Override
-  public Message update(Message entity) {
+  public TelegramTokenDto update(TelegramTokenDto entity) {
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    Message response = new Message();
+    TelegramTokenDto response = new TelegramTokenDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -83,28 +91,28 @@ public class TelegramTokenRepository extends AbstractRepository<Message>{
         case "user_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
         case "telegram_token" -> preparedStatement.setString(1, entity.getTelegramToken());
       }
-      preparedStatement.setInt(2, Integer.parseInt(entity.getDeviceId()));
+      preparedStatement.setInt(2, Integer.parseInt(entity.getTelegramTokenId()));
       preparedStatement.executeUpdate();
 
       sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
       preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
+      preparedStatement.setInt(1, Integer.parseInt(entity.getTelegramTokenId()));
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
-        response.setDeviceId(resultSet.getString(tableID));
+        response.setTelegramTokenId(resultSet.getString(tableID));
         response.setUserId(resultSet.getString("user_id"));
         response.setTelegramToken(resultSet.getString("telegram_token"));
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось изменить данные telegram-токена", e);
     }
     return response;
   }
 
   @Override
-  public Message delete(Message message) {
-    int id = Integer.parseInt(message.getDeviceId());
-    Message response = new Message();
+  public TelegramTokenDto delete(TelegramTokenDto message) {
+    int id = Integer.parseInt(message.getTelegramTokenId());
+    TelegramTokenDto response = new TelegramTokenDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
       Connection connection = DatabaseConnection.getConnection();
@@ -113,16 +121,16 @@ public class TelegramTokenRepository extends AbstractRepository<Message>{
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось удалить telegram_токен", e);
       response.setSuccessful(false);
     }
     return response;
   }
 
   @Override
-  public Message create(Message entity) {
+  public TelegramTokenDto create(TelegramTokenDto entity) {
     String sql = "INSERT INTO " + tableName + " (user_id, telegram_token) VALUES (?, ?)";
-    Message response = new Message();
+    TelegramTokenDto response = new TelegramTokenDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -132,11 +140,11 @@ public class TelegramTokenRepository extends AbstractRepository<Message>{
       response.setSuccessful(true);
       ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
       if (generatedKeys.next()) {
-        long deviceId = generatedKeys.getLong(1);
-        response.setDeviceId(String.valueOf(deviceId));
+        long telegramTokenId = generatedKeys.getLong(1);
+        response.setTelegramTokenId(String.valueOf(telegramTokenId));
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось создать telegram-токен", e);
       response.setSuccessful(false);
     }
     return response;
@@ -156,7 +164,7 @@ public class TelegramTokenRepository extends AbstractRepository<Message>{
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.executeUpdate();
     } catch (SQLException e) {
-      System.out.println(e);
+      LOG.error("Не удалось создать функцию", e);
     }
   }
 
@@ -170,10 +178,7 @@ public class TelegramTokenRepository extends AbstractRepository<Message>{
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.executeUpdate();
     } catch (SQLException e) {
-      System.out.println(e);
+      LOG.error("Не удалось запустить trigger", e);
     }
   }
-
 }
-
-
