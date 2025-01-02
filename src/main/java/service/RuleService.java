@@ -2,7 +2,9 @@ package service;
 
 import config.ServerConfig;
 
-import dto.Message;
+import dto.DeviceDto;
+import dto.RuleDto;
+import dto.UserDto;
 import tables.DevicesRepository;
 import tables.UsersRepository;
 import tables.RulesRepository;
@@ -24,20 +26,19 @@ public class RuleService {
     return info.toString();
   }
 
-  public boolean existenceUser(Message message) {
-    for (Message currentMessage : usersRepository.getAll()) {
-      if (message.getLogin().equals(currentMessage.getLogin())) {
+  public boolean existenceUser(UserDto userDto) {
+    for (UserDto currentUserDto : usersRepository.getAll()) {
+      if (userDto.getLogin().equals(currentUserDto.getLogin())) {
         return true;
       }
     }
     return false;
   }
 
-  public boolean existenceUserDevice(Message message) {
-    List<Message> allDevices = usersRepository.devicesOfUser(message);
-    for (Message currentMessage : allDevices) {
-      if (message.getLogin().equals(currentMessage.getLogin()) &&
-              message.getDeviceId().equals(currentMessage.getDeviceId())) {
+  public boolean existenceUserDevice(UserDto userDto, DeviceDto deviceDto) {
+    List<DeviceDto> allDevices = usersRepository.devicesOfUser(userDto);
+    for (DeviceDto currentDeviceDto : allDevices) {
+      if (deviceDto.getDeviceId().equals(currentDeviceDto.getDeviceId())) {
         return true;
       }
     }
@@ -47,13 +48,13 @@ public class RuleService {
   //public String setDeviceRules() {
   //}
 
-  public String applyRule(Message message) {
-    if (existenceUser(message)) {
-      if (existenceUserDevice(message)) {
+  public String applyRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {
+    if (existenceUser(userDto)) {
+      if (existenceUserDevice(userDto, deviceDto)) {
 
-        message.setDeviceId(getDeviceIdByToken(message.getLogin(), message.getToken()));
+        ruleDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
 
-        rulesRepository.create(message);
+        rulesRepository.create(ruleDto);
 
         return "Правила успешно добавлены.";
       } else {
@@ -64,17 +65,16 @@ public class RuleService {
     }
   }
 
-  public String getDeviceRules(String login, String token) {
-    Message message = new Message();
-    message.setDeviceId(getDeviceIdByToken(login, token));
+  public String getDeviceRules(UserDto userDto, DeviceDto deviceDto) {
+    deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
 
-    List<Message> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
+    List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(deviceDto);
 
     StringBuilder info = new StringBuilder();
     boolean hasAnyRule = false;
 
-    for (Message ruleMessage : allRulesOfDevice) {
-      info.append(ruleMessage.getToken());
+    for (RuleDto currentRuleDto : allRulesOfDevice) {
+      info.append(currentRuleDto.getRule()).append("\n");
       hasAnyRule = true;
     }
     if (hasAnyRule) {
@@ -84,14 +84,14 @@ public class RuleService {
 
   }
 
-  public String deleteDeviceRule(Message message) {
-    message.setDeviceId(getDeviceIdByToken(message.getLogin(), message.getToken()));
-    List<Message> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
+  public String deleteDeviceRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {
+    deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
+    List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(deviceDto);
 
     boolean hasDeletedAnyRule = false;
-    for (Message ruleMessage : allRulesOfDevice) {
-      if (Objects.equals(ruleMessage.getToken(), message.getRule())) {
-        devicesRepository.delete(ruleMessage);
+    for (RuleDto currentRuleDto : allRulesOfDevice) {
+      if (Objects.equals(currentRuleDto.getRule(), ruleDto.getRule())) {
+        rulesRepository.delete(currentRuleDto);
         hasDeletedAnyRule = true;
         break;
       }
@@ -102,12 +102,12 @@ public class RuleService {
     return "Правило успешно удалено.";
   }
 
-  public String getDeviceIdByToken(String userLogin, String deviceToken) {
-    for (Message userMessage : usersRepository.getAll()) {
-      if (userLogin.equals(userMessage.getLogin())) {
-        for (Message deviceMessage : usersRepository.devicesOfUser(userMessage)) {
-          if (deviceToken.equals(deviceMessage.getToken())) {
-            return deviceMessage.getDeviceId();
+  public String getDeviceIdByToken(UserDto userDto, DeviceDto deviceDto) {
+    for (UserDto currentUserDto : usersRepository.getAll()) {
+      if (userDto.getLogin().equals(currentUserDto.getLogin())) {
+        for (DeviceDto currentDeviceDto : usersRepository.devicesOfUser(currentUserDto)) {
+          if (deviceDto.getToken().equals(currentDeviceDto.getToken())) {
+            return currentDeviceDto.getDeviceId();
           }
         }
       }

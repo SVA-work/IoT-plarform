@@ -1,6 +1,6 @@
-package test.DTO;
+package dto;
 
-public class DeviceDto extends BaseDto{
+public class DeviceDto extends BaseDto {
   private String userId;
   private String deviceId;
   private String token;

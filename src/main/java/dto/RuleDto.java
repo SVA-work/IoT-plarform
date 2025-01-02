@@ -1,11 +1,11 @@
-package test.DTO;
+package dto;
 
-public class RulesDto extends BaseDto{
+public class RuleDto extends BaseDto {
   private String ruleId;
   private String rule;
   private String deviceId;
 
-  public RulesDto() {
+  public RuleDto() {
   }
 
   public String getRuleId() {

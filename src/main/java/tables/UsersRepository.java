@@ -1,8 +1,9 @@
 package tables;
 
+import dto.DeviceDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import DTO.UserDto;
+import dto.UserDto;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -81,20 +82,20 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     return response;
   }
 
-  public List<UserDto> deviceOfUser(UserDto message) {
+  public List<DeviceDto> devicesOfUser(UserDto message) {
     int id = Integer.parseInt(message.getUserId());
     String sql = "SELECT d.* " +
             "FROM devices d " +
             "JOIN users u ON d.user_id = u.user_id " +
             "WHERE u.user_id = ?";
-    List<UserDto> list = new ArrayList<>();
+    List<DeviceDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
-        UserDto response = new UserDto();
+        DeviceDto response = new DeviceDto();
         response.setDeviceId(resultSet.getString("device_id"));
         response.setToken(resultSet.getString("token"));
         list.add(response);

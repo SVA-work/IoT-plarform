@@ -1,8 +1,9 @@
 package tables;
 
+import dto.RuleDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import test.DTO.DeviceDto;
+import dto.DeviceDto;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -81,22 +82,22 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
     return response;
   }
 
-  public List<DeviceDto> ruleOfDevice(DeviceDto message) {
+  public List<RuleDto> rulesOfDevice(DeviceDto message) {
     int id = Integer.parseInt(message.getDeviceId());
     String sql = "SELECT r.* " +
             "FROM rules r " +
             "JOIN devices d ON r.device_id = d.device_id " +
             "WHERE d.device_id = ?";
-    List<DeviceDto> list = new ArrayList<>();
+    List<RuleDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
-        DeviceDto response = new DeviceDto();
+        RuleDto response = new RuleDto();
         response.setDeviceId(resultSet.getString("rule_id"));
-        response.setToken(resultSet.getString("rule"));
+        response.setRule(resultSet.getString("rule"));
         list.add(response);
       }
       resultSet.close();

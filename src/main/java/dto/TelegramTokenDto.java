@@ -1,6 +1,6 @@
-package test.DTO;
+package dto;
 
-public class TelegramTokenDto extends  BaseDto{
+public class TelegramTokenDto extends BaseDto {
   private String userId;
   private String telegramToken;
   private String telegramTokenId;

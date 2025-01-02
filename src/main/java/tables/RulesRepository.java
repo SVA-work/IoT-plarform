@@ -1,8 +1,8 @@
 package tables;
 
+import dto.RuleDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import DTO.RulesDto;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -12,19 +12,19 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RulesRepository extends AbstractRepository<RulesDto>{
+public class RulesRepository extends AbstractRepository<RuleDto>{
   private final String tableName = "rules";
   private final String tableID = "rule_id";
 
   private static final Logger LOG = LoggerFactory.getLogger(RulesRepository.class);
 
   @Override
-  public RulesDto createTable() {
+  public RuleDto createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "rule_id SERIAL PRIMARY KEY," +
             "device_id INTEGER REFERENCES devices(device_id)," +
             "rule VARCHAR(255) NOT NULL)";
-    RulesDto response = new RulesDto();
+    RuleDto response = new RuleDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
@@ -38,15 +38,15 @@ public class RulesRepository extends AbstractRepository<RulesDto>{
   }
 
   @Override
-  public List<RulesDto> getAll() {
+  public List<RuleDto> getAll() {
     String sql = "SELECT * FROM " + tableName;
-    List<RulesDto> list = new ArrayList<>();
+    List<RuleDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
-        RulesDto response = new RulesDto();
+        RuleDto response = new RuleDto();
         response.setRuleId(resultSet.getString(tableID));
         response.setDeviceId(resultSet.getString("device_id"));
         response.setRule(resultSet.getString("rule"));
@@ -60,10 +60,10 @@ public class RulesRepository extends AbstractRepository<RulesDto>{
   }
 
   @Override
-  public RulesDto getById(RulesDto message) {
+  public RuleDto getById(RuleDto message) {
     int id = Integer.parseInt(message.getRuleId());
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-    RulesDto response = new RulesDto();
+    RuleDto response = new RuleDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -82,9 +82,9 @@ public class RulesRepository extends AbstractRepository<RulesDto>{
   }
 
   @Override
-  public RulesDto update(RulesDto entity) {
+  public RuleDto update(RuleDto entity) {
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    RulesDto response = new RulesDto();
+    RuleDto response = new RuleDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -112,9 +112,9 @@ public class RulesRepository extends AbstractRepository<RulesDto>{
   }
 
   @Override
-  public RulesDto delete(RulesDto message) {
+  public RuleDto delete(RuleDto message) {
     int id = Integer.parseInt(message.getRuleId());
-    RulesDto response = new RulesDto();
+    RuleDto response = new RuleDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
       Connection connection = DatabaseConnection.getConnection();
@@ -130,9 +130,9 @@ public class RulesRepository extends AbstractRepository<RulesDto>{
   }
 
   @Override
-  public RulesDto create(RulesDto entity) {
+  public RuleDto create(RuleDto entity) {
     String sql = "INSERT INTO " + tableName + " (device_id, rule) VALUES (?, ?)";
-    RulesDto response = new RulesDto();
+    RuleDto response = new RuleDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);

@@ -1,6 +1,8 @@
 package service;
 
-import dto.Message;
+import dto.DeviceDto;
+import dto.RuleDto;
+import dto.UserDto;
 import tables.DevicesRepository;
 import tables.UsersRepository;
 
@@ -12,20 +14,18 @@ public class DeviceService {
   private final UsersRepository usersRepository = new UsersRepository();
   private final DevicesRepository devicesRepository = new DevicesRepository();
 
-  public String listOfDevicesOfUser(String userLogin) {
-    Message message = new Message();
-    message.setLogin(userLogin);
+  public String listOfDevicesOfUser(UserDto userDto) {
 
-    message.setUserId(getUserIdByLogin(userLogin));
+    userDto.setUserId(getUserIdByLogin(userDto));
 
-    List<Message> allDevicesOfUser = usersRepository.devicesOfUser(message);
+    List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
 
     StringBuilder info = new StringBuilder();
     boolean hasAnyDevice = false;
-    for (Message deviceMessage : allDevicesOfUser) {
-      info.append(deviceMessage.getToken()).append('\n');
-      for (Message ruleMessage : devicesRepository.rulesOfDevice(deviceMessage)) {
-        info.append("  ").append(ruleMessage.getToken()).append("\n");
+    for (DeviceDto currentDeviceDto : allDevicesOfUser) {
+      info.append(currentDeviceDto.getToken()).append('\n');
+      for (RuleDto ruleDto : devicesRepository.rulesOfDevice(currentDeviceDto)) {
+        info.append("  ").append(ruleDto.getRule()).append("\n");
       }
       hasAnyDevice = true;
     }
@@ -35,20 +35,20 @@ public class DeviceService {
     return "У вас нет устройств.";
   }
 
-  public String addDevice(Message message) {
-    message.setUserId(getUserIdByLogin(message.getLogin()));
-    devicesRepository.create(message);
-    return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(message.getLogin());
+  public String addDevice(UserDto userDto, DeviceDto deviceDto) {
+    deviceDto.setUserId(getUserIdByLogin(userDto));
+    devicesRepository.create(deviceDto);
+    return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(userDto);
   }
 
-  public String deleteDevice(Message message) {
-    message.setUserId(getUserIdByLogin(message.getLogin()));
-    List<Message> allDevicesOfUser = usersRepository.devicesOfUser(message);
+  public String deleteDevice(UserDto userDto, DeviceDto deviceDto) {
+    userDto.setUserId(getUserIdByLogin(userDto));
+    List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
 
     boolean hasDeletedAnyDevice = false;
-    for (Message deviceMessage : allDevicesOfUser) {
-      if (Objects.equals(deviceMessage.getToken(), message.getToken())) {
-        devicesRepository.delete(deviceMessage);
+    for (DeviceDto currentDeviceDto : allDevicesOfUser) {
+      if (Objects.equals(currentDeviceDto.getToken(), deviceDto.getToken())) {
+        devicesRepository.delete(currentDeviceDto);
         hasDeletedAnyDevice = true;
         break;
       }
@@ -57,7 +57,7 @@ public class DeviceService {
       return "У вас нет такого устройства.";
     }
 
-    String infoAboutDevices = listOfDevicesOfUser(message.getLogin());
+    String infoAboutDevices = listOfDevicesOfUser(userDto);
     if (Objects.equals(infoAboutDevices, "У вас нет устройств.")) {
       return "У вас больше нет устройств.";
     }
@@ -65,10 +65,10 @@ public class DeviceService {
             infoAboutDevices);
   }
 
-  public String getUserIdByLogin(String userLogin) {
-    for (Message currentMessage : usersRepository.getAll()) {
-      if (userLogin.equals(currentMessage.getLogin())) {
-        return currentMessage.getUserId();
+  public String getUserIdByLogin(UserDto userDto) {
+    for (UserDto currentUserDto : usersRepository.getAll()) {
+      if (userDto.getLogin().equals(currentUserDto.getLogin())) {
+        return currentUserDto.getUserId();
       }
     }
     return null;

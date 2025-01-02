@@ -1,4 +1,4 @@
-package test.DTO;
+package dto;
 
 public class UserDto extends BaseDto {
   private String userId;
