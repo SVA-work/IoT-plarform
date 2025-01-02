@@ -20,10 +20,16 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
     super(parser);
   }
 
-  @Get("/test/get/deviceRules")
+  @Get("/test/get/allAvailableRules")
   public DefaultFullHttpResponse AvailableDeviceRules() {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-        Unpooled.copiedBuffer(user.getDeviceRules(), StandardCharsets.UTF_8));
+        Unpooled.copiedBuffer(user.getAllAvailableRules(), StandardCharsets.UTF_8));
+  }
+
+  @Get("/test/get/deviceRules")
+  public DefaultFullHttpResponse deviceRules(@QueryParam("login") String login, @QueryParam("token") String token) {
+    return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+        Unpooled.copiedBuffer(user.getDeviceRules(login, token), StandardCharsets.UTF_8));
   }
 
   @Get("/test/get/listOfDevicesOfUser")
@@ -60,5 +66,11 @@ public class HelloHttpHandler extends AbstractHttpMappingHandler {
   public DefaultFullHttpResponse applyRule(@RequestBody Message message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
         Unpooled.copiedBuffer(user.applyRule(message), StandardCharsets.UTF_8));
+  }
+
+  @Post("/test/post/deleteDeviceRule")
+  public DefaultFullHttpResponse deleteDeviceRule(@RequestBody Message message) {
+    return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+        Unpooled.copiedBuffer(user.deleteDeviceRule(message), StandardCharsets.UTF_8));
   }
 }

@@ -9,6 +9,8 @@ public class ServerConfig {
     public static final String LINK_GET_DEVICE_INFORMATION = "http://localhost:" + PORT + "/test/get/listOfDevicesOfUser";
     public static final String LINK_ENTRY = "http://localhost:" + PORT + "/test/post/entry";
     public static final String LINK_REGISTRATION = "http://localhost:" + PORT + "/test/post/registration";
-    public static final String LINK_DEVICE_RULES = "http://localhost:" + PORT + "/test/get/deviceRules";
+    public static final String LINK_ALL_AVAILABLE_RULES = "http://localhost:" + PORT + "/test/get/allAvailableRules";
     public static final String LINK_APPLY_RULE = "http://localhost:" + PORT + "/test/post/applyRule";
+    public static final String LINK_DELETE_DEVICE_RULE = "http://localhost:" + PORT + "/test/post/deleteDeviceRule";
+    public static final String LINK_DEVICE_RULES = "http://localhost:" + PORT + "/test/get/deviceRules";
 }
