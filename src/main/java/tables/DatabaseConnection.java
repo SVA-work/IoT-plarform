@@ -9,12 +9,16 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
+  public static final String user = "postgres";
+  public static final String password = "scoups";
+  public static final String url = "jdbc:postgresql://localhost:" + DbConfig.localHost + "/" + DbConfig.databaseName;
+
   private static final Logger LOG = LoggerFactory.getLogger(DatabaseConnection.class);
 
   public static Connection getConnection() {
     Connection connection = null;
     try {
-      connection = DriverManager.getConnection(DbConfig.url, DbConfig.user, DbConfig.password);
+      connection = DriverManager.getConnection(url, user, password);
       if (connection != null) {
         LOG.info("Вы успешно подключились к базе данных");
       } else {
