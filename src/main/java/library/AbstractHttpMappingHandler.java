@@ -184,80 +184,95 @@ public abstract class AbstractHttpMappingHandler extends ChannelInboundHandlerAd
         return handlers.isEmpty() ? null : handlers;
     }
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if (httpMethodHandlers != null && msg instanceof HttpRequest) {
-            HttpRequest request = (HttpRequest) msg;
+  @Override
+  public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    if (httpMethodHandlers != null && msg instanceof HttpRequest) {
+        HttpRequest request = (HttpRequest) msg;
+        boolean handled = false;
 
-            for (HttpMethodHandler handler : httpMethodHandlers) {
-                Matcher matcher = handler.getPathPattern().matcher(request.uri());
+        for (HttpMethodHandler handler : httpMethodHandlers) {
+            Matcher matcher = handler.getPathPattern().matcher(request.uri());
 
-                if (handler.getHttpMethod().equals(request.method()) && matcher.matches()) {
-                    Map<String, String> pathParamValues = new HashMap<>();
+            if (handler.getHttpMethod().equals(request.method()) && matcher.matches()) {
+                Map<String, String> pathParamValues = new HashMap<>();
 
-                    for (int i = 0; i < matcher.groupCount(); i++) {
-                        String value = matcher.group(i + 1);
-
-                        if (value != null) {
-                            pathParamValues.put(handler.getPathParamNames().get(i), value);
-                        }
+                for (int i = 0; i < matcher.groupCount(); i++) {
+                    String value = matcher.group(i + 1);
+                    if (value != null) {
+                        pathParamValues.put(handler.getPathParamNames().get(i), value);
                     }
-
-                    Object[] parameters = null;
-
-                    if (handler.getParams() != null && !handler.getParams().isEmpty()) {
-                        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.uri());
-                        parameters = new Object[handler.getParams().size()];
-
-                        for (int i = 0; i < handler.getParams().size(); i++ ) {
-                            if (handler.getParams().get(i).getTypeParam().equals(MethodParam.TypeParam.REQUEST_BODY)) {
-                                parameters[i] = parser.parse(handler.getPath(),
-                                        ((HttpContent) request).content(), handler.getParams().get(i).getType());
-                                continue;
-                            }
-
-                            String value;
-
-                            if (handler.getParams().get(i).getTypeParam().equals(MethodParam.TypeParam.PATH_PARAM)) {
-                                value = pathParamValues.get(handler.getParams().get(i).getName());
-                            } else {
-                                List<String> values =
-                                        queryStringDecoder.parameters().get(handler.getParams().get(i).getName());
-                                value = values != null && !values.isEmpty() ? values.get(0) : null;
-                            }
-                            if (value != null && !value.isEmpty()) {
-                                try {
-                                    if (handler.getParams().get(i).getType().equals(String.class)) {
-                                        parameters[i] = value;
-                                    } else {
-                                        Method valueOfMethod = handler.getParams().get(i).getType().getMethod("valueOf",
-                                                String.class);
-                                        parameters[i] = valueOfMethod.invoke(null, value);
-                                    }
-                                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                                    throw new ParamException(String.format(
-                                            "Error cast parameter '%s' with value '%s' to '%s, path - '%s'",
-                                            handler.getParams().get(i).getName(), value,
-                                            handler.getParams().get(i).getType(),
-                                            handler.getPath()));
-                                }
-                            } else if (handler.getParams().get(i).isRequired()) {
-                                throw new ParamException(String.format("No required parameter '%s', path - '%s'",
-                                        handler.getParams().get(i).getName(), handler.getPath()));
-                            }
-                        }
-                    }
-
-                    FullHttpResponse response = handler.invoke(parameters);
-                    ctx.writeAndFlush(response);
                 }
+
+                Object[] parameters = null;
+
+                if (handler.getParams() != null && !handler.getParams().isEmpty()) {
+                    QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.uri());
+                    parameters = new Object[handler.getParams().size()];
+
+                    for (int i = 0; i < handler.getParams().size(); i++) {
+                        if (handler.getParams().get(i).getTypeParam().equals(MethodParam.TypeParam.REQUEST_BODY)) {
+                            parameters[i] = parser.parse(handler.getPath(),
+                                    ((HttpContent) request).content(), handler.getParams().get(i).getType());
+                            continue;
+                        }
+
+                        String value;
+
+                        if (handler.getParams().get(i).getTypeParam().equals(MethodParam.TypeParam.PATH_PARAM)) {
+                            value = pathParamValues.get(handler.getParams().get(i).getName());
+                        } else {
+                            List<String> values =
+                                    queryStringDecoder.parameters().get(handler.getParams().get(i).getName());
+                            value = values != null && !values.isEmpty() ? values.get(0) : null;
+                        }
+                        if (value != null && !value.isEmpty()) {
+                            try {
+                                if (handler.getParams().get(i).getType().equals(String.class)) {
+                                    parameters[i] = value;
+                                } else {
+                                    Method valueOfMethod = handler.getParams().get(i).getType().getMethod("valueOf",
+                                            String.class);
+                                    parameters[i] = valueOfMethod.invoke(null, value);
+                                }
+                            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                                throw new ParamException(String.format(
+                                        "Error cast parameter '%s' with value '%s' to '%s, path - '%s'",
+                                        handler.getParams().get(i).getName(), value,
+                                        handler.getParams().get(i).getType(),
+                                        handler.getPath()));
+                            }
+                        } else if (handler.getParams().get(i).isRequired()) {
+                            throw new ParamException(String.format("No required parameter '%s', path - '%s'",
+                                    handler.getParams().get(i).getName(), handler.getPath()));
+                        }
+                    }
+                }
+                FullHttpResponse response = handler.invoke(parameters);
+                ctx.writeAndFlush(response);
+                handled = true;
+                break;
             }
         }
-    }
+        if (!handled && nextHandler != null) {
+            nextHandler.channelRead(ctx, msg);
+        }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-        ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR));
+    } else {
+        if (nextHandler != null) {
+            nextHandler.channelRead(ctx, msg);
+        }
     }
+  }
+
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    super.exceptionCaught(ctx, cause);
+    ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR));
+  }
+
+  private AbstractHttpMappingHandler nextHandler;
+
+  public void setNextHandler(AbstractHttpMappingHandler nextHandler) {
+    this.nextHandler = nextHandler;
+  }
 }

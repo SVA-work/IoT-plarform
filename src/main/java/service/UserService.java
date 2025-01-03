@@ -2,7 +2,7 @@ package service;
 
 import config.ServerConfig;
 
-import dto.Message;
+import dto.UserDto;
 import tables.UsersRepository;
 
 public class UserService {
@@ -12,7 +12,7 @@ public class UserService {
   public UserService() {
   }
 
-  public String registration(Message message) {
+  public String registration(UserDto message) {
     if (existenceUser(message)) {
       return "Пользователь с таким логином уже существует.";
     }
@@ -22,8 +22,8 @@ public class UserService {
             "Ваш пароль: " + message.getPassword();
   }
 
-  public boolean existenceUser(Message message) {
-    for (Message currentMessage : usersRepository.getAll()) {
+  public boolean existenceUser(UserDto message) {
+    for (UserDto currentMessage : usersRepository.getAll()) {
       if (message.getLogin().equals(currentMessage.getLogin())) {
         return true;
       }
@@ -31,8 +31,8 @@ public class UserService {
     return false;
   }
 
-  public String userVerification(Message message) {
-    for (Message currentMessage : usersRepository.getAll()) {
+  public String userVerification(UserDto message) {
+    for (UserDto currentMessage : usersRepository.getAll()) {
       if (message.getLogin().equals(currentMessage.getLogin()) &&
               message.getPassword().equals(currentMessage.getPassword())) {
         return successfulEntry();

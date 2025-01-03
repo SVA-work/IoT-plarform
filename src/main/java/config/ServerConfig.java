@@ -13,4 +13,5 @@ public class ServerConfig {
     public static final String LINK_APPLY_RULE = "http://localhost:" + PORT + "/post/applyRule";
     public static final String LINK_DELETE_DEVICE_RULE = "http://localhost:" + PORT + "/post/deleteDeviceRule";
     public static final String LINK_DEVICE_RULES = "http://localhost:" + PORT + "/get/deviceRules";
+    public static final String LINK_REPORT = "http://localhost:" + PORT + "/post/report";
 }

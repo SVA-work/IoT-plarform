@@ -1,6 +1,6 @@
 package tables;
 
-import dto.Message;
+import dto.UserDto;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -10,17 +10,17 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RulesRepository extends AbstractRepository<Message>{
+public class RulesRepository extends AbstractRepository<UserDto>{
   private final String tableName = "rules";
   private final String tableID = "rule_id";
 
   @Override
-  public Message createTable() {
+  public UserDto createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "rule_id SERIAL PRIMARY KEY," +
             "device_id INTEGER REFERENCES devices(device_id)," +
             "rule VARCHAR(255) NOT NULL)";
-    Message response = new Message();
+    UserDto response = new UserDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
@@ -34,15 +34,15 @@ public class RulesRepository extends AbstractRepository<Message>{
   }
 
   @Override
-  public List<Message> getAll() {
+  public List<UserDto> getAll() {
     String sql = "SELECT * FROM " + tableName;
-    List<Message> list = new ArrayList<>();
+    List<UserDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
-        Message response = new Message();
+        UserDto response = new UserDto();
         response.setRuleId(resultSet.getString(tableID));
         response.setDeviceId(resultSet.getString("device_id"));
         response.setRule(resultSet.getString("rule"));
@@ -56,10 +56,10 @@ public class RulesRepository extends AbstractRepository<Message>{
   }
 
   @Override
-  public Message getById(Message message) {
+  public UserDto getById(UserDto message) {
     int id = Integer.parseInt(message.getDeviceId());
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-    Message response = new Message();
+    UserDto response = new UserDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -78,9 +78,9 @@ public class RulesRepository extends AbstractRepository<Message>{
   }
 
   @Override
-  public Message update(Message entity) {
+  public UserDto update(UserDto entity) {
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    Message response = new Message();
+    UserDto response = new UserDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -108,9 +108,9 @@ public class RulesRepository extends AbstractRepository<Message>{
   }
 
   @Override
-  public Message delete(Message message) {
+  public UserDto delete(UserDto message) {
     int id = Integer.parseInt(message.getRuleId());
-    Message response = new Message();
+    UserDto response = new UserDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
       Connection connection = DatabaseConnection.getConnection();
@@ -126,9 +126,9 @@ public class RulesRepository extends AbstractRepository<Message>{
   }
 
   @Override
-  public Message create(Message entity) {
+  public UserDto create(UserDto entity) {
     String sql = "INSERT INTO " + tableName + " (device_id, rule) VALUES (?, ?)";
-    Message response = new Message();
+    UserDto response = new UserDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);

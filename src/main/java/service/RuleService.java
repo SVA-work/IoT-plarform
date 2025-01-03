@@ -2,7 +2,7 @@ package service;
 
 import config.ServerConfig;
 
-import dto.Message;
+import dto.UserDto;
 import tables.DevicesRepository;
 import tables.UsersRepository;
 import tables.RulesRepository;
@@ -24,8 +24,8 @@ public class RuleService {
     return info.toString();
   }
 
-  public boolean existenceUser(Message message) {
-    for (Message currentMessage : usersRepository.getAll()) {
+  public boolean existenceUser(UserDto message) {
+    for (UserDto currentMessage : usersRepository.getAll()) {
       if (message.getLogin().equals(currentMessage.getLogin())) {
         return true;
       }
@@ -33,9 +33,9 @@ public class RuleService {
     return false;
   }
 
-  public boolean existenceUserDevice(Message message) {
-    List<Message> allDevices = usersRepository.devicesOfUser(message);
-    for (Message currentMessage : allDevices) {
+  public boolean existenceUserDevice(UserDto message) {
+    List<UserDto> allDevices = usersRepository.devicesOfUser(message);
+    for (UserDto currentMessage : allDevices) {
       if (message.getLogin().equals(currentMessage.getLogin()) &&
               message.getDeviceId().equals(currentMessage.getDeviceId())) {
         return true;
@@ -47,7 +47,7 @@ public class RuleService {
   //public String setDeviceRules() {
   //}
 
-  public String applyRule(Message message) {
+  public String applyRule(UserDto message) {
     if (existenceUser(message)) {
       if (existenceUserDevice(message)) {
 
@@ -65,15 +65,15 @@ public class RuleService {
   }
 
   public String getDeviceRules(String login, String token) {
-    Message message = new Message();
+    UserDto message = new UserDto();
     message.setDeviceId(getDeviceIdByToken(login, token));
 
-    List<Message> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
+    List<UserDto> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
 
     StringBuilder info = new StringBuilder();
     boolean hasAnyRule = false;
 
-    for (Message ruleMessage : allRulesOfDevice) {
+    for (UserDto ruleMessage : allRulesOfDevice) {
       info.append(ruleMessage.getToken());
       hasAnyRule = true;
     }
@@ -84,12 +84,12 @@ public class RuleService {
 
   }
 
-  public String deleteDeviceRule(Message message) {
+  public String deleteDeviceRule(UserDto message) {
     message.setDeviceId(getDeviceIdByToken(message.getLogin(), message.getToken()));
-    List<Message> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
+    List<UserDto> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
 
     boolean hasDeletedAnyRule = false;
-    for (Message ruleMessage : allRulesOfDevice) {
+    for (UserDto ruleMessage : allRulesOfDevice) {
       if (Objects.equals(ruleMessage.getToken(), message.getRule())) {
         devicesRepository.delete(ruleMessage);
         hasDeletedAnyRule = true;
@@ -103,9 +103,9 @@ public class RuleService {
   }
 
   public String getDeviceIdByToken(String userLogin, String deviceToken) {
-    for (Message userMessage : usersRepository.getAll()) {
+    for (UserDto userMessage : usersRepository.getAll()) {
       if (userLogin.equals(userMessage.getLogin())) {
-        for (Message deviceMessage : usersRepository.devicesOfUser(userMessage)) {
+        for (UserDto deviceMessage : usersRepository.devicesOfUser(userMessage)) {
           if (deviceToken.equals(deviceMessage.getToken())) {
             return deviceMessage.getDeviceId();
           }

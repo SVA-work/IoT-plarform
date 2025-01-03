@@ -1,8 +1,10 @@
 package controller;
 
 import config.*;
-
-import controller.userapi.HelloHttpHandler;
+import controller.deviceapi.TelemetryHttpHandler;
+import controller.userapi.DeviceHttpHandler;
+import controller.userapi.RulesHttpHandler;
+import controller.userapi.UserHttpHandler;
 import library.json.JsonParserDefault;
 import tables.DatabaseConnection;
 import io.netty.bootstrap.ServerBootstrap;
@@ -22,7 +24,6 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 public class ServerLauncher {
 
   public static void main(String[] args) throws Exception {
-    System.out.println(1);
     NioEventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
     try {
@@ -34,16 +35,25 @@ public class ServerLauncher {
               .childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel channel) throws Exception {
+                  JsonParserDefault parser = new JsonParserDefault();
+                  UserHttpHandler userHandler = new UserHttpHandler(parser);
+                  DeviceHttpHandler deviceHandler = new DeviceHttpHandler(parser);
+                  RulesHttpHandler rulesHandler = new RulesHttpHandler(parser);
+                  TelemetryHttpHandler telemetryHandler = new TelemetryHttpHandler(parser);
+                  userHandler.setNextHandler(deviceHandler);
+                  deviceHandler.setNextHandler(rulesHandler);
+                  rulesHandler.setNextHandler(telemetryHandler);
                   channel.pipeline()
                           .addLast("HttpServerCodec", new HttpServerCodec())
                           .addLast("HttpServerKeepAlive", new HttpServerKeepAliveHandler())
                           .addLast("HttpObjectAggregator", new HttpObjectAggregator(ServerConfig.MAX_CONTENT_LENGHT, true))
                           .addLast("HttpChunkedWrite", new ChunkedWriteHandler())
-                          .addLast("HelloHttpHandler", new HelloHttpHandler(new JsonParserDefault()));
+                          .addLast("User HttpHandler", userHandler);
                 }
               })
               .option(ChannelOption.SO_BACKLOG, ServerConfig.MAX_BACK_LOG_SIZE)
               .childOption(ChannelOption.SO_KEEPALIVE, true);
+      System.out.println("Сервер запущен на порту: " + ServerConfig.PORT);
       ChannelFuture future = boot.bind(ServerConfig.PORT).sync();
 
       future.channel().closeFuture().sync();

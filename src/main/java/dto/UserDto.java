@@ -1,6 +1,6 @@
 package dto;
 
-public class Message {
+public class UserDto {
   private String userId;
   private String login;
   private String password;
@@ -15,7 +15,7 @@ public class Message {
   private String lowTemperature;
   private String hightTemperature;
 
-  public Message() {
+  public UserDto() {
   }
 
   public String getUserId() {

@@ -1,6 +1,6 @@
 package service;
 
-import dto.Message;
+import dto.UserDto;
 import tables.DevicesRepository;
 import tables.UsersRepository;
 
@@ -13,18 +13,18 @@ public class DeviceService {
   private final DevicesRepository devicesRepository = new DevicesRepository();
 
   public String listOfDevicesOfUser(String userLogin) {
-    Message message = new Message();
+    UserDto message = new UserDto();
     message.setLogin(userLogin);
 
     message.setUserId(getUserIdByLogin(userLogin));
 
-    List<Message> allDevicesOfUser = usersRepository.devicesOfUser(message);
+    List<UserDto> allDevicesOfUser = usersRepository.devicesOfUser(message);
 
     StringBuilder info = new StringBuilder();
     boolean hasAnyDevice = false;
-    for (Message deviceMessage : allDevicesOfUser) {
+    for (UserDto deviceMessage : allDevicesOfUser) {
       info.append(deviceMessage.getToken()).append('\n');
-      for (Message ruleMessage : devicesRepository.rulesOfDevice(deviceMessage)) {
+      for (UserDto ruleMessage : devicesRepository.rulesOfDevice(deviceMessage)) {
         info.append("  ").append(ruleMessage.getToken()).append("\n");
       }
       hasAnyDevice = true;
@@ -35,18 +35,18 @@ public class DeviceService {
     return "У вас нет устройств.";
   }
 
-  public String addDevice(Message message) {
+  public String addDevice(UserDto message) {
     message.setUserId(getUserIdByLogin(message.getLogin()));
     devicesRepository.create(message);
     return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(message.getLogin());
   }
 
-  public String deleteDevice(Message message) {
+  public String deleteDevice(UserDto message) {
     message.setUserId(getUserIdByLogin(message.getLogin()));
-    List<Message> allDevicesOfUser = usersRepository.devicesOfUser(message);
+    List<UserDto> allDevicesOfUser = usersRepository.devicesOfUser(message);
 
     boolean hasDeletedAnyDevice = false;
-    for (Message deviceMessage : allDevicesOfUser) {
+    for (UserDto deviceMessage : allDevicesOfUser) {
       if (Objects.equals(deviceMessage.getToken(), message.getToken())) {
         devicesRepository.delete(deviceMessage);
         hasDeletedAnyDevice = true;
@@ -66,7 +66,7 @@ public class DeviceService {
   }
 
   public String getUserIdByLogin(String userLogin) {
-    for (Message currentMessage : usersRepository.getAll()) {
+    for (UserDto currentMessage : usersRepository.getAll()) {
       if (userLogin.equals(currentMessage.getLogin())) {
         return currentMessage.getUserId();
       }

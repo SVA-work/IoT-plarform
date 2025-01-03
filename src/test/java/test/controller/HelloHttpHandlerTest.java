@@ -65,7 +65,7 @@ class HelloHttpHandlerTest {
       throw new RuntimeException(e);
     }
     UserInfoService userInfoService = new UserInfoService();
-    Message message = new Message();
+    UserDto message = new UserDto();
     message.setLogin("123");
     String result = userInfoService.listOfDevicesOfUser("123");
     assertEquals(response.toString(), result);
@@ -102,17 +102,17 @@ class HelloHttpHandlerTest {
       throw new RuntimeException(e);
     }
 
-    Message deleteMessage1 = new Message();
+    UserDto deleteMessage1 = new UserDto();
     deleteMessage1.setLogin("123");
     usersController.delete(deleteMessage1);
 
-    Message message = new Message();
+    UserDto message = new UserDto();
     UserInfoService userInfoService = new UserInfoService();
     message.setLogin("123");
     message.setPassword("123");
     String result = userInfoService.registration(message);
 
-    Message deleteMessage2 = new Message();
+    UserDto deleteMessage2 = new UserDto();
     deleteMessage2.setLogin("123");
     usersController.delete(deleteMessage2);
 
@@ -149,7 +149,7 @@ class HelloHttpHandlerTest {
       throw new RuntimeException(e);
     }
 
-    Message message = new Message();
+    UserDto message = new UserDto();
     UserInfoService user = new UserInfoService();
     message.setLogin("123");
     message.setPassword("123");
@@ -188,18 +188,18 @@ class HelloHttpHandlerTest {
       throw new RuntimeException(e);
     }
     UserInfoService user = new UserInfoService();
-    Message deleteMessage1 = new Message();
+    UserDto deleteMessage1 = new UserDto();
     deleteMessage1.setLogin("123");
     deleteMessage1.setToken("123");
     deleteMessage1.setDeviceId(user.getDeviceIdByToken("123", "123"));
     devicesController.delete(deleteMessage1);
 
-    Message message = new Message();
+    UserDto message = new UserDto();
     message.setLogin("123");
     message.setDeviceId("123");
     String result = user.addDevice(message);
 
-    Message deleteMessage2 = new Message();
+    UserDto deleteMessage2 = new UserDto();
     deleteMessage2.setLogin("123");
     deleteMessage2.setToken("123");
     deleteMessage2.setDeviceId(user.getDeviceIdByToken("123", "123"));
@@ -239,18 +239,18 @@ class HelloHttpHandlerTest {
     }
     UserInfoService user = new UserInfoService();
 
-    Message addMessage1 = new Message();
+    UserDto addMessage1 = new UserDto();
     addMessage1.setLogin("123");
     addMessage1.setToken("123");
     addMessage1.setDeviceId(user.getDeviceIdByToken("123", "123"));
     devicesController.create(addMessage1);
   
-    Message message = new Message();
+    UserDto message = new UserDto();
     message.setLogin("123");
     message.setToken("123");
     String result = user.deleteDevice(message);
 
-    Message addMessage2 = new Message();
+    UserDto addMessage2 = new UserDto();
     addMessage2.setLogin("123");
     addMessage2.setToken("123");
     addMessage2.setDeviceId(user.getDeviceIdByToken("123", "123"));
@@ -348,13 +348,13 @@ class HelloHttpHandlerTest {
     }
     UserInfoService user = new UserInfoService();
 
-    Message deleteMessage1 = new Message();
+    UserDto deleteMessage1 = new UserDto();
     deleteMessage1.setLogin("123");
     deleteMessage1.setToken("123");
     deleteMessage1.setRule("123");
     user.deleteDeviceRule(deleteMessage1);
 
-    Message message = new Message();
+    UserDto message = new UserDto();
     message.setLogin("123");
     message.setToken("123");
     deleteMessage1.setRule("123");
@@ -362,7 +362,7 @@ class HelloHttpHandlerTest {
     message.setHightTemperature("20");
     String result = user.applyRule(message);
 
-    Message deleteMessage2 = new Message();
+    UserDto deleteMessage2 = new UserDto();
     deleteMessage2.setLogin("123");
     deleteMessage2.setToken("123");
     deleteMessage2.setRule("123");
@@ -402,19 +402,19 @@ class HelloHttpHandlerTest {
     }
     UserInfoService user = new UserInfoService();
 
-    Message addMessage1 = new Message();
+    UserDto addMessage1 = new UserDto();
     addMessage1.setLogin("123");
     addMessage1.setToken("123");
     addMessage1.setRule("123");
     user.applyRule(addMessage1);
 
-    Message message = new Message();
+    UserDto message = new UserDto();
     message.setLogin("123");
     message.setToken("123");
     message.setRule("123");
     String result = user.deleteDeviceRule(message);
 
-    Message addMessage2 = new Message();
+    UserDto addMessage2 = new UserDto();
     addMessage2.setLogin("123");
     addMessage2.setToken("123");
     addMessage2.setRule("123");
