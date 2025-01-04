@@ -30,7 +30,9 @@ public class DeviceService {
         hasAnyDevice = true;
       }
       if (hasAnyDevice) {
-        return info.toString();
+        String result = info.toString();
+        result = result.substring(0, result.length() - 1);
+        return result;
       }
       return "У вас нет устройств.";
     } else {

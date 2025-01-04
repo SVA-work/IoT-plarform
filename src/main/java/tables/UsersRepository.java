@@ -78,28 +78,32 @@ public class UsersRepository extends AbstractRepository<UserDto> {
   }
 
   public List<UserDto> devicesOfUser(UserDto message) {
-    int id = Integer.parseInt(message.getUserId());
-    String sql = "SELECT d.* " +
-            "FROM devices d " +
-            "JOIN users u ON d.user_id = u.user_id " +
-            "WHERE u.user_id = ?";
-    List<UserDto> list = new ArrayList<>();
-    try {
-      Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, id);
-      ResultSet resultSet = preparedStatement.executeQuery();
-      while (resultSet.next()) {
-        UserDto response = new UserDto();
-        response.setDeviceId(resultSet.getString("device_id"));
-        response.setToken(resultSet.getString("token"));
-        list.add(response);
+    if (message.getUserId() != null) {
+      int id = Integer.parseInt(message.getUserId());
+      String sql = "SELECT d.* " +
+              "FROM devices d " +
+              "JOIN users u ON d.user_id = u.user_id " +
+              "WHERE u.user_id = ?";
+      List<UserDto> list = new ArrayList<>();
+      try {
+        Connection connection = DatabaseConnection.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, id);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+          UserDto response = new UserDto();
+          response.setDeviceId(resultSet.getString("device_id"));
+          response.setToken(resultSet.getString("token"));
+          list.add(response);
+        }
+        resultSet.close();
+      } catch (SQLException e) {
+        System.out.println(e.getMessage());
       }
-      resultSet.close();
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      return list;
+    } else {
+      return null;
     }
-    return list;
   }
 
   @Override

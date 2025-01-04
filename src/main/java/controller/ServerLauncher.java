@@ -7,6 +7,9 @@ import controller.userapi.RulesHttpHandler;
 import controller.userapi.UserHttpHandler;
 import library.json.JsonParserDefault;
 import tables.DatabaseConnection;
+import tables.DevicesRepository;
+import tables.RulesRepository;
+import tables.UsersRepository;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -53,6 +56,14 @@ public class ServerLauncher {
               .option(ChannelOption.SO_BACKLOG, ServerConfig.MAX_BACK_LOG_SIZE)
               .childOption(ChannelOption.SO_KEEPALIVE, true);
       System.out.println("Сервер запущен на порту: " + ServerConfig.PORT);
+
+      UsersRepository createUserTable = new UsersRepository();
+      createUserTable.createTable();
+      DevicesRepository createDeviceTable = new DevicesRepository();
+      createDeviceTable.createTable();
+      RulesRepository createRuleTable = new RulesRepository();
+      createRuleTable.createTable();
+
       ChannelFuture future = boot.bind(ServerConfig.PORT).sync();
 
       future.channel().closeFuture().sync();
