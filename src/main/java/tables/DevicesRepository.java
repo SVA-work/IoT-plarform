@@ -133,42 +133,50 @@ public class DevicesRepository extends AbstractRepository<UserDto> {
 
   @Override
   public UserDto delete(UserDto message) {
-    int id = Integer.parseInt(message.getDeviceId());
-    UserDto response = new UserDto();
-    String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
-    try {
-      Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, id);
-      preparedStatement.executeUpdate();
-      response.setSuccessful(true);
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
-      response.setSuccessful(false);
+    if (message.getDeviceId() != null) {
+      int id = Integer.parseInt(message.getDeviceId());
+      UserDto response = new UserDto();
+      String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
+      try {
+        Connection connection = DatabaseConnection.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, id);
+        preparedStatement.executeUpdate();
+        response.setSuccessful(true);
+      } catch (SQLException e) {
+        System.out.println(e.getMessage());
+        response.setSuccessful(false);
+      }
+      return response;
+    } else {
+      return null;
     }
-    return response;
   }
 
   @Override
   public UserDto create(UserDto entity) {
-    String sql = "INSERT INTO " + tableName + " (user_id, token) VALUES (?, ?)";
-    UserDto response = new UserDto();
-    try {
-      Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-      preparedStatement.setString(2, entity.getToken());
-      preparedStatement.executeUpdate();
-      response.setSuccessful(true);
-      ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-      if (generatedKeys.next()) {
-        long deviceId = generatedKeys.getLong(1);
-        response.setDeviceId(String.valueOf(deviceId));
+    if (entity.getUserId() != null) {
+      String sql = "INSERT INTO " + tableName + " (user_id, token) VALUES (?, ?)";
+      UserDto response = new UserDto();
+      try {
+        Connection connection = DatabaseConnection.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+        preparedStatement.setString(2, entity.getToken());
+        preparedStatement.executeUpdate();
+        response.setSuccessful(true);
+        ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+        if (generatedKeys.next()) {
+          long deviceId = generatedKeys.getLong(1);
+          response.setDeviceId(String.valueOf(deviceId));
+        }
+      } catch (SQLException e) {
+        System.out.println(e.getMessage());
+        response.setSuccessful(false);
       }
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
-      response.setSuccessful(false);
+      return response;
+    } else {
+      return null;
     }
-    return response;
   }
 }

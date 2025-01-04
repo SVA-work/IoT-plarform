@@ -2,12 +2,14 @@ package test.controller;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import test.DTO.Message;
-import test.config.ServerConfig;
-import test.service.UserInfoService;
-import test.tables.DevicesRepository;
-import test.tables.RulesRepository;
-import test.tables.UsersRepository;
+import dto.UserDto;
+import config.ServerConfig;
+import controller.ServerLauncher;
+import service.DeviceService;
+import service.RuleService;
+import service.UserService;
+import tables.DevicesRepository;
+import tables.UsersRepository;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -20,7 +22,6 @@ class HelloHttpHandlerTest {
 
   private final UsersRepository usersController = new UsersRepository();
   private final DevicesRepository devicesController = new DevicesRepository();
-  private final RulesRepository rulesController = new RulesRepository();
 
   @BeforeAll
   static void server() {
@@ -64,10 +65,12 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    UserInfoService userInfoService = new UserInfoService();
+
+    DeviceService device = new DeviceService();
+
     UserDto message = new UserDto();
     message.setLogin("123");
-    String result = userInfoService.listOfDevicesOfUser("123");
+    String result = device.listOfDevicesOfUser("123");
     assertEquals(response.toString(), result);
   }
 
@@ -107,10 +110,10 @@ class HelloHttpHandlerTest {
     usersController.delete(deleteMessage1);
 
     UserDto message = new UserDto();
-    UserInfoService userInfoService = new UserInfoService();
+    UserService UserService = new UserService();
     message.setLogin("123");
     message.setPassword("123");
-    String result = userInfoService.registration(message);
+    String result = UserService.registration(message);
 
     UserDto deleteMessage2 = new UserDto();
     deleteMessage2.setLogin("123");
@@ -150,7 +153,7 @@ class HelloHttpHandlerTest {
     }
 
     UserDto message = new UserDto();
-    UserInfoService user = new UserInfoService();
+    UserService user = new UserService();
     message.setLogin("123");
     message.setPassword("123");
     String result = user.userVerification(message);
@@ -187,22 +190,24 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    UserInfoService user = new UserInfoService();
+
+    DeviceService device = new DeviceService();
+
     UserDto deleteMessage1 = new UserDto();
     deleteMessage1.setLogin("123");
     deleteMessage1.setToken("123");
-    deleteMessage1.setDeviceId(user.getDeviceIdByToken("123", "123"));
+    //deleteMessage1.setDeviceId(user.getDeviceIdByToken("123", "123"));
     devicesController.delete(deleteMessage1);
 
     UserDto message = new UserDto();
     message.setLogin("123");
     message.setDeviceId("123");
-    String result = user.addDevice(message);
+    String result = device.addDevice(message);
 
     UserDto deleteMessage2 = new UserDto();
     deleteMessage2.setLogin("123");
     deleteMessage2.setToken("123");
-    deleteMessage2.setDeviceId(user.getDeviceIdByToken("123", "123"));
+    //deleteMessage2.setDeviceId(user.getDeviceIdByToken("123", "123"));
     devicesController.delete(deleteMessage2);
 
     assertEquals(response.toString(), result);
@@ -237,23 +242,24 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    UserInfoService user = new UserInfoService();
+
+    DeviceService device = new DeviceService();
 
     UserDto addMessage1 = new UserDto();
     addMessage1.setLogin("123");
     addMessage1.setToken("123");
-    addMessage1.setDeviceId(user.getDeviceIdByToken("123", "123"));
+    //addMessage1.setDeviceId(device.getDeviceIdByToken("123", "123"));
     devicesController.create(addMessage1);
   
     UserDto message = new UserDto();
     message.setLogin("123");
     message.setToken("123");
-    String result = user.deleteDevice(message);
+    String result = device.deleteDevice(message);
 
     UserDto addMessage2 = new UserDto();
     addMessage2.setLogin("123");
     addMessage2.setToken("123");
-    addMessage2.setDeviceId(user.getDeviceIdByToken("123", "123"));
+    //addMessage2.setDeviceId(device.getDeviceIdByToken("123", "123"));
     devicesController.create(addMessage2);
 
     assertEquals(response.toString(), result);
@@ -283,8 +289,9 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    UserInfoService userInfoService = new UserInfoService();
-    String result = userInfoService.getAllAvailableRules();
+
+    RuleService rule = new RuleService();
+    String result = rule.getAllAvailableRules();
     assertEquals(response.toString(), result);
   }
 
@@ -292,7 +299,7 @@ class HelloHttpHandlerTest {
   void deviceRules() {
     StringBuilder response = new StringBuilder();
     try {
-      URL url = new URL(ServerConfig.LINK_DEVICE_RULES + "?login=123, token=123");
+      URL url = new URL(ServerConfig.LINK_DEVICE_RULES + "?login=user_login&token=your_token");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
 
@@ -312,8 +319,8 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    UserInfoService userInfoService = new UserInfoService();
-    String result = userInfoService.getDeviceRules("123", "123");
+    RuleService rule = new RuleService();
+    String result = rule.getDeviceRules("123", "123");
     assertEquals(response.toString(), result);
   }
 
@@ -346,13 +353,14 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    UserInfoService user = new UserInfoService();
+
+    RuleService rule = new RuleService();
 
     UserDto deleteMessage1 = new UserDto();
     deleteMessage1.setLogin("123");
     deleteMessage1.setToken("123");
     deleteMessage1.setRule("123");
-    user.deleteDeviceRule(deleteMessage1);
+    rule.deleteDeviceRule(deleteMessage1);
 
     UserDto message = new UserDto();
     message.setLogin("123");
@@ -360,19 +368,28 @@ class HelloHttpHandlerTest {
     deleteMessage1.setRule("123");
     message.setLowTemperature("15");
     message.setHightTemperature("20");
-    String result = user.applyRule(message);
+    String result = rule.applyRule(message);
 
     UserDto deleteMessage2 = new UserDto();
     deleteMessage2.setLogin("123");
     deleteMessage2.setToken("123");
     deleteMessage2.setRule("123");
-    user.deleteDeviceRule(deleteMessage2);
+    rule.deleteDeviceRule(deleteMessage2);
 
     assertEquals(response.toString(), result);
   }
 
   @Test
   void deleteDeviceRule() {
+
+    RuleService rule = new RuleService();
+
+    UserDto addMessage1 = new UserDto();
+    addMessage1.setLogin("123");
+    addMessage1.setToken("123");
+    addMessage1.setRule("123");
+    rule.applyRule(addMessage1);
+
     StringBuilder response = new StringBuilder();
     try {
       URL url = new URL(ServerConfig.LINK_DELETE_DEVICE_RULE);
@@ -400,25 +417,18 @@ class HelloHttpHandlerTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    UserInfoService user = new UserInfoService();
-
-    UserDto addMessage1 = new UserDto();
-    addMessage1.setLogin("123");
-    addMessage1.setToken("123");
-    addMessage1.setRule("123");
-    user.applyRule(addMessage1);
-
-    UserDto message = new UserDto();
-    message.setLogin("123");
-    message.setToken("123");
-    message.setRule("123");
-    String result = user.deleteDeviceRule(message);
 
     UserDto addMessage2 = new UserDto();
     addMessage2.setLogin("123");
     addMessage2.setToken("123");
     addMessage2.setRule("123");
-    user.applyRule(addMessage2);
+    rule.applyRule(addMessage2);
+
+    UserDto message = new UserDto();
+    message.setLogin("123");
+    message.setToken("123");
+    message.setRule("123");
+    String result = rule.deleteDeviceRule(message);
 
     assertEquals(response.toString(), result);
   }

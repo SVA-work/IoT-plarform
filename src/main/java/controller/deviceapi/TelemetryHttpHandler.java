@@ -1,6 +1,8 @@
 package controller.deviceapi;
 
 import java.nio.charset.StandardCharsets;
+
+import config.ServerConfig;
 import dto.MicroclimateSensor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -24,7 +26,7 @@ public class TelemetryHttpHandler extends AbstractHttpMappingHandler{
     this.jsonParser = parser;
   }
 
-  @Post("/post/report")
+  @Post(ServerConfig.SHORT_LINK_REPORT)
   public DefaultFullHttpResponse report(@RequestBody MicroclimateSensor message) {
     String uuid = message.getUuid();
     String base64Message = message.getBase64Message();

@@ -58,6 +58,6 @@ public class UserService {
   }
 
   public String failedEntry() {
-    return "Неверный пароль или логин.\n";
+    return "Неверный пароль или логин.";
   }
 }

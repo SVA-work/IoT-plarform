@@ -1,6 +1,8 @@
 package controller.userapi;
 
 import java.nio.charset.StandardCharsets;
+
+import config.ServerConfig;
 import dto.UserDto;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -23,25 +25,25 @@ public class RulesHttpHandler extends AbstractHttpMappingHandler {
     super(parser);
   }
 
-  @Get("/get/allAvailableRules")
+  @Get(ServerConfig.SHORT_LINK_ALL_AVAILABLE_RULES)
   public DefaultFullHttpResponse AvailableDeviceRules() {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(rule.getAllAvailableRules(), StandardCharsets.UTF_8));
   }
 
-  @Get("/get/deviceRules")
+  @Get(ServerConfig.SHORT_LINK_DEVICE_RULES)
   public DefaultFullHttpResponse deviceRules(@QueryParam("login") String login, @QueryParam("token") String token) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(rule.getDeviceRules(login, token), StandardCharsets.UTF_8));
   }
 
-  @Post("/post/applyRule")
+  @Post(ServerConfig.SHORT_LINK_APPLY_RULE)
   public DefaultFullHttpResponse applyRule(@RequestBody UserDto message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(rule.applyRule(message), StandardCharsets.UTF_8));
   }
 
-  @Post("/post/deleteDeviceRule")
+  @Post(ServerConfig.SHORT_LINK_DELETE_DEVICE_RULE)
   public DefaultFullHttpResponse deleteDeviceRule(@RequestBody UserDto message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(rule.deleteDeviceRule(message), StandardCharsets.UTF_8));

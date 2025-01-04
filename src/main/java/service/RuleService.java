@@ -66,40 +66,48 @@ public class RuleService {
 
   public String getDeviceRules(String login, String token) {
     UserDto message = new UserDto();
-    message.setDeviceId(getDeviceIdByToken(login, token));
+    if (getDeviceIdByToken(login, token) != null) {
+      message.setDeviceId(getDeviceIdByToken(login, token));
 
-    List<UserDto> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
+      List<UserDto> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
 
-    StringBuilder info = new StringBuilder();
-    boolean hasAnyRule = false;
+      StringBuilder info = new StringBuilder();
+      boolean hasAnyRule = false;
 
-    for (UserDto ruleMessage : allRulesOfDevice) {
-      info.append(ruleMessage.getToken());
-      hasAnyRule = true;
+      for (UserDto ruleMessage : allRulesOfDevice) {
+        info.append(ruleMessage.getToken());
+        hasAnyRule = true;
+      }
+      if (hasAnyRule) {
+        return info.toString();
+      }
+      return "У данного устройства нет правил.";
+    } else {
+      System.out.println(1);
+      return "Такого устройства нет";
     }
-    if (hasAnyRule) {
-      return info.toString();
-    }
-    return "У данного устройства нет правил.";
-
   }
 
   public String deleteDeviceRule(UserDto message) {
-    message.setDeviceId(getDeviceIdByToken(message.getLogin(), message.getToken()));
-    List<UserDto> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
+    if (getDeviceIdByToken(message.getLogin(), message.getToken()) != null) {
+      message.setDeviceId(getDeviceIdByToken(message.getLogin(), message.getToken()));
+      List<UserDto> allRulesOfDevice = devicesRepository.rulesOfDevice(message);
 
-    boolean hasDeletedAnyRule = false;
-    for (UserDto ruleMessage : allRulesOfDevice) {
-      if (Objects.equals(ruleMessage.getToken(), message.getRule())) {
-        devicesRepository.delete(ruleMessage);
-        hasDeletedAnyRule = true;
-        break;
+      boolean hasDeletedAnyRule = false;
+      for (UserDto ruleMessage : allRulesOfDevice) {
+        if (Objects.equals(ruleMessage.getToken(), message.getRule())) {
+          devicesRepository.delete(ruleMessage);
+          hasDeletedAnyRule = true;
+          break;
+        }
       }
+      if (!hasDeletedAnyRule) {
+        return "У данного устройства нет правила с таким названием.";
+      }
+      return "Правило успешно удалено.";
+    } else {
+      return "Такого устройства не существует";
     }
-    if (!hasDeletedAnyRule) {
-      return "У данного устройства нет правила с таким названием.";
-    }
-    return "Правило успешно удалено.";
   }
 
   public String getDeviceIdByToken(String userLogin, String deviceToken) {

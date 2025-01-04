@@ -135,20 +135,24 @@ public class UsersRepository extends AbstractRepository<UserDto> {
 
   @Override
   public UserDto delete(UserDto message) {
-    int id = Integer.parseInt(message.getUserId());
-    UserDto response = new UserDto();
-    String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
-    try {
-      Connection connection = DatabaseConnection.getConnection();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, id);
-      preparedStatement.executeUpdate();
-      response.setSuccessful(true);
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
-      response.setSuccessful(false);
+    if (message.getUserId() != null) {
+      int id = Integer.parseInt(message.getUserId());
+      UserDto response = new UserDto();
+      String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
+      try {
+        Connection connection = DatabaseConnection.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, id);
+        preparedStatement.executeUpdate();
+        response.setSuccessful(true);
+      } catch (SQLException e) {
+        System.out.println(e.getMessage());
+        response.setSuccessful(false);
+      }
+      return response;
+    } else {
+      return null;
     }
-    return response;
   }
 
   @Override

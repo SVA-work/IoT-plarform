@@ -8,6 +8,8 @@ import library.annotation.RequestBody;
 import library.json.JsonParser;
 import service.DeviceService;
 import java.nio.charset.StandardCharsets;
+
+import config.ServerConfig;
 import dto.UserDto;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -23,19 +25,19 @@ public class DeviceHttpHandler extends AbstractHttpMappingHandler {
     super(parser);
   }
 
-  @Get("/get/listOfDevicesOfUser")
+  @Get(ServerConfig.SHORT_LINK_GET_DEVICE_INFORMATION)
   public DefaultFullHttpResponse deviceInformation(@QueryParam("login") String login) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(device.listOfDevicesOfUser(login), StandardCharsets.UTF_8));
   }
   
-  @Post("/post/addDevice")
+  @Post(ServerConfig.SHORT_LINK_ADD_DEVICE)
   public DefaultFullHttpResponse addDevices(@RequestBody UserDto message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(device.addDevice(message), StandardCharsets.UTF_8));
   }
 
-  @Post("/post/deleteDevice")
+  @Post(ServerConfig.SHORT_LINK_DELETE_DEVICE)
   public DefaultFullHttpResponse deleteDevices(@RequestBody UserDto message) {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(device.deleteDevice(message), StandardCharsets.UTF_8));
