@@ -38,6 +38,9 @@ jobs:
       
       - name: Install PostgreSQL client
         run: sudo apt-get install postgresql-client
+    
+      - name: List running containers
+        run: docker ps
 
       - name: Wait for PostgreSQL to be ready
         run: |
@@ -48,5 +51,5 @@ jobs:
       
       - name: Build with Maven
         env:
-          DATABASE_URL: jdbc:postgresql://localhost:5433/postgres
+          DATABASE_URL: jdbc:postgresql://posgres:5433/postgres
         run: mvn verify
