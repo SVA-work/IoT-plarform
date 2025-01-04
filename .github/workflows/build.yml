@@ -15,7 +15,7 @@ jobs:
       postgres:
         image: postgres:latest
         ports:
-          - 5433:5433
+          - 5433:5432
         env:
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
@@ -51,5 +51,5 @@ jobs:
       
       - name: Build with Maven
         env:
-          DATABASE_URL: jdbc:postgresql://posgres:5433/postgres
+          DATABASE_URL: jdbc:postgresql://localhost:5433/postgres
         run: mvn verify
