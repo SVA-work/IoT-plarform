@@ -1,4 +1,4 @@
-package dto;
+package dto.entity;
 
 public class TelegramTokenDto extends BaseDto {
   private String userId;

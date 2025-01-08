@@ -2,7 +2,7 @@ package service;
 
 import config.ServerConfig;
 
-import dto.UserDto;
+import dto.entity.UserDto;
 import tables.UsersRepository;
 
 public class UserService {

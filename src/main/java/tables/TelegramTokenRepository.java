@@ -2,7 +2,7 @@ package tables;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import dto.TelegramTokenDto;
+import dto.entity.TelegramTokenDto;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;

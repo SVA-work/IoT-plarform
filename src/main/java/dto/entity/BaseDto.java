@@ -1,4 +1,4 @@
-package dto;
+package dto.entity;
 
 public class BaseDto {
   private String columnTitle;

@@ -3,7 +3,7 @@ package controller.deviceapi;
 import java.nio.charset.StandardCharsets;
 
 import config.ServerConfig;
-import dto.MicroclimateSensor;
+import dto.devices.MicroclimateSensor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;

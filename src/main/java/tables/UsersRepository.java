@@ -1,9 +1,9 @@
 package tables;
 
-import dto.DeviceDto;
+import dto.entity.DeviceDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import dto.UserDto;
+import dto.entity.UserDto;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;

@@ -56,12 +56,7 @@ public class ServerLauncher {
               .childOption(ChannelOption.SO_KEEPALIVE, true);
       System.out.println("Сервер запущен на порту: " + ServerConfig.PORT);
 
-      UsersRepository createUserTable = new UsersRepository();
-      createUserTable.createTable();
-      DevicesRepository createDeviceTable = new DevicesRepository();
-      createDeviceTable.createTable();
-      RulesRepository createRuleTable = new RulesRepository();
-      createRuleTable.createTable();
+      initDataBase();
 
       ChannelFuture future = boot.bind(ServerConfig.PORT).sync();
 
@@ -70,5 +65,14 @@ public class ServerLauncher {
       workerGroup.shutdownGracefully();
       bossGroup.shutdownGracefully();
     }
+  }
+
+  private static void initDataBase() {
+    UsersRepository createUserTable = new UsersRepository();
+    createUserTable.createTable();
+    DevicesRepository createDeviceTable = new DevicesRepository();
+    createDeviceTable.createTable();
+    RulesRepository createRuleTable = new RulesRepository();
+    createRuleTable.createTable();
   }
 }

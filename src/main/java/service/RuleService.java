@@ -2,9 +2,9 @@ package service;
 
 import config.ServerConfig;
 
-import dto.DeviceDto;
-import dto.RuleDto;
-import dto.UserDto;
+import dto.entity.DeviceDto;
+import dto.entity.RuleDto;
+import dto.entity.UserDto;
 import tables.DevicesRepository;
 import tables.UsersRepository;
 import tables.RulesRepository;

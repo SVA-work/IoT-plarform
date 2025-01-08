@@ -2,7 +2,7 @@ package service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import dto.MicroclimateSensor;
+import dto.devices.MicroclimateSensor;
 
 public class TelemetryService {
 

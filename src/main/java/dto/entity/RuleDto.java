@@ -1,4 +1,4 @@
-package dto;
+package dto.entity;
 
 public class RuleDto extends BaseDto {
   private String ruleId;

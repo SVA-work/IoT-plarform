@@ -1,9 +1,8 @@
 package service;
 
-import dto.UserDto;
-import dto.DeviceDto;
-import dto.RuleDto;
-import dto.UserDto;
+import dto.entity.UserDto;
+import dto.entity.DeviceDto;
+import dto.entity.RuleDto;
 import tables.DevicesRepository;
 import tables.UsersRepository;
 
@@ -37,17 +36,17 @@ public class DeviceService {
   }
 
   public String addDevice(UserDto userDto, DeviceDto deviceDto) {
-    if (getUserIdByLogin(message.getLogin()) != null) {
+    if (getUserIdByLogin(userDto) != null) {
       deviceDto.setUserId(getUserIdByLogin(userDto));
       devicesRepository.create(deviceDto);
       return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(userDto);
-   else {
+    } else {
       return "Нет такого пользователя";
     }
   }
 
   public String deleteDevice(UserDto userDto, DeviceDto deviceDto) {
-    if (getUserIdByLogin(message.getLogin()) != null) {
+    if (getUserIdByLogin(userDto) != null) {
       userDto.setUserId(getUserIdByLogin(userDto));
       List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
 
