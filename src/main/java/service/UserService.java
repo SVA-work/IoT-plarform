@@ -9,32 +9,29 @@ public class UserService {
 
   private final UsersRepository usersRepository = new UsersRepository();
 
-  public UserService() {
-  }
-
-  public String registration(UserDto message) {
-    if (existenceUser(message)) {
+  public String registration(UserDto userDto) {
+    if (existenceUser(userDto)) {
       return "Пользователь с таким логином уже существует.";
     }
-    usersRepository.create(message);
+    usersRepository.create(userDto);
     return "Вы успешно зарегистрировались.\n" +
-            "Ваш логин: " + message.getLogin() + "\n" +
-            "Ваш пароль: " + message.getPassword();
+            "Ваш логин: " + userDto.getLogin() + "\n" +
+            "Ваш пароль: " + userDto.getPassword();
   }
 
-  public boolean existenceUser(UserDto message) {
-    for (UserDto currentMessage : usersRepository.getAll()) {
-      if (message.getLogin().equals(currentMessage.getLogin())) {
+  public boolean existenceUser(UserDto userDto) {
+    for (UserDto currentUser : usersRepository.getAll()) {
+      if (userDto.getLogin().equals(currentUser.getLogin())) {
         return true;
       }
     }
     return false;
   }
 
-  public String userVerification(UserDto message) {
-    for (UserDto currentMessage : usersRepository.getAll()) {
-      if (message.getLogin().equals(currentMessage.getLogin()) &&
-              message.getPassword().equals(currentMessage.getPassword())) {
+  public String userVerification(UserDto userDto) {
+    for (UserDto currentUser : usersRepository.getAll()) {
+      if (userDto.getLogin().equals(currentUser.getLogin()) &&
+              userDto.getPassword().equals(currentUser.getPassword())) {
         return successfulEntry();
       }
     }
@@ -58,6 +55,6 @@ public class UserService {
   }
 
   public String failedEntry() {
-    return "Неверный пароль или логин.";
+    return "Неверный пароль или логин.\n";
   }
 }

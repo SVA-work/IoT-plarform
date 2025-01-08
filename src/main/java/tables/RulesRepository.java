@@ -1,6 +1,8 @@
 package tables;
 
-import dto.UserDto;
+import dto.RuleDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -10,39 +12,41 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RulesRepository extends AbstractRepository<UserDto>{
+public class RulesRepository extends AbstractRepository<RuleDto>{
   private final String tableName = "rules";
   private final String tableID = "rule_id";
 
+  private static final Logger LOG = LoggerFactory.getLogger(RulesRepository.class);
+
   @Override
-  public UserDto createTable() {
+  public RuleDto createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "rule_id SERIAL PRIMARY KEY," +
             "device_id INTEGER REFERENCES devices(device_id)," +
             "rule VARCHAR(255) NOT NULL)";
-    UserDto response = new UserDto();
+    RuleDto response = new RuleDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
       response.setSuccessful(true);
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Соединение не удалось", e);
       response.setSuccessful(false);
     }
     return response;
   }
 
   @Override
-  public List<UserDto> getAll() {
+  public List<RuleDto> getAll() {
     String sql = "SELECT * FROM " + tableName;
-    List<UserDto> list = new ArrayList<>();
+    List<RuleDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection();
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
-        UserDto response = new UserDto();
+        RuleDto response = new RuleDto();
         response.setRuleId(resultSet.getString(tableID));
         response.setDeviceId(resultSet.getString("device_id"));
         response.setRule(resultSet.getString("rule"));
@@ -50,16 +54,16 @@ public class RulesRepository extends AbstractRepository<UserDto>{
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось получить информацию из таблицы rules", e);
     }
     return list;
   }
 
   @Override
-  public UserDto getById(UserDto message) {
-    int id = Integer.parseInt(message.getDeviceId());
+  public RuleDto getById(RuleDto message) {
+    int id = Integer.parseInt(message.getRuleId());
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-    UserDto response = new UserDto();
+    RuleDto response = new RuleDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -72,15 +76,15 @@ public class RulesRepository extends AbstractRepository<UserDto>{
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось получить информацию о правиле", e);
     }
     return response;
   }
 
   @Override
-  public UserDto update(UserDto entity) {
+  public RuleDto update(RuleDto entity) {
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    UserDto response = new UserDto();
+    RuleDto response = new RuleDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -102,15 +106,15 @@ public class RulesRepository extends AbstractRepository<UserDto>{
         response.setRule(resultSet.getString("rule"));
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось изменить данные о правиле", e);
     }
     return response;
   }
 
   @Override
-  public UserDto delete(UserDto message) {
+  public RuleDto delete(RuleDto message) {
     int id = Integer.parseInt(message.getRuleId());
-    UserDto response = new UserDto();
+    RuleDto response = new RuleDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
       Connection connection = DatabaseConnection.getConnection();
@@ -119,16 +123,16 @@ public class RulesRepository extends AbstractRepository<UserDto>{
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось удалить правило", e);
       response.setSuccessful(false);
     }
     return response;
   }
 
   @Override
-  public UserDto create(UserDto entity) {
+  public RuleDto create(RuleDto entity) {
     String sql = "INSERT INTO " + tableName + " (device_id, rule) VALUES (?, ?)";
-    UserDto response = new UserDto();
+    RuleDto response = new RuleDto();
     try {
       Connection connection = DatabaseConnection.getConnection();
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -142,7 +146,7 @@ public class RulesRepository extends AbstractRepository<UserDto>{
         response.setRuleId(String.valueOf(ruleId));
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось создать правило", e);
       response.setSuccessful(false);
     }
     return response;

@@ -23,7 +23,6 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
-
 public class ServerLauncher {
   public static void main(String[] args) throws Exception {
     NioEventLoopGroup bossGroup = new NioEventLoopGroup();

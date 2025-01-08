@@ -1,5 +1,8 @@
 package tables;
 
+import dto.DeviceDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import dto.UserDto;
 
 import java.sql.PreparedStatement;
@@ -14,11 +17,13 @@ public class UsersRepository extends AbstractRepository<UserDto> {
   private final String tableName = "users";
   private final String tableID = "user_id";
 
+  private static final Logger LOG = LoggerFactory.getLogger(UsersRepository.class);
+
   @Override
   public UserDto createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "user_id SERIAL PRIMARY KEY," +
-            "login VARCHAR(255) NOT NULL," +
+            "login VARCHAR(255) UNIQUE NOT NULL," +
             "password VARCHAR(255) NOT NULL)";
     UserDto response = new UserDto();
     try {
@@ -27,7 +32,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
       statement.executeUpdate(sql);
       response.setSuccessful(true);
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Соединение не удалось", e);
       response.setSuccessful(false);
     }
     return response;
@@ -50,7 +55,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось получить информацию из таблицы users", e);
     }
     return list;
   }
@@ -72,38 +77,34 @@ public class UsersRepository extends AbstractRepository<UserDto> {
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось получить информацию о пользователе", e);
     }
     return response;
   }
 
-  public List<UserDto> devicesOfUser(UserDto message) {
-    if (message.getUserId() != null) {
-      int id = Integer.parseInt(message.getUserId());
-      String sql = "SELECT d.* " +
-              "FROM devices d " +
-              "JOIN users u ON d.user_id = u.user_id " +
-              "WHERE u.user_id = ?";
-      List<UserDto> list = new ArrayList<>();
-      try {
-        Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, id);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        while (resultSet.next()) {
-          UserDto response = new UserDto();
-          response.setDeviceId(resultSet.getString("device_id"));
-          response.setToken(resultSet.getString("token"));
-          list.add(response);
-        }
-        resultSet.close();
-      } catch (SQLException e) {
-        System.out.println(e.getMessage());
+  public List<DeviceDto> devicesOfUser(UserDto message) {
+    int id = Integer.parseInt(message.getUserId());
+    String sql = "SELECT d.* " +
+            "FROM devices d " +
+            "JOIN users u ON d.user_id = u.user_id " +
+            "WHERE u.user_id = ?";
+    List<DeviceDto> list = new ArrayList<>();
+    try {
+      Connection connection = DatabaseConnection.getConnection();
+      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, id);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      while (resultSet.next()) {
+        DeviceDto response = new DeviceDto();
+        response.setDeviceId(resultSet.getString("device_id"));
+        response.setToken(resultSet.getString("token"));
+        list.add(response);
       }
-      return list;
-    } else {
-      return null;
+      resultSet.close();
+    } catch (SQLException e) {
+      LOG.error("Не удалось получить информацию об устройствах пользователя", e);
     }
+    return list;
   }
 
   @Override
@@ -132,31 +133,27 @@ public class UsersRepository extends AbstractRepository<UserDto> {
       }
       resultSet.close();
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось изменить данные о пользователе", e);
     }
     return response;
   }
 
   @Override
   public UserDto delete(UserDto message) {
-    if (message.getUserId() != null) {
-      int id = Integer.parseInt(message.getUserId());
-      UserDto response = new UserDto();
-      String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
-      try {
-        Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, id);
-        preparedStatement.executeUpdate();
-        response.setSuccessful(true);
-      } catch (SQLException e) {
-        System.out.println(e.getMessage());
-        response.setSuccessful(false);
-      }
-      return response;
-    } else {
-      return null;
+    int id = Integer.parseInt(message.getUserId());
+    UserDto response = new UserDto();
+    String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
+    try {
+      Connection connection = DatabaseConnection.getConnection();
+      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+      preparedStatement.setInt(1, id);
+      preparedStatement.executeUpdate();
+      response.setSuccessful(true);
+    } catch (SQLException e) {
+      LOG.error("Не удалось удалить пользователя", e);
+      response.setSuccessful(false);
     }
+    return response;
   }
 
   @Override
@@ -176,7 +173,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
       }
       response.setSuccessful(true);
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      LOG.error("Не удалось создать пользователя", e);
       response.setSuccessful(false);
     }
     return response;

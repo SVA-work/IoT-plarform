@@ -1,6 +1,9 @@
 package service;
 
 import dto.UserDto;
+import dto.DeviceDto;
+import dto.RuleDto;
+import dto.UserDto;
 import tables.DevicesRepository;
 import tables.UsersRepository;
 
@@ -12,53 +15,46 @@ public class DeviceService {
   private final UsersRepository usersRepository = new UsersRepository();
   private final DevicesRepository devicesRepository = new DevicesRepository();
 
-  public String listOfDevicesOfUser(String userLogin) {
-    UserDto message = new UserDto();
-    message.setLogin(userLogin);
-    if (getUserIdByLogin(userLogin) != null) {
-      message.setUserId(getUserIdByLogin(userLogin));
+  public String listOfDevicesOfUser(UserDto userDto) {
 
-      List<UserDto> allDevicesOfUser = usersRepository.devicesOfUser(message);
+    userDto.setUserId(getUserIdByLogin(userDto));
 
-      StringBuilder info = new StringBuilder();
-      boolean hasAnyDevice = false;
-      for (UserDto deviceMessage : allDevicesOfUser) {
-        info.append(deviceMessage.getToken()).append('\n');
-        for (UserDto ruleMessage : devicesRepository.rulesOfDevice(deviceMessage)) {
-          info.append("  ").append(ruleMessage.getToken()).append("\n");
-        }
-        hasAnyDevice = true;
+    List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
+
+    StringBuilder info = new StringBuilder();
+    boolean hasAnyDevice = false;
+    for (DeviceDto currentDeviceDto : allDevicesOfUser) {
+      info.append(currentDeviceDto.getToken()).append('\n');
+      for (RuleDto ruleDto : devicesRepository.rulesOfDevice(currentDeviceDto)) {
+        info.append("  ").append(ruleDto.getRule()).append("\n");
       }
-      if (hasAnyDevice) {
-        String result = info.toString();
-        result = result.substring(0, result.length() - 1);
-        return result;
-      }
-      return "У вас нет устройств.";
-    } else {
-      return "Такого пользователя не существует";
+      hasAnyDevice = true;
     }
+    if (hasAnyDevice) {
+      return info.toString();
+    }
+    return "У вас нет устройств.";
   }
 
-  public String addDevice(UserDto message) {
+  public String addDevice(UserDto userDto, DeviceDto deviceDto) {
     if (getUserIdByLogin(message.getLogin()) != null) {
-      message.setUserId(getUserIdByLogin(message.getLogin()));
-      devicesRepository.create(message);
-      return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(message.getLogin());
-    } else {
+      deviceDto.setUserId(getUserIdByLogin(userDto));
+      devicesRepository.create(deviceDto);
+      return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(userDto);
+   else {
       return "Нет такого пользователя";
     }
   }
 
-  public String deleteDevice(UserDto message) {
+  public String deleteDevice(UserDto userDto, DeviceDto deviceDto) {
     if (getUserIdByLogin(message.getLogin()) != null) {
-      message.setUserId(getUserIdByLogin(message.getLogin()));
-      List<UserDto> allDevicesOfUser = usersRepository.devicesOfUser(message);
+      userDto.setUserId(getUserIdByLogin(userDto));
+      List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
 
       boolean hasDeletedAnyDevice = false;
-      for (UserDto deviceMessage : allDevicesOfUser) {
-        if (Objects.equals(deviceMessage.getToken(), message.getToken())) {
-          devicesRepository.delete(deviceMessage);
+      for (DeviceDto currentDeviceDto : allDevicesOfUser) {
+        if (Objects.equals(currentDeviceDto.getToken(), deviceDto.getToken())) {
+          devicesRepository.delete(currentDeviceDto);
           hasDeletedAnyDevice = true;
           break;
         }
@@ -67,7 +63,7 @@ public class DeviceService {
         return "У вас нет такого устройства.";
       }
 
-      String infoAboutDevices = listOfDevicesOfUser(message.getLogin());
+      String infoAboutDevices = listOfDevicesOfUser(userDto);
       if (Objects.equals(infoAboutDevices, "У вас нет устройств.")) {
         return "У вас больше нет устройств.";
       }
@@ -78,10 +74,10 @@ public class DeviceService {
     }
   }
 
-  public String getUserIdByLogin(String userLogin) {
-    for (UserDto currentMessage : usersRepository.getAll()) {
-      if (userLogin.equals(currentMessage.getLogin())) {
-        return currentMessage.getUserId();
+  public String getUserIdByLogin(UserDto userDto) {
+    for (UserDto currentUserDto : usersRepository.getAll()) {
+      if (userDto.getLogin().equals(currentUserDto.getLogin())) {
+        return currentUserDto.getUserId();
       }
     }
     return null;
