@@ -12,6 +12,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static config.DbConfig.*;
+
 public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto>{
   private final String tableName = "telegram_tokens";
   private final String tableID = "telegram_token_id";
@@ -25,7 +27,7 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
             "telegram_token VARCHAR(255) NOT NULL)";
     TelegramTokenDto response = new TelegramTokenDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
       response.setSuccessful(true);
@@ -41,7 +43,7 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
     String sql = "SELECT * FROM " + tableName;
     List<TelegramTokenDto> list = new ArrayList<>();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
@@ -64,7 +66,7 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
     TelegramTokenDto response = new TelegramTokenDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -85,7 +87,7 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
     TelegramTokenDto response = new TelegramTokenDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       switch (entity.getColumnTitle()) {
         case "user_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
@@ -115,7 +117,7 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
     TelegramTokenDto response = new TelegramTokenDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       preparedStatement.executeUpdate();
@@ -132,7 +134,7 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
     String sql = "INSERT INTO " + tableName + " (user_id, telegram_token) VALUES (?, ?)";
     TelegramTokenDto response = new TelegramTokenDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
       preparedStatement.setString(2, entity.getTelegramToken());
@@ -160,7 +162,7 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
             "END;" +
             "$$ LANGUAGE plpgsql;";
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.executeUpdate();
     } catch (SQLException e) {
@@ -174,7 +176,7 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
             "FOR EACH ROW " +
             "EXECUTE FUNCTION insert_into_telegram_tokens();";
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.executeUpdate();
     } catch (SQLException e) {

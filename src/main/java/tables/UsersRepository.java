@@ -13,6 +13,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static config.DbConfig.*;
+
 public class UsersRepository extends AbstractRepository<UserDto> {
   private final String tableName = "users";
   private final String tableID = "user_id";
@@ -27,7 +29,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
             "password VARCHAR(255) NOT NULL)";
     UserDto response = new UserDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
       response.setSuccessful(true);
@@ -43,7 +45,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     String sql = "SELECT * FROM " + tableName;
     List<UserDto> list = new ArrayList<>();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
@@ -66,7 +68,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
     UserDto response = new UserDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -90,7 +92,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
             "WHERE u.user_id = ?";
     List<DeviceDto> list = new ArrayList<>();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -113,7 +115,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     UserDto response = new UserDto();
 
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       switch (entity.getColumnTitle()) {
         case "login" -> preparedStatement.setString(1, entity.getLogin());
@@ -144,7 +146,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     UserDto response = new UserDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       preparedStatement.executeUpdate();
@@ -161,7 +163,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     String sql = "INSERT INTO " + tableName + " (login, password) VALUES (?, ?)";
     UserDto response = new UserDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setString(1, entity.getLogin());
       preparedStatement.setString(2, entity.getPassword());

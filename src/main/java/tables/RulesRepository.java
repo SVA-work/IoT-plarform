@@ -12,6 +12,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static config.DbConfig.*;
+
 public class RulesRepository extends AbstractRepository<RuleDto>{
   private final String tableName = "rules";
   private final String tableID = "rule_id";
@@ -26,7 +28,7 @@ public class RulesRepository extends AbstractRepository<RuleDto>{
             "rule VARCHAR(255) NOT NULL)";
     RuleDto response = new RuleDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
       response.setSuccessful(true);
@@ -42,7 +44,7 @@ public class RulesRepository extends AbstractRepository<RuleDto>{
     String sql = "SELECT * FROM " + tableName;
     List<RuleDto> list = new ArrayList<>();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
@@ -65,7 +67,7 @@ public class RulesRepository extends AbstractRepository<RuleDto>{
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
     RuleDto response = new RuleDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -86,7 +88,7 @@ public class RulesRepository extends AbstractRepository<RuleDto>{
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
     RuleDto response = new RuleDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       switch (entity.getColumnTitle()) {
         case "device_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
@@ -117,7 +119,7 @@ public class RulesRepository extends AbstractRepository<RuleDto>{
     RuleDto response = new RuleDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       preparedStatement.executeUpdate();
@@ -134,7 +136,7 @@ public class RulesRepository extends AbstractRepository<RuleDto>{
     String sql = "INSERT INTO " + tableName + " (device_id, rule) VALUES (?, ?)";
     RuleDto response = new RuleDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
       preparedStatement.setString(2, entity.getRule());

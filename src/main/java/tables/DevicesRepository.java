@@ -13,6 +13,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static config.DbConfig.*;
+
 public class DevicesRepository extends AbstractRepository<DeviceDto> {
   private final String tableName = "devices";
   private final String tableID = "device_id";
@@ -27,7 +29,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
             "token VARCHAR(255) NOT NULL)";
     DeviceDto response = new DeviceDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
       response.setSuccessful(true);
@@ -43,7 +45,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
     String sql = "SELECT * FROM " + tableName;
     List<DeviceDto> list = new ArrayList<>();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
@@ -66,7 +68,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
     DeviceDto response = new DeviceDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -90,7 +92,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
             "WHERE d.device_id = ?";
     List<RuleDto> list = new ArrayList<>();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -112,7 +114,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
     DeviceDto response = new DeviceDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       switch (entity.getColumnTitle()) {
         case "user_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
@@ -142,7 +144,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
     DeviceDto response = new DeviceDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       preparedStatement.executeUpdate();
@@ -159,7 +161,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
     String sql = "INSERT INTO " + tableName + " (user_id, token) VALUES (?, ?)";
     DeviceDto response = new DeviceDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(user, password, url);
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
       preparedStatement.setString(2, entity.getToken());
