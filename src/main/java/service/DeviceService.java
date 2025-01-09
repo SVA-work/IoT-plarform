@@ -30,16 +30,23 @@ public class DeviceService {
       hasAnyDevice = true;
     }
     if (hasAnyDevice) {
-      return info.toString();
+      String result = info.toString();
+      return result.substring(0, result.length() - 1);
     }
     return "У вас нет устройств.";
   }
 
   public String addDevice(UserDto userDto, DeviceDto deviceDto) {
     if (getUserIdByLogin(userDto) != null) {
-      deviceDto.setUserId(getUserIdByLogin(userDto));
-      devicesRepository.create(deviceDto);
-      return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(userDto);
+      RuleService rule = new RuleService();
+      userDto.setUserId(getUserIdByLogin(userDto));
+      if (!(rule.existenceUserDevice(userDto, deviceDto))) {
+        deviceDto.setUserId(getUserIdByLogin(userDto));
+        devicesRepository.create(deviceDto);
+        return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(userDto);
+      } else {
+        return "У этого пользователя уже есть устройство с таким названием";
+      }
     } else {
       return "Нет такого пользователя";
     }

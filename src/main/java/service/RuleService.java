@@ -21,7 +21,7 @@ public class RuleService {
   public String getAllAvailableRules() {
     StringBuilder info = new StringBuilder();
     info.append("1) Датчик температуры. \n" +
-            "Отправьте запрос на адрес: " + ServerConfig.LINK_ALL_AVAILABLE_RULES + "\n" +
+            "Отправьте запрос на адрес: " + ServerConfig.LINK_APPLY_RULE + "\n" +
             "Укажите название устройства и приемлемую для вас температуры в таком формате: {login: 99, token: 123, lowTemperature: 15, hightTemperature: 20}");
     return info.toString();
   }
@@ -37,18 +37,27 @@ public class RuleService {
 
   public boolean existenceUserDevice(UserDto userDto, DeviceDto deviceDto) {
     List<DeviceDto> allDevices = usersRepository.devicesOfUser(userDto);
-    for (DeviceDto currentDeviceDto : allDevices) {
-      if (deviceDto.getDeviceId().equals(currentDeviceDto.getDeviceId())) {
-        return true;
+    if (allDevices != null) {
+      for (DeviceDto currentMessage : allDevices) {
+        String token = getTokenbyDeviceId(userDto, currentMessage);
+        currentMessage.setToken(token);
+        if (currentMessage.getToken().equals(deviceDto.getToken())) {
+          return true;
+        }
       }
+      return false;
+    } else {
+      return false;
     }
-    return false;
   }
 
   //public String setDeviceRules() {
   //}
 
   public String applyRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {
+    DeviceService device = new DeviceService();
+    userDto.setUserId(device.getUserIdByLogin(userDto));
+    deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
     if (existenceUser(userDto)) {
       if (existenceUserDevice(userDto, deviceDto)) {
 
@@ -66,40 +75,54 @@ public class RuleService {
   }
 
   public String getDeviceRules(UserDto userDto, DeviceDto deviceDto) {
-    deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
-
-    List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(deviceDto);
-
-    StringBuilder info = new StringBuilder();
-    boolean hasAnyRule = false;
-
-    for (RuleDto currentRuleDto : allRulesOfDevice) {
-      info.append(currentRuleDto.getRule()).append("\n");
-      hasAnyRule = true;
+    UserService user = new UserService();
+    if (user.existenceUser(userDto)) {
+      if (getDeviceIdByToken(userDto, deviceDto) != null) {
+        deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
+  
+        List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(deviceDto);
+  
+        StringBuilder info = new StringBuilder();
+        boolean hasAnyRule = false;
+  
+        for (RuleDto currentRuleDto : allRulesOfDevice) {
+          info.append(currentRuleDto.getRule()).append("\n");
+          hasAnyRule = true;
+        }
+        if (hasAnyRule) {
+          String result = info.toString();
+          return result.substring(0, result.length() - 1);
+        }
+        return "У данного устройства нет правил.";
+      } else {
+        return "Такого устройства нет";
+      }
+    } else {
+      return "Такого пользователя нет";
     }
-    if (hasAnyRule) {
-      return info.toString();
-    }
-    return "У данного устройства нет правил.";
-
   }
 
   public String deleteDeviceRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {
-    deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
-    List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(deviceDto);
+    if (getDeviceIdByToken(userDto, deviceDto) != null) {
+      deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
+      ruleDto.setRuleId(getRuleIdByRule(deviceDto, ruleDto));
+      List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(deviceDto);
 
-    boolean hasDeletedAnyRule = false;
-    for (RuleDto currentRuleDto : allRulesOfDevice) {
-      if (Objects.equals(currentRuleDto.getRule(), ruleDto.getRule())) {
-        rulesRepository.delete(currentRuleDto);
-        hasDeletedAnyRule = true;
-        break;
+      boolean hasDeletedAnyRule = false;
+      for (RuleDto currentRuleDto : allRulesOfDevice) {
+        if (Objects.equals(currentRuleDto.getRule(), ruleDto.getRule())) {
+          rulesRepository.delete(ruleDto);
+          hasDeletedAnyRule = true;
+          break;
+        }
       }
+      if (!hasDeletedAnyRule) {
+        return "У данного устройства нет правила с таким названием.";
+      }
+      return "Правило успешно удалено.";
+    } else {
+      return "Такого устройства не существует";
     }
-    if (!hasDeletedAnyRule) {
-      return "У данного устройства нет правила с таким названием.";
-    }
-    return "Правило успешно удалено.";
   }
 
   public String getDeviceIdByToken(UserDto userDto, DeviceDto deviceDto) {
@@ -110,6 +133,28 @@ public class RuleService {
             return currentDeviceDto.getDeviceId();
           }
         }
+      }
+    }
+    return null;
+  }
+
+  public String getTokenbyDeviceId(UserDto userDto, DeviceDto deviceDto) {
+    for (UserDto currentUserDto : usersRepository.getAll()) {
+      if (userDto.getLogin().equals(currentUserDto.getLogin())) {
+        for (DeviceDto currentDeviceDto : usersRepository.devicesOfUser(currentUserDto)) {
+          if (deviceDto.getDeviceId().equals(currentDeviceDto.getDeviceId())) {
+            return currentDeviceDto.getToken();
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  public String getRuleIdByRule(DeviceDto deviceDto, RuleDto ruleDto) {
+    for (RuleDto ruleMessage : rulesRepository.getAll()) {
+      if (deviceDto.getDeviceId().equals(ruleMessage.getDeviceId()) && (ruleDto.getRule().equals(ruleMessage.getRule()))) {
+        return ruleMessage.getRuleId();
       }
     }
     return null;

@@ -1,5 +1,8 @@
 package dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RuleRequestDto {
   private String login;
   private String token;

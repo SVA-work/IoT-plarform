@@ -9,8 +9,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-  public static final String user = "postgres";
-  public static final String password = "scoups";
+  public static final String user = DbConfig.user;
+  public static final String password = DbConfig.password;
   public static final String url = "jdbc:postgresql://localhost:" + DbConfig.localHost + "/" + DbConfig.databaseName;
 
   private static final Logger LOG = LoggerFactory.getLogger(DatabaseConnection.class);
