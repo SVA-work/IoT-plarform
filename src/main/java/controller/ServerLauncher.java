@@ -27,7 +27,7 @@ public class ServerLauncher {
     try {
       ServerBootstrap boot = new ServerBootstrap();
       DatabaseConnection data = new DatabaseConnection();
-      data.getConnection();
+      //data.getConnection();
       boot.group(bossGroup, workerGroup)
               .channel(NioServerSocketChannel.class)
               .childHandler(new ChannelInitializer<SocketChannel>() {
