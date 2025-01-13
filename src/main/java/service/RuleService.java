@@ -22,7 +22,7 @@ public class RuleService {
     StringBuilder info = new StringBuilder();
     info.append("1) Датчик температуры. \n" +
             "Отправьте запрос на адрес: " + ServerConfig.LINK_APPLY_RULE + "\n" +
-            "Укажите название устройства и приемлемую для вас температуры в таком формате: {login: 99, token: 123, lowTemperature: 15, hightTemperature: 20}");
+            "Укажите название устройства и приемлемую для вас температуры в таком формате: {login: 99, token: 123, rule: Temparature/lowTemperature/hightTemperature}");
     return info.toString();
   }
 
@@ -51,7 +51,7 @@ public class RuleService {
     }
   }
 
-  //public String setDeviceRules() {
+  //public String setDeviceRules(RuleDto ruleDto) {
   //}
 
   public String applyRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {
