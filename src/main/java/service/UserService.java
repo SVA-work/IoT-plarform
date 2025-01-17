@@ -4,7 +4,6 @@ import config.ServerConfig;
 
 import dto.DbConnectionDto;
 import dto.entity.UserDto;
-import tables.DevicesRepository;
 import tables.UsersRepository;
 
 public class UserService {
