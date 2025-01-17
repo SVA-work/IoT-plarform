@@ -1,6 +1,7 @@
 package tables;
 
 import dto.DbConnectionDto;
+import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import config.DbConfig;
@@ -25,6 +26,15 @@ public class DatabaseConnection {
       LOG.info("Соединение не удалось");
     }
     return connection;
+  }
+
+  public static void initFlyway(DbConnectionDto dbConnectionDto) {
+    Flyway flyway =
+            Flyway.configure()
+                    .locations("classpath:db/migrations")
+                    .dataSource(dbConnectionDto.url, dbConnectionDto.user, dbConnectionDto.password)
+                    .load();
+    flyway.migrate();
   }
 
   public DatabaseConnection() {

@@ -4,6 +4,7 @@ public class DeviceDto extends BaseDto {
   private String userId;
   private String deviceId;
   private String token;
+  private String type;
 
   public DeviceDto() {
   }
@@ -30,5 +31,13 @@ public class DeviceDto extends BaseDto {
 
   public void setToken(String token) {
     this.token = token;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 }

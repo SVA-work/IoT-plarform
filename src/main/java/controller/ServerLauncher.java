@@ -32,7 +32,6 @@ public class ServerLauncher {
     dbConnectionDto.url = DbConfig.url;
     dbConnectionDto.user = DbConfig.user;
     dbConnectionDto.password = DbConfig.password;
-
     runApplication(args, dbConnectionDto);
   }
 

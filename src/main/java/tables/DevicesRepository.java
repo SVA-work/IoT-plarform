@@ -31,7 +31,8 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "device_id SERIAL PRIMARY KEY," +
             "user_id INTEGER REFERENCES users(user_id)," +
-            "token VARCHAR(255) NOT NULL)";
+            "token VARCHAR(255) NOT NULL," +
+            "type VARCHAR(255) NOT NULL)";
     DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
@@ -58,6 +59,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
         response.setDeviceId(resultSet.getString(tableID));
         response.setUserId(resultSet.getString("user_id"));
         response.setToken(resultSet.getString("token"));
+        response.setType(resultSet.getString("type"));
         list.add(response);
       }
       resultSet.close();
@@ -81,6 +83,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
         response.setDeviceId(resultSet.getString(tableID));
         response.setUserId(resultSet.getString("user_id"));
         response.setToken(resultSet.getString("token"));
+        response.setType(resultSet.getString("type"));
       }
       resultSet.close();
     } catch (SQLException e) {
@@ -124,6 +127,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
       switch (entity.getColumnTitle()) {
         case "user_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
         case "token" -> preparedStatement.setString(1, entity.getToken());
+        case "type" -> preparedStatement.setString(1, entity.getType());
       }
       preparedStatement.setInt(2, Integer.parseInt(entity.getDeviceId()));
       preparedStatement.executeUpdate();
@@ -136,6 +140,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
         response.setDeviceId(resultSet.getString(tableID));
         response.setUserId(resultSet.getString("user_id"));
         response.setToken(resultSet.getString("token"));
+        response.setType(resultSet.getString("type"));
       }
     } catch (SQLException e) {
       LOG.error("Не удалось изменить данные об устройстве", e);
@@ -163,13 +168,14 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
 
   @Override
   public DeviceDto create(DeviceDto entity) {
-    String sql = "INSERT INTO " + tableName + " (user_id, token) VALUES (?, ?)";
+    String sql = "INSERT INTO " + tableName + " (user_id, token, type) VALUES (?, ?, ?)";
     DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
       preparedStatement.setString(2, entity.getToken());
+      preparedStatement.setString(3, entity.getType());
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
       ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
