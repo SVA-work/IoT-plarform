@@ -6,6 +6,7 @@ import controller.userapi.DeviceHttpHandler;
 import controller.userapi.RulesHttpHandler;
 import controller.userapi.UserHttpHandler;
 import library.json.JsonParserDefault;
+import org.springframework.boot.SpringApplication;
 import tables.DatabaseConnection;
 import tables.DevicesRepository;
 import tables.RulesRepository;
@@ -22,11 +23,15 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import telegrambot.IoTServiceBotApplication;
 
 public class ServerLauncher {
   public static void main(String[] args) throws Exception {
     NioEventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+    IoTServiceBotApplication.main(args);
+
     try {
       ServerBootstrap boot = new ServerBootstrap();
       DatabaseConnection data = new DatabaseConnection();

@@ -10,10 +10,10 @@
         <version>3.4.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-
     <groupId>groupId</groupId>
     <artifactId>IoT-plarform</artifactId>
     <version>1.0-SNAPSHOT</version>
+
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -69,6 +69,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
             <version>6.5.0</version>
@@ -83,6 +89,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.4.1</version>
             </plugin>
 
             <plugin>
