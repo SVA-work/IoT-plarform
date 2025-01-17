@@ -12,6 +12,7 @@ import tables.RulesRepository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class RuleService {
 
@@ -60,9 +61,6 @@ public class RuleService {
     }
   }
 
-  //public String setDeviceRules(RuleDto ruleDto) {
-  //}
-
   public String applyRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {
     DeviceService device = new DeviceService(dbConnectionDto);
     userDto.setUserId(device.getUserIdByLogin(userDto));
@@ -71,10 +69,12 @@ public class RuleService {
       if (existenceUserDevice(userDto, deviceDto)) {
 
         ruleDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
-
-        rulesRepository.create(ruleDto);
-
-        return "Правила успешно добавлены.";
+        String pattern = "^Temperature/[-+]?[0-9]+(\\.[0-9]+)?/[-+]?[0-9]+(\\.[0-9]+)?$";
+        if (Pattern.matches(pattern, ruleDto.getRule())) {
+          rulesRepository.create(ruleDto);
+          return "Правила успешно добавлены.";
+        }
+        return "Неверный формат правила";
       } else {
         return "У вас нет такого устройства.";
       }

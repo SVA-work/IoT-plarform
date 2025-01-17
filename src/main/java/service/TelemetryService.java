@@ -16,12 +16,12 @@ import telegrambot.bot.IoTServiceBot;
 public class TelemetryService {
 
   private final DevicesRepository devicesRepository;
-  //private final IoTServiceBot iotServiceBot;
+  private final IoTServiceBot iotServiceBot;
   private final TelegramTokenRepository telegramTokenRepository;
 
   public TelemetryService(DbConnectionDto dbConnectionDto) {
     devicesRepository = new DevicesRepository(dbConnectionDto);
-    //iotServiceBot = new IoTServiceBot("7614249328:AAF6E3EFO1yLqxlbQhBCR4P977EA8VWxuWY");
+    iotServiceBot = new IoTServiceBot("7614249328:AAF6E3EFO1yLqxlbQhBCR4P977EA8VWxuWY");
     telegramTokenRepository = new TelegramTokenRepository(dbConnectionDto);
   }
 
@@ -64,10 +64,10 @@ public class TelemetryService {
         float lowTemperature = Float.parseFloat(parts[1]);
         float hightTemperature = Float.parseFloat(parts[2]);
         if (deviceTemperature < lowTemperature) {
-          //iotServiceBot.sendLowerTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[1]);
+          iotServiceBot.sendLowerTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[1]);
         }
         if (deviceTemperature > hightTemperature) {
-          //iotServiceBot.sendLowerTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[2]);
+          iotServiceBot.sendHighTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[2]);
         }
       }
     }
