@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
+import dto.DbConnectionDto;
 import dto.devices.MicroclimateSensor;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
@@ -11,9 +12,10 @@ import tables.DevicesRepository;
 
 public class TelemetryService {
 
-  private final DevicesRepository devicesRepository = new DevicesRepository();
+  private final DevicesRepository devicesRepository;
 
-  public TelemetryService() {
+  public TelemetryService(DbConnectionDto dbConnectionDto) {
+    devicesRepository = new DevicesRepository(dbConnectionDto);
   }
 
   public String decodeBase64(String base64Data) {

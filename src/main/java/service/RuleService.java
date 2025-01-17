@@ -2,6 +2,7 @@ package service;
 
 import config.ServerConfig;
 
+import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
 import dto.entity.UserDto;
@@ -14,9 +15,17 @@ import java.util.Objects;
 
 public class RuleService {
 
-  private final UsersRepository usersRepository = new UsersRepository();
-  private final DevicesRepository devicesRepository = new DevicesRepository();
-  private final RulesRepository rulesRepository = new RulesRepository();
+  private final UsersRepository usersRepository;
+  private final DevicesRepository devicesRepository;
+  private final RulesRepository rulesRepository;
+  private final DbConnectionDto dbConnectionDto;
+
+  public RuleService(DbConnectionDto dbConnectionDto) {
+    usersRepository = new UsersRepository(dbConnectionDto);
+    devicesRepository = new DevicesRepository(dbConnectionDto);
+    rulesRepository = new RulesRepository(dbConnectionDto);
+    this.dbConnectionDto = dbConnectionDto;
+  }
 
   public String getAllAvailableRules() {
     StringBuilder info = new StringBuilder();
@@ -55,7 +64,7 @@ public class RuleService {
   //}
 
   public String applyRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {
-    DeviceService device = new DeviceService();
+    DeviceService device = new DeviceService(dbConnectionDto);
     userDto.setUserId(device.getUserIdByLogin(userDto));
     deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
     if (existenceUser(userDto)) {
@@ -75,7 +84,7 @@ public class RuleService {
   }
 
   public String getDeviceRules(UserDto userDto, DeviceDto deviceDto) {
-    UserService user = new UserService();
+    UserService user = new UserService(dbConnectionDto);
     if (user.existenceUser(userDto)) {
       if (getDeviceIdByToken(userDto, deviceDto) != null) {
         deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));

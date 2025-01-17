@@ -3,6 +3,7 @@ package controller.userapi;
 import java.nio.charset.StandardCharsets;
 
 import config.ServerConfig;
+import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
 import dto.entity.UserDto;
@@ -16,16 +17,18 @@ import library.annotation.Post;
 import library.annotation.QueryParam;
 import library.annotation.RequestBody;
 import library.json.JsonParser;
+import service.DeviceService;
 import service.RuleService;
 
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class RulesHttpHandler extends AbstractHttpMappingHandler {
-  private static RuleService rule = new RuleService();
+  private static RuleService rule;
 
-  public RulesHttpHandler(JsonParser parser) {
+  public RulesHttpHandler(JsonParser parser, DbConnectionDto dbConnectionDto) {
     super(parser);
+    rule = new RuleService(dbConnectionDto);
   }
 
   @Get(ServerConfig.SHORT_LINK_ALL_AVAILABLE_RULES)

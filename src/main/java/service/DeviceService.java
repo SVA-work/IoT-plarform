@@ -1,5 +1,6 @@
 package service;
 
+import dto.DbConnectionDto;
 import dto.entity.UserDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
@@ -11,8 +12,15 @@ import java.util.Objects;
 
 public class DeviceService {
 
-  private final UsersRepository usersRepository = new UsersRepository();
-  private final DevicesRepository devicesRepository = new DevicesRepository();
+  private final UsersRepository usersRepository;
+  private final DevicesRepository devicesRepository;
+  private final DbConnectionDto dbConnectionDto;
+
+  public DeviceService(DbConnectionDto dbConnectionDto) {
+    usersRepository = new UsersRepository(dbConnectionDto);
+    devicesRepository = new DevicesRepository(dbConnectionDto);
+    this.dbConnectionDto = dbConnectionDto;
+  }
 
   public String listOfDevicesOfUser(UserDto userDto) {
 
@@ -38,7 +46,7 @@ public class DeviceService {
 
   public String addDevice(UserDto userDto, DeviceDto deviceDto) {
     if (getUserIdByLogin(userDto) != null) {
-      RuleService rule = new RuleService();
+      RuleService rule = new RuleService(dbConnectionDto);
       userDto.setUserId(getUserIdByLogin(userDto));
       if (!(rule.existenceUserDevice(userDto, deviceDto))) {
         deviceDto.setUserId(getUserIdByLogin(userDto));

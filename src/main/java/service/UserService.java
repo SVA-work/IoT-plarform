@@ -2,12 +2,18 @@ package service;
 
 import config.ServerConfig;
 
+import dto.DbConnectionDto;
 import dto.entity.UserDto;
+import tables.DevicesRepository;
 import tables.UsersRepository;
 
 public class UserService {
 
-  private final UsersRepository usersRepository = new UsersRepository();
+  private final UsersRepository usersRepository;
+
+  public UserService(DbConnectionDto dbConnectionDto) {
+    usersRepository = new UsersRepository(dbConnectionDto);
+  }
 
   public String registration(UserDto userDto) {
     if (existenceUser(userDto)) {

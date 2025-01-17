@@ -6,5 +6,5 @@ public class DbConfig {
   public static final String databaseName = "postgres";
   public static final String url = "jdbc:postgresql://localhost:" + localHost + "/" + databaseName;
   public static final String user = "postgres";
-  public static final String password = "Safari";
+  public static final String password = "123";
 }

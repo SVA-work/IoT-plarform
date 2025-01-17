@@ -3,6 +3,7 @@ package controller.deviceapi;
 import java.nio.charset.StandardCharsets;
 
 import config.ServerConfig;
+import dto.DbConnectionDto;
 import dto.devices.MicroclimateSensor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -17,13 +18,14 @@ import service.TelemetryService;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class TelemetryHttpHandler extends AbstractHttpMappingHandler{
-  TelemetryService telemetryService = new TelemetryService();
+  TelemetryService telemetryService;
   private final JsonParser jsonParser;
 
 
-  public TelemetryHttpHandler(JsonParser parser) {
+  public TelemetryHttpHandler(JsonParser parser, DbConnectionDto dbConnectionDto) {
     super(parser);
     this.jsonParser = parser;
+    telemetryService = new TelemetryService(dbConnectionDto);
   }
 
   @Post(ServerConfig.SHORT_LINK_REPORT)

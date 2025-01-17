@@ -1,5 +1,6 @@
 package controller.userapi;
 
+import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
 import dto.request.DeviceRequestDto;
 import library.AbstractHttpMappingHandler;
@@ -21,10 +22,11 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class DeviceHttpHandler extends AbstractHttpMappingHandler {
 
-  private static DeviceService device = new DeviceService();
+  private static DeviceService device;
 
-  public DeviceHttpHandler(JsonParser parser) {
+  public DeviceHttpHandler(JsonParser parser, DbConnectionDto dbConnectionDto) {
     super(parser);
+    device = new DeviceService(dbConnectionDto);
   }
 
   @Get(ServerConfig.SHORT_LINK_GET_DEVICE_INFORMATION)

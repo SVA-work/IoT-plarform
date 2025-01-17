@@ -1,9 +1,11 @@
 package controller.userapi;
 
+import dto.DbConnectionDto;
 import library.AbstractHttpMappingHandler;
 import library.annotation.Post;
 import library.annotation.RequestBody;
 import library.json.JsonParser;
+import service.RuleService;
 import service.UserService;
 import java.nio.charset.StandardCharsets;
 
@@ -17,10 +19,11 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class UserHttpHandler extends AbstractHttpMappingHandler {
 
-  private static UserService user = new UserService();
+  private static UserService user;
 
-  public UserHttpHandler(JsonParser parser) {
+  public UserHttpHandler(JsonParser parser, DbConnectionDto dbConnectionDto) {
     super(parser);
+    user = new UserService(dbConnectionDto);
   }
     
   @Post(ServerConfig.SHORT_LINK_REGISTRATION)
