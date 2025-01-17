@@ -1,6 +1,8 @@
 package controller.userapi;
 
 import dto.DbConnectionDto;
+import dto.entity.TelegramTokenDto;
+import dto.request.UserRegistrationRequestDto;
 import library.AbstractHttpMappingHandler;
 import library.annotation.Post;
 import library.annotation.RequestBody;
@@ -27,9 +29,17 @@ public class UserHttpHandler extends AbstractHttpMappingHandler {
   }
     
   @Post(ServerConfig.SHORT_LINK_REGISTRATION)
-  public DefaultFullHttpResponse registration(@RequestBody UserDto userDto) {
+  public DefaultFullHttpResponse registration(@RequestBody UserRegistrationRequestDto userRegistrationRequestDto) {
+
+    UserDto userDto = new UserDto();
+    userDto.setLogin(userRegistrationRequestDto.getLogin());
+    userDto.setPassword(userRegistrationRequestDto.getPassword());
+
+    TelegramTokenDto telegramTokenDto = new TelegramTokenDto();
+    telegramTokenDto.setTelegramToken(userRegistrationRequestDto.getTelegramToken());
+
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-            Unpooled.copiedBuffer(user.registration(userDto), StandardCharsets.UTF_8));
+            Unpooled.copiedBuffer(user.registration(userDto, telegramTokenDto), StandardCharsets.UTF_8));
   }
 
   @Post(ServerConfig.SHORT_LINK_ENTRY)

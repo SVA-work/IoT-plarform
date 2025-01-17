@@ -3,22 +3,28 @@ package service;
 import config.ServerConfig;
 
 import dto.DbConnectionDto;
+import dto.entity.TelegramTokenDto;
 import dto.entity.UserDto;
+import tables.DevicesRepository;
+import tables.TelegramTokenRepository;
 import tables.UsersRepository;
 
 public class UserService {
 
   private final UsersRepository usersRepository;
+  private final TelegramTokenRepository telegramTokenRepository;
 
   public UserService(DbConnectionDto dbConnectionDto) {
     usersRepository = new UsersRepository(dbConnectionDto);
+    telegramTokenRepository = new TelegramTokenRepository(dbConnectionDto);
   }
 
-  public String registration(UserDto userDto) {
+  public String registration(UserDto userDto, TelegramTokenDto telegramTokenDto) {
     if (existenceUser(userDto)) {
       return "Пользователь с таким логином уже существует.";
     }
-    usersRepository.create(userDto);
+    telegramTokenDto.setUserId(usersRepository.create(userDto).getUserId());
+    telegramTokenRepository.create(telegramTokenDto);
     return "Вы успешно зарегистрировались.\n" +
             "Ваш логин: " + userDto.getLogin() + "\n" +
             "Ваш пароль: " + userDto.getPassword();

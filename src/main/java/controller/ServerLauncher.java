@@ -8,10 +8,7 @@ import controller.userapi.UserHttpHandler;
 import dto.DbConnectionDto;
 import library.json.JsonParserDefault;
 import org.springframework.boot.SpringApplication;
-import tables.DatabaseConnection;
-import tables.DevicesRepository;
-import tables.RulesRepository;
-import tables.UsersRepository;
+import tables.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -91,5 +88,7 @@ public class ServerLauncher {
     createDeviceTable.createTable();
     RulesRepository createRuleTable = new RulesRepository(dbConnectionDto);
     createRuleTable.createTable();
+    TelegramTokenRepository telegramTokenRepository = new TelegramTokenRepository(dbConnectionDto);
+    telegramTokenRepository.createTable();
   }
 }
