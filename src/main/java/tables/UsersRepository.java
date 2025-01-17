@@ -1,5 +1,6 @@
 package tables;
 
+import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,12 @@ public class UsersRepository extends AbstractRepository<UserDto> {
 
   private static final Logger LOG = LoggerFactory.getLogger(UsersRepository.class);
 
+  private DbConnectionDto dbConnectionDto;
+
+  public UsersRepository(DbConnectionDto dbConnectionDto) {
+    this.dbConnectionDto = dbConnectionDto;
+  }
+
   @Override
   public UserDto createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
@@ -27,7 +34,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
             "password VARCHAR(255) NOT NULL)";
     UserDto response = new UserDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
       response.setSuccessful(true);
@@ -43,7 +50,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     String sql = "SELECT * FROM " + tableName;
     List<UserDto> list = new ArrayList<>();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
@@ -66,7 +73,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
     UserDto response = new UserDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -90,7 +97,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
             "WHERE u.user_id = ?";
     List<DeviceDto> list = new ArrayList<>();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
@@ -113,7 +120,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     UserDto response = new UserDto();
 
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       switch (entity.getColumnTitle()) {
         case "login" -> preparedStatement.setString(1, entity.getLogin());
@@ -144,7 +151,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     UserDto response = new UserDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       preparedStatement.executeUpdate();
@@ -161,7 +168,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
     String sql = "INSERT INTO " + tableName + " (login, password) VALUES (?, ?)";
     UserDto response = new UserDto();
     try {
-      Connection connection = DatabaseConnection.getConnection();
+      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
       preparedStatement.setString(1, entity.getLogin());
       preparedStatement.setString(2, entity.getPassword());

@@ -1,5 +1,6 @@
 package tables;
 
+import dto.DbConnectionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import config.DbConfig;
@@ -9,16 +10,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-  public static final String user = DbConfig.user;
-  public static final String password = DbConfig.password;
-  public static final String url = "jdbc:postgresql://localhost:" + DbConfig.localHost + "/" + DbConfig.databaseName;
-
   private static final Logger LOG = LoggerFactory.getLogger(DatabaseConnection.class);
 
-  public static Connection getConnection() {
+  public static Connection getConnection(DbConnectionDto dbConnectionDto) {
     Connection connection = null;
     try {
-      connection = DriverManager.getConnection(url, user, password);
+      connection = DriverManager.getConnection(dbConnectionDto.url, dbConnectionDto.user, dbConnectionDto.password);
       if (connection != null) {
         LOG.info("Вы успешно подключились к базе данных");
       } else {

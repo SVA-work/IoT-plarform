@@ -5,6 +5,7 @@ import controller.deviceapi.TelemetryHttpHandler;
 import controller.userapi.DeviceHttpHandler;
 import controller.userapi.RulesHttpHandler;
 import controller.userapi.UserHttpHandler;
+import dto.DbConnectionDto;
 import library.json.JsonParserDefault;
 import org.springframework.boot.SpringApplication;
 import tables.DatabaseConnection;
@@ -27,25 +28,32 @@ import telegrambot.IoTServiceBotApplication;
 
 public class ServerLauncher {
   public static void main(String[] args) throws Exception {
+    DbConnectionDto dbConnectionDto = new DbConnectionDto();
+    dbConnectionDto.url = DbConfig.url;
+    dbConnectionDto.user = DbConfig.user;
+    dbConnectionDto.password = DbConfig.password;
+
+    runApplication(args, dbConnectionDto);
+  }
+
+  public static void runApplication(String[] args, DbConnectionDto dbConnectionDto) throws InterruptedException {
     NioEventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-    IoTServiceBotApplication.main(args);
+    runTelegramBot(args);
 
     try {
       ServerBootstrap boot = new ServerBootstrap();
-      DatabaseConnection data = new DatabaseConnection();
-      data.getConnection();
       boot.group(bossGroup, workerGroup)
               .channel(NioServerSocketChannel.class)
               .childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel channel) throws Exception {
                   JsonParserDefault parser = new JsonParserDefault();
-                  UserHttpHandler userHandler = new UserHttpHandler(parser);
-                  DeviceHttpHandler deviceHandler = new DeviceHttpHandler(parser);
-                  RulesHttpHandler rulesHandler = new RulesHttpHandler(parser);
-                  TelemetryHttpHandler telemetryHandler = new TelemetryHttpHandler(parser);
+                  UserHttpHandler userHandler = new UserHttpHandler(parser, dbConnectionDto);
+                  DeviceHttpHandler deviceHandler = new DeviceHttpHandler(parser, dbConnectionDto);
+                  RulesHttpHandler rulesHandler = new RulesHttpHandler(parser, dbConnectionDto);
+                  TelemetryHttpHandler telemetryHandler = new TelemetryHttpHandler(parser, dbConnectionDto);
                   userHandler.setNextHandler(deviceHandler);
                   deviceHandler.setNextHandler(rulesHandler);
                   rulesHandler.setNextHandler(telemetryHandler);
@@ -61,7 +69,7 @@ public class ServerLauncher {
               .childOption(ChannelOption.SO_KEEPALIVE, true);
       System.out.println("Сервер запущен на порту: " + ServerConfig.PORT);
 
-      initDataBase();
+      initDataBase(dbConnectionDto);
 
       ChannelFuture future = boot.bind(ServerConfig.PORT).sync();
 
@@ -72,12 +80,16 @@ public class ServerLauncher {
     }
   }
 
-  private static void initDataBase() {
-    UsersRepository createUserTable = new UsersRepository();
+  private static void runTelegramBot(String[] args) {
+    IoTServiceBotApplication.main(args);
+  }
+
+  private static void initDataBase(DbConnectionDto dbConnectionDto) {
+    UsersRepository createUserTable = new UsersRepository(dbConnectionDto);
     createUserTable.createTable();
-    DevicesRepository createDeviceTable = new DevicesRepository();
+    DevicesRepository createDeviceTable = new DevicesRepository(dbConnectionDto);
     createDeviceTable.createTable();
-    RulesRepository createRuleTable = new RulesRepository();
+    RulesRepository createRuleTable = new RulesRepository(dbConnectionDto);
     createRuleTable.createTable();
   }
 }
