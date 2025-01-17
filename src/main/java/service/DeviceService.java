@@ -4,6 +4,7 @@ import dto.DbConnectionDto;
 import dto.entity.UserDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
+
 import tables.DevicesRepository;
 import tables.UsersRepository;
 
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class DeviceService {
-
   private final UsersRepository usersRepository;
   private final DevicesRepository devicesRepository;
   private final DbConnectionDto dbConnectionDto;
@@ -23,69 +23,75 @@ public class DeviceService {
   }
 
   public String listOfDevicesOfUser(UserDto userDto) {
-
     userDto.setUserId(getUserIdByLogin(userDto));
-
     List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
 
+    if (allDevicesOfUser.isEmpty()) {
+      return "У вас нет устройств.";
+    }
+
     StringBuilder info = new StringBuilder();
-    boolean hasAnyDevice = false;
+    
     for (DeviceDto currentDeviceDto : allDevicesOfUser) {
       info.append(currentDeviceDto.getToken()).append('\n');
       for (RuleDto ruleDto : devicesRepository.rulesOfDevice(currentDeviceDto)) {
         info.append("  ").append(ruleDto.getRule()).append("\n");
       }
-      hasAnyDevice = true;
     }
-    if (hasAnyDevice) {
-      String result = info.toString();
-      return result.substring(0, result.length() - 1);
-    }
-    return "У вас нет устройств.";
+
+    String result = info.toString();
+    return result.substring(0, result.length() - 1);
   }
 
   public String addDevice(UserDto userDto, DeviceDto deviceDto) {
-    if (getUserIdByLogin(userDto) != null) {
-      RuleService rule = new RuleService(dbConnectionDto);
-      userDto.setUserId(getUserIdByLogin(userDto));
-      if (!(rule.existenceUserDevice(userDto, deviceDto))) {
-        deviceDto.setUserId(getUserIdByLogin(userDto));
-        devicesRepository.create(deviceDto);
-        return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(userDto);
-      } else {
-        return "У этого пользователя уже есть устройство с таким названием";
-      }
-    } else {
+    String userId = getUserIdByLogin(userDto);
+
+    if (userId == null) {
       return "Нет такого пользователя";
     }
+
+    RuleService ruleService = new RuleService(dbConnectionDto);
+    userDto.setUserId(userId);
+
+    if (ruleService.existenceUserDevice(userDto, deviceDto)) {
+      return "У этого пользователя уже есть устройство с таким названием";
+    }
+
+    deviceDto.setUserId(getUserIdByLogin(userDto));
+    devicesRepository.create(deviceDto);
+
+    return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(userDto);
   }
 
   public String deleteDevice(UserDto userDto, DeviceDto deviceDto) {
-    if (getUserIdByLogin(userDto) != null) {
-      userDto.setUserId(getUserIdByLogin(userDto));
-      List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
+    String userId = getUserIdByLogin(userDto);
 
-      boolean hasDeletedAnyDevice = false;
-      for (DeviceDto currentDeviceDto : allDevicesOfUser) {
-        if (Objects.equals(currentDeviceDto.getToken(), deviceDto.getToken())) {
-          devicesRepository.delete(currentDeviceDto);
-          hasDeletedAnyDevice = true;
-          break;
-        }
-      }
-      if (!hasDeletedAnyDevice) {
-        return "У вас нет такого устройства.";
-      }
-
-      String infoAboutDevices = listOfDevicesOfUser(userDto);
-      if (Objects.equals(infoAboutDevices, "У вас нет устройств.")) {
-        return "У вас больше нет устройств.";
-      }
-      return ("Список ваших устройств:\n" +
-              infoAboutDevices);
-    } else {
+    if (userId == null) {
       return "Нет такого пользователя";
     }
+
+    userDto.setUserId(getUserIdByLogin(userDto));
+    List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
+
+    boolean hasDeletedAnyDevice = false;
+    for (DeviceDto currentDeviceDto : allDevicesOfUser) {
+      if (Objects.equals(currentDeviceDto.getToken(), deviceDto.getToken())) {
+        devicesRepository.delete(currentDeviceDto);
+        hasDeletedAnyDevice = true;
+        break;
+      }
+    }
+
+    if (!hasDeletedAnyDevice) {
+      return "У вас нет такого устройства.";
+    }
+
+    String infoAboutDevices = listOfDevicesOfUser(userDto);
+    if (Objects.equals(infoAboutDevices, "У вас нет устройств.")) {
+      return "У вас больше нет устройств.";
+    }
+
+    return ("Список ваших устройств:\n" + infoAboutDevices);
   }
 
   public String getUserIdByLogin(UserDto userDto) {

@@ -1,14 +1,16 @@
 package controller;
 
 import config.*;
+
 import controller.deviceapi.TelemetryHttpHandler;
 import controller.userapi.DeviceHttpHandler;
 import controller.userapi.RulesHttpHandler;
 import controller.userapi.UserHttpHandler;
+
 import dto.DbConnectionDto;
 import library.json.JsonParserDefault;
-import org.springframework.boot.SpringApplication;
 import tables.*;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -21,6 +23,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+
 import telegrambot.IoTServiceBotApplication;
 
 public class ServerLauncher {

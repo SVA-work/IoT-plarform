@@ -6,6 +6,7 @@ import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
 import dto.entity.UserDto;
+
 import tables.DevicesRepository;
 import tables.UsersRepository;
 import tables.RulesRepository;
@@ -15,7 +16,6 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class RuleService {
-
   private final UsersRepository usersRepository;
   private final DevicesRepository devicesRepository;
   private final RulesRepository rulesRepository;
@@ -62,53 +62,55 @@ public class RuleService {
   }
 
   public String applyRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {
-    DeviceService device = new DeviceService(dbConnectionDto);
-    userDto.setUserId(device.getUserIdByLogin(userDto));
-    deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
-    if (existenceUser(userDto)) {
-      if (existenceUserDevice(userDto, deviceDto)) {
+    DeviceService deviceService = new DeviceService(dbConnectionDto);
+    userDto.setUserId(deviceService.getUserIdByLogin(userDto));
+    String deviceId = getDeviceIdByToken(userDto, deviceDto);
+    deviceDto.setDeviceId(deviceId);
 
-        ruleDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
-        String pattern = "^Temperature/[-+]?[0-9]+(\\.[0-9]+)?/[-+]?[0-9]+(\\.[0-9]+)?$";
-        if (Pattern.matches(pattern, ruleDto.getRule())) {
-          rulesRepository.create(ruleDto);
-          return "Правила успешно добавлены.";
-        }
-        return "Неверный формат правила";
-      } else {
-        return "У вас нет такого устройства.";
-      }
-    } else {
+    if (!(existenceUser(userDto))) {
       return "Пользователя с таким логином не существует.";
     }
+
+    if (!existenceUserDevice(userDto, deviceDto)) {
+      return "У вас нет такого устройства.";
+    }
+
+    ruleDto.setDeviceId(deviceId);
+    String pattern = "^Temperature/[-+]?[0-9]+(\\.[0-9]+)?/[-+]?[0-9]+(\\.[0-9]+)?$";
+
+    if (Pattern.matches(pattern, ruleDto.getRule())) {
+      rulesRepository.create(ruleDto);
+      return "Правила успешно добавлены.";
+    }
+    return "Неверный формат правила";
   }
 
   public String getDeviceRules(UserDto userDto, DeviceDto deviceDto) {
-    UserService user = new UserService(dbConnectionDto);
-    if (user.existenceUser(userDto)) {
-      if (getDeviceIdByToken(userDto, deviceDto) != null) {
-        deviceDto.setDeviceId(getDeviceIdByToken(userDto, deviceDto));
-  
-        List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(deviceDto);
-  
-        StringBuilder info = new StringBuilder();
-        boolean hasAnyRule = false;
-  
-        for (RuleDto currentRuleDto : allRulesOfDevice) {
-          info.append(currentRuleDto.getRule()).append("\n");
-          hasAnyRule = true;
-        }
-        if (hasAnyRule) {
-          String result = info.toString();
-          return result.substring(0, result.length() - 1);
-        }
-        return "У данного устройства нет правил.";
-      } else {
-        return "Такого устройства нет";
-      }
-    } else {
+    UserService userService = new UserService(dbConnectionDto);
+    if (!userService.existenceUser (userDto)) {
       return "Такого пользователя нет";
     }
+
+    String deviceId = getDeviceIdByToken(userDto, deviceDto);
+    if (deviceId == null) {
+      return "Такого устройства нет";
+    }
+
+    deviceDto.setDeviceId(deviceId);
+    List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(deviceDto);
+    StringBuilder info = new StringBuilder();
+    boolean hasAnyRule = false;
+  
+    for (RuleDto currentRuleDto : allRulesOfDevice) {
+      info.append(currentRuleDto.getRule()).append("\n");
+      hasAnyRule = true;
+    }
+
+    if (hasAnyRule) {
+      String result = info.toString();
+      return result.substring(0, result.length() - 1);
+    }
+    return "У данного устройства нет правил.";
   }
 
   public String deleteDeviceRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {

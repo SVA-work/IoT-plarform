@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserRegistrationRequestDto {
-
   private String login;
   private String password;
   private String telegramToken;
