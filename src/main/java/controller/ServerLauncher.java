@@ -8,9 +8,8 @@ import controller.userapi.RulesHttpHandler;
 import controller.userapi.UserHttpHandler;
 
 import dto.DbConnectionDto;
-import library.json.JsonParserDefault;
-import tables.*;
-
+import netty.library.json.JsonParserDefault;
+import repository.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -32,6 +31,7 @@ public class ServerLauncher {
     dbConnectionDto.url = DbConfig.url;
     dbConnectionDto.user = DbConfig.user;
     dbConnectionDto.password = DbConfig.password;
+
     runApplication(args, dbConnectionDto);
   }
 

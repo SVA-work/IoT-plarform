@@ -1,4 +1,4 @@
-package tables;
+package repository;
 
 import java.util.List;
 

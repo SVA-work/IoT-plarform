@@ -4,14 +4,14 @@ import dto.DbConnectionDto;
 import dto.entity.UserDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
-
-import tables.DevicesRepository;
-import tables.UsersRepository;
+import repository.DevicesRepository;
+import repository.UsersRepository;
 
 import java.util.List;
 import java.util.Objects;
 
 public class DeviceService {
+
   private final UsersRepository usersRepository;
   private final DevicesRepository devicesRepository;
   private final DbConnectionDto dbConnectionDto;
@@ -23,7 +23,9 @@ public class DeviceService {
   }
 
   public String listOfDevicesOfUser(UserDto userDto) {
+
     userDto.setUserId(getUserIdByLogin(userDto));
+
     List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
 
     if (allDevicesOfUser.isEmpty()) {
@@ -31,12 +33,13 @@ public class DeviceService {
     }
 
     StringBuilder info = new StringBuilder();
-    
+    boolean hasAnyDevice = false;
     for (DeviceDto currentDeviceDto : allDevicesOfUser) {
       info.append(currentDeviceDto.getToken()).append('\n');
       for (RuleDto ruleDto : devicesRepository.rulesOfDevice(currentDeviceDto)) {
         info.append("  ").append(ruleDto.getRule()).append("\n");
       }
+      hasAnyDevice = true;
     }
 
     String result = info.toString();

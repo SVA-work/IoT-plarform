@@ -1,19 +1,17 @@
 package service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
-
-import dto.devices.MicroclimateSensor;
 import dto.DbConnectionDto;
+import dto.devices.MicroclimateSensor;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
 import dto.entity.TelegramTokenDto;
-
-import tables.DevicesRepository;
-import tables.TelegramTokenRepository;
-
+import repository.DevicesRepository;
+import repository.TelegramTokenRepository;
 import telegrambot.bot.IoTServiceBot;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.List;
 
 public class TelemetryService {
 

@@ -1,4 +1,4 @@
-package library.json;
+package netty.library.json;
 
 import io.netty.buffer.ByteBuf;
 

@@ -6,16 +6,16 @@ import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
 import dto.entity.UserDto;
-
-import tables.DevicesRepository;
-import tables.UsersRepository;
-import tables.RulesRepository;
+import repository.DevicesRepository;
+import repository.UsersRepository;
+import repository.RulesRepository;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class RuleService {
+
   private final UsersRepository usersRepository;
   private final DevicesRepository devicesRepository;
   private final RulesRepository rulesRepository;

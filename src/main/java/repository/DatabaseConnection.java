@@ -1,4 +1,4 @@
-package tables;
+package repository;
 
 import dto.DbConnectionDto;
 import org.flywaydb.core.Flyway;
