@@ -1,20 +1,20 @@
 package controller.userapi;
 
+import config.ServerConfig;
 import dto.DbConnectionDto;
 import dto.entity.TelegramTokenDto;
+import dto.entity.UserDto;
 import dto.request.UserRegistrationRequestDto;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.HttpVersion;
 import netty.library.AbstractHttpMappingHandler;
 import netty.library.annotation.Post;
 import netty.library.annotation.RequestBody;
 import netty.library.json.JsonParser;
 import service.UserService;
-import java.nio.charset.StandardCharsets;
 
-import config.ServerConfig;
-import dto.entity.UserDto;
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.HttpVersion;
+import java.nio.charset.StandardCharsets;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
@@ -26,7 +26,7 @@ public class UserHttpHandler extends AbstractHttpMappingHandler {
     super(parser);
     user = new UserService(dbConnectionDto);
   }
-    
+
   @Post(ServerConfig.SHORT_LINK_REGISTRATION)
   public DefaultFullHttpResponse registration(@RequestBody UserRegistrationRequestDto userRegistrationRequestDto) {
 

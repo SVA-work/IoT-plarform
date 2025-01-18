@@ -1,9 +1,9 @@
 package service;
 
 import dto.DbConnectionDto;
-import dto.entity.UserDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
+import dto.entity.UserDto;
 import repository.DevicesRepository;
 import repository.UsersRepository;
 
@@ -33,13 +33,11 @@ public class DeviceService {
     }
 
     StringBuilder info = new StringBuilder();
-    boolean hasAnyDevice = false;
     for (DeviceDto currentDeviceDto : allDevicesOfUser) {
       info.append(currentDeviceDto.getToken()).append('\n');
       for (RuleDto ruleDto : devicesRepository.rulesOfDevice(currentDeviceDto)) {
         info.append("  ").append(ruleDto.getRule()).append("\n");
       }
-      hasAnyDevice = true;
     }
 
     String result = info.toString();

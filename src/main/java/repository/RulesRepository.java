@@ -5,11 +5,7 @@ import dto.entity.RuleDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.PreparedStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +15,7 @@ public class RulesRepository extends AbstractRepository<RuleDto> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RulesRepository.class);
 
-  private DbConnectionDto dbConnectionDto;
+  private final DbConnectionDto dbConnectionDto;
 
   public RulesRepository(DbConnectionDto dbConnectionDto) {
     this.dbConnectionDto = dbConnectionDto;

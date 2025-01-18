@@ -3,7 +3,6 @@ package controller.userapi;
 import controller.ServerLauncher;
 import dto.DbConnectionDto;
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

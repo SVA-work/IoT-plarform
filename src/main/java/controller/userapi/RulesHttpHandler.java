@@ -1,7 +1,5 @@
 package controller.userapi;
 
-import java.nio.charset.StandardCharsets;
-
 import config.ServerConfig;
 import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
@@ -19,6 +17,7 @@ import netty.library.annotation.RequestBody;
 import netty.library.json.JsonParser;
 import service.RuleService;
 
+import java.nio.charset.StandardCharsets;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 

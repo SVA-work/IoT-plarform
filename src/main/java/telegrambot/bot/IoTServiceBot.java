@@ -15,12 +15,12 @@ import telegrambot.devicenotification.TemperatureNotification;
 public class IoTServiceBot extends TelegramLongPollingBot {
 
   private static final Logger LOG = LoggerFactory.getLogger(IoTServiceBot.class);
-  
+
   private static final String START = "/start";
 
   private static final TemperatureNotification temperatureNotification = new TemperatureNotification();
 
-  public IoTServiceBot(@Value("${bot.token}")String botToken) {
+  public IoTServiceBot(@Value("${bot.token}") String botToken) {
     super(botToken);
   }
 
@@ -41,9 +41,9 @@ public class IoTServiceBot extends TelegramLongPollingBot {
 
   private void startCommand(Long chatId, String userName) {
     var text = """
-                Добро пожаловать в бот, %s!
-                Иcпользуйте этот телеграм токен при регистрации: %d
-                """;
+            Добро пожаловать в бот, %s!
+            Иcпользуйте этот телеграм токен при регистрации: %d
+            """;
     var formattedText = String.format(text, userName, chatId);
     String chatIdStr = String.valueOf(chatId);
     sendMessage(chatIdStr, formattedText);
@@ -70,6 +70,6 @@ public class IoTServiceBot extends TelegramLongPollingBot {
 
   @Override
   public String getBotUsername() {
-    return "test";
+    return null;
   }
 }

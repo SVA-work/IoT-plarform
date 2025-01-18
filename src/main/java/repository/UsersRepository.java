@@ -2,15 +2,11 @@ package repository;
 
 import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
+import dto.entity.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import dto.entity.UserDto;
 
-import java.sql.PreparedStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +16,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
 
   private static final Logger LOG = LoggerFactory.getLogger(UsersRepository.class);
 
-  private DbConnectionDto dbConnectionDto;
+  private final DbConnectionDto dbConnectionDto;
 
   public UsersRepository(DbConnectionDto dbConnectionDto) {
     this.dbConnectionDto = dbConnectionDto;

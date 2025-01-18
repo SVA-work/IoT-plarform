@@ -1,15 +1,12 @@
 package controller;
 
-import config.*;
-
+import config.DbConfig;
+import config.ServerConfig;
 import controller.deviceapi.TelemetryHttpHandler;
 import controller.userapi.DeviceHttpHandler;
 import controller.userapi.RulesHttpHandler;
 import controller.userapi.UserHttpHandler;
-
 import dto.DbConnectionDto;
-import netty.library.json.JsonParserDefault;
-import repository.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -22,7 +19,11 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-
+import netty.library.json.JsonParserDefault;
+import repository.DevicesRepository;
+import repository.RulesRepository;
+import repository.TelegramTokenRepository;
+import repository.UsersRepository;
 import telegrambot.IoTServiceBotApplication;
 
 public class ServerLauncher {
@@ -47,7 +48,7 @@ public class ServerLauncher {
               .channel(NioServerSocketChannel.class)
               .childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
-                public void initChannel(SocketChannel channel) throws Exception {
+                public void initChannel(SocketChannel channel) {
                   JsonParserDefault parser = new JsonParserDefault();
                   UserHttpHandler userHandler = new UserHttpHandler(parser, dbConnectionDto);
                   DeviceHttpHandler deviceHandler = new DeviceHttpHandler(parser, dbConnectionDto);
@@ -59,7 +60,7 @@ public class ServerLauncher {
                   channel.pipeline()
                           .addLast("HttpServerCodec", new HttpServerCodec())
                           .addLast("HttpServerKeepAlive", new HttpServerKeepAliveHandler())
-                          .addLast("HttpObjectAggregator", new HttpObjectAggregator(ServerConfig.MAX_CONTENT_LENGHT, true))
+                          .addLast("HttpObjectAggregator", new HttpObjectAggregator(ServerConfig.MAX_CONTENT_LENGTH, true))
                           .addLast("HttpChunkedWrite", new ChunkedWriteHandler())
                           .addLast("User HttpHandler", userHandler);
                 }

@@ -1,7 +1,6 @@
 package controller.userapi;
 
 import config.ServerConfig;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +9,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,9 +55,10 @@ class UserHttpHandlerTest extends BaseHttpHandlerTest {
     assertEquals(200, createUserResponse.statusCode());
 
     String responseText = createUserResponse.body();
-    assertEquals("Вы успешно зарегистрировались.\n" +
-            "Ваш логин: testUser\n" +
-            "Ваш пароль: 123", responseText);
+    assertEquals("""
+            Вы успешно зарегистрировались.
+            Ваш логин: testUser
+            Ваш пароль: 123""", responseText);
 
     try {
       PreparedStatement preparedStatement = connection.prepareStatement("Select * FROM users");
@@ -96,17 +99,18 @@ class UserHttpHandlerTest extends BaseHttpHandlerTest {
             );
     assertEquals(200, enteryResponse.statusCode());
 
-    assertEquals("Вы успешно вошли в систему.\n" +
-            "Список доступных команд:\n" +
-            "1) Добавить устройство.\n" +
-            "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
-            "http://localhost:8091/post/addDevice\n" +
-            "2) Удалить устройство.\n" +
-            "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
-            "http://localhost:8091/post/deleteDevice\n" +
-            "3) Посмотреть список устройств.\n" +
-            "http://localhost:8091/get/listOfDevicesOfUser\n" +
-            "4) Посмотреть список доступных правил для устройств.Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
-            "http://localhost:8091/get/deviceRules", enteryResponse.body());
+    assertEquals("""
+            Вы успешно вошли в систему.
+            Список доступных команд:
+            1) Добавить устройство.
+            Для доступа к команде нужно отправить POST запрос на сервер по адресу:\s
+            http://localhost:8091/post/addDevice
+            2) Удалить устройство.
+            Для доступа к команде нужно отправить POST запрос на сервер по адресу:\s
+            http://localhost:8091/post/deleteDevice
+            3) Посмотреть список устройств.
+            http://localhost:8091/get/listOfDevicesOfUser
+            4) Посмотреть список доступных правил для устройств.Для доступа к команде нужно отправить POST запрос на сервер по адресу:\s
+            http://localhost:8091/get/deviceRules""", enteryResponse.body());
   }
 }

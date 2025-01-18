@@ -1,8 +1,13 @@
 package controller.userapi;
 
+import config.ServerConfig;
 import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
+import dto.entity.UserDto;
 import dto.request.DeviceRequestDto;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.HttpVersion;
 import netty.library.AbstractHttpMappingHandler;
 import netty.library.annotation.Get;
 import netty.library.annotation.Post;
@@ -10,13 +15,8 @@ import netty.library.annotation.QueryParam;
 import netty.library.annotation.RequestBody;
 import netty.library.json.JsonParser;
 import service.DeviceService;
-import java.nio.charset.StandardCharsets;
 
-import config.ServerConfig;
-import dto.entity.UserDto;
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.HttpVersion;
+import java.nio.charset.StandardCharsets;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
@@ -38,7 +38,7 @@ public class DeviceHttpHandler extends AbstractHttpMappingHandler {
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(device.listOfDevicesOfUser(userDto), StandardCharsets.UTF_8));
   }
-  
+
   @Post(ServerConfig.SHORT_LINK_ADD_DEVICE)
   public DefaultFullHttpResponse addDevices(@RequestBody DeviceRequestDto deviceRequestDto) {
 

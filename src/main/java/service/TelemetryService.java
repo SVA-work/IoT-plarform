@@ -33,7 +33,7 @@ public class TelemetryService {
     return new String(decodedBytes, StandardCharsets.UTF_8);
   }
 
-  public void reportProcessing(String uuid, MicroclimateSensor InfoAboutdevice) {
+  public void reportProcessing(String uuid, MicroclimateSensor InfoAboutDevice) {
     DeviceDto device = new DeviceDto();
     device.setToken(uuid);
     device.setDeviceId(getDeviceIdByToken(device));
@@ -48,7 +48,7 @@ public class TelemetryService {
       String rule = ruleDto.getRule();
       String[] parts = rule.split("/");
       if (parts[0].equals("Temperature")) {
-        TemperatureСheck(parts, device, InfoAboutdevice, telegramToken);
+        TemperatureCheck(parts, device, InfoAboutDevice, telegramToken);
       }
     }
   }
@@ -56,9 +56,9 @@ public class TelemetryService {
   public String getDeviceIdByToken(DeviceDto deviceDto) {
     List<DeviceDto> allDevices = devicesRepository.getAll();
 
-    for (DeviceDto correntDevice : allDevices) {
-      if (correntDevice.getToken().equals(deviceDto.getToken())) {
-        return correntDevice.getDeviceId();
+    for (DeviceDto currentDevice : allDevices) {
+      if (currentDevice.getToken().equals(deviceDto.getToken())) {
+        return currentDevice.getDeviceId();
       }
     }
     return null;
@@ -74,15 +74,15 @@ public class TelemetryService {
     return null;
   }
 
-  public void TemperatureСheck(String[] parts, DeviceDto device, MicroclimateSensor InfoAboutdevice, TelegramTokenDto telegramToken) {
-    float deviceTemperature = Float.parseFloat(InfoAboutdevice.getTemperature());
-    float lowTemperature = Float.parseFloat(parts[1]);
-    float hightTemperature = Float.parseFloat(parts[2]);
+  public void TemperatureCheck(String[] parts, DeviceDto device, MicroclimateSensor InfoAboutDevice, TelegramTokenDto telegramToken) {
+    double deviceTemperature = Float.parseFloat(InfoAboutDevice.getTemperature());
+    double lowTemperature = Float.parseFloat(parts[1]);
+    double highTemperature = Float.parseFloat(parts[2]);
 
     if (deviceTemperature < lowTemperature) {
       iotServiceBot.sendLowerTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[1]);
     }
-    if (deviceTemperature > hightTemperature) {
+    if (deviceTemperature > highTemperature) {
       iotServiceBot.sendHighTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[2]);
     }
   }

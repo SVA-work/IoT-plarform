@@ -1,14 +1,13 @@
 package service;
 
 import config.ServerConfig;
-
 import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
 import dto.entity.UserDto;
 import repository.DevicesRepository;
-import repository.UsersRepository;
 import repository.RulesRepository;
+import repository.UsersRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,11 +28,9 @@ public class RuleService {
   }
 
   public String getAllAvailableRules() {
-    StringBuilder info = new StringBuilder();
-    info.append("1) Датчик температуры. \n" +
+    return "1) Датчик температуры. \n" +
             "Отправьте запрос на адрес: " + ServerConfig.LINK_APPLY_RULE + "\n" +
-            "Укажите название устройства и приемлемую для вас температуры в таком формате: {login: 99, token: 123, rule: Temparature/lowTemperature/hightTemperature}");
-    return info.toString();
+            "Укажите название устройства и приемлемую для вас температуры в таком формате: {login: 99, token: 123, rule: Temperature/lowTemperature/highTemperature}";
   }
 
   public boolean existenceUser(UserDto userDto) {
@@ -49,16 +46,14 @@ public class RuleService {
     List<DeviceDto> allDevices = usersRepository.devicesOfUser(userDto);
     if (allDevices != null) {
       for (DeviceDto currentMessage : allDevices) {
-        String token = getTokenbyDeviceId(userDto, currentMessage);
+        String token = getTokenByDeviceId(userDto, currentMessage);
         currentMessage.setToken(token);
         if (currentMessage.getToken().equals(deviceDto.getToken())) {
           return true;
         }
       }
-      return false;
-    } else {
-      return false;
     }
+    return false;
   }
 
   public String applyRule(UserDto userDto, DeviceDto deviceDto, RuleDto ruleDto) {
@@ -76,7 +71,7 @@ public class RuleService {
     }
 
     ruleDto.setDeviceId(deviceId);
-    String pattern = "^Temperature/[-+]?[0-9]+(\\.[0-9]+)?/[-+]?[0-9]+(\\.[0-9]+)?$";
+    String pattern = "^Temperature/[-+]?\\d+(\\.\\d+)?/[-+]?\\d+(\\.\\d+)?$";
 
     if (Pattern.matches(pattern, ruleDto.getRule())) {
       rulesRepository.create(ruleDto);
@@ -87,7 +82,7 @@ public class RuleService {
 
   public String getDeviceRules(UserDto userDto, DeviceDto deviceDto) {
     UserService userService = new UserService(dbConnectionDto);
-    if (!userService.existenceUser (userDto)) {
+    if (!userService.existenceUser(userDto)) {
       return "Такого пользователя нет";
     }
 
@@ -100,7 +95,7 @@ public class RuleService {
     List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(deviceDto);
     StringBuilder info = new StringBuilder();
     boolean hasAnyRule = false;
-  
+
     for (RuleDto currentRuleDto : allRulesOfDevice) {
       info.append(currentRuleDto.getRule()).append("\n");
       hasAnyRule = true;
@@ -149,7 +144,7 @@ public class RuleService {
     return null;
   }
 
-  public String getTokenbyDeviceId(UserDto userDto, DeviceDto deviceDto) {
+  public String getTokenByDeviceId(UserDto userDto, DeviceDto deviceDto) {
     for (UserDto currentUserDto : usersRepository.getAll()) {
       if (userDto.getLogin().equals(currentUserDto.getLogin())) {
         for (DeviceDto currentDeviceDto : usersRepository.devicesOfUser(currentUserDto)) {

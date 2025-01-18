@@ -1,7 +1,5 @@
 package controller.deviceapi;
 
-import java.nio.charset.StandardCharsets;
-
 import config.ServerConfig;
 import dto.DbConnectionDto;
 import dto.devices.MicroclimateSensor;
@@ -9,15 +7,17 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpVersion;
-import netty.library.json.JsonParser;
 import netty.library.AbstractHttpMappingHandler;
 import netty.library.annotation.Post;
 import netty.library.annotation.RequestBody;
+import netty.library.json.JsonParser;
 import service.TelemetryService;
+
+import java.nio.charset.StandardCharsets;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public class TelemetryHttpHandler extends AbstractHttpMappingHandler{
+public class TelemetryHttpHandler extends AbstractHttpMappingHandler {
   TelemetryService telemetryService;
   private final JsonParser jsonParser;
 
