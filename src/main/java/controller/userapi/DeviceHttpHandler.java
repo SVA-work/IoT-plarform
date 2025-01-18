@@ -3,12 +3,12 @@ package controller.userapi;
 import dto.DbConnectionDto;
 import dto.entity.DeviceDto;
 import dto.request.DeviceRequestDto;
-import library.AbstractHttpMappingHandler;
-import library.annotation.Get;
-import library.annotation.Post;
-import library.annotation.QueryParam;
-import library.annotation.RequestBody;
-import library.json.JsonParser;
+import netty.library.AbstractHttpMappingHandler;
+import netty.library.annotation.Get;
+import netty.library.annotation.Post;
+import netty.library.annotation.QueryParam;
+import netty.library.annotation.RequestBody;
+import netty.library.json.JsonParser;
 import service.DeviceService;
 import java.nio.charset.StandardCharsets;
 

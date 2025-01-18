@@ -5,9 +5,8 @@ import config.ServerConfig;
 import dto.DbConnectionDto;
 import dto.entity.TelegramTokenDto;
 import dto.entity.UserDto;
-import tables.DevicesRepository;
-import tables.TelegramTokenRepository;
-import tables.UsersRepository;
+import repository.TelegramTokenRepository;
+import repository.UsersRepository;
 
 public class UserService {
 

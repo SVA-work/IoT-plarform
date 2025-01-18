@@ -9,10 +9,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpVersion;
-import library.json.JsonParser;
-import library.AbstractHttpMappingHandler;
-import library.annotation.Post;
-import library.annotation.RequestBody;
+import netty.library.json.JsonParser;
+import netty.library.AbstractHttpMappingHandler;
+import netty.library.annotation.Post;
+import netty.library.annotation.RequestBody;
 import service.TelemetryService;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;

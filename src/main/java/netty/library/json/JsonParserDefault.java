@@ -1,7 +1,7 @@
-package library.json;
+package netty.library.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import library.exception.JsonParseException;
+import netty.library.exception.JsonParseException;
 import io.netty.buffer.ByteBuf;
 
 import java.io.IOException;

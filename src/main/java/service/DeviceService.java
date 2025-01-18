@@ -4,8 +4,8 @@ import dto.DbConnectionDto;
 import dto.entity.UserDto;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
-import tables.DevicesRepository;
-import tables.UsersRepository;
+import repository.DevicesRepository;
+import repository.UsersRepository;
 
 import java.util.List;
 import java.util.Objects;

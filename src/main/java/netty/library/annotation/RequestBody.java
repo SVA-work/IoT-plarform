@@ -1,4 +1,4 @@
-package library.annotation;
+package netty.library.annotation;
 
 import java.lang.annotation.*;
 

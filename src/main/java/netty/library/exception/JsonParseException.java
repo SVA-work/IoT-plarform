@@ -1,4 +1,4 @@
-package library.exception;
+package netty.library.exception;
 
 public class JsonParseException extends NumException {
 

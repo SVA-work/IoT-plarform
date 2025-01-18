@@ -1,11 +1,11 @@
-package library.annotation;
+package netty.library.annotation;
 
 import java.lang.annotation.*;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Post {
+public @interface PathParam {
 
     String value();
 }

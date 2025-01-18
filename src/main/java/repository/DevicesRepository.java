@@ -1,10 +1,10 @@
-package tables;
+package repository;
 
 import dto.DbConnectionDto;
-import dto.entity.DeviceDto;
+import dto.entity.RuleDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import dto.entity.UserDto;
+import dto.entity.DeviceDto;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -14,25 +14,25 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsersRepository extends AbstractRepository<UserDto> {
-  private final String tableName = "users";
-  private final String tableID = "user_id";
+public class DevicesRepository extends AbstractRepository<DeviceDto> {
+  private final String tableName = "devices";
+  private final String tableID = "device_id";
 
-  private static final Logger LOG = LoggerFactory.getLogger(UsersRepository.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DevicesRepository.class);
 
   private DbConnectionDto dbConnectionDto;
 
-  public UsersRepository(DbConnectionDto dbConnectionDto) {
+  public DevicesRepository(DbConnectionDto dbConnectionDto) {
     this.dbConnectionDto = dbConnectionDto;
   }
 
   @Override
-  public UserDto createTable() {
+  public DeviceDto createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
-            "user_id SERIAL PRIMARY KEY," +
-            "login VARCHAR(255) UNIQUE NOT NULL," +
-            "password VARCHAR(255) NOT NULL)";
-    UserDto response = new UserDto();
+            "device_id SERIAL PRIMARY KEY," +
+            "user_id INTEGER REFERENCES users(user_id)," +
+            "token VARCHAR(255) NOT NULL)";
+    DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       Statement statement = connection.createStatement();
@@ -46,109 +46,107 @@ public class UsersRepository extends AbstractRepository<UserDto> {
   }
 
   @Override
-  public List<UserDto> getAll() {
+  public List<DeviceDto> getAll() {
     String sql = "SELECT * FROM " + tableName;
-    List<UserDto> list = new ArrayList<>();
+    List<DeviceDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
       while (resultSet.next()) {
-        UserDto response = new UserDto();
-        response.setUserId(resultSet.getString(tableID));
-        response.setLogin(resultSet.getString("login"));
-        response.setPassword(resultSet.getString("password"));
+        DeviceDto response = new DeviceDto();
+        response.setDeviceId(resultSet.getString(tableID));
+        response.setUserId(resultSet.getString("user_id"));
+        response.setToken(resultSet.getString("token"));
         list.add(response);
       }
       resultSet.close();
     } catch (SQLException e) {
-      LOG.error("Не удалось получить информацию из таблицы users", e);
+      LOG.error("Не удалось получить информацию из таблицы devices", e);
     }
     return list;
   }
 
   @Override
-  public UserDto getById(UserDto message) {
-    int id = Integer.parseInt(message.getUserId());
+  public DeviceDto getById(DeviceDto UserDto) {
+    int id = Integer.parseInt(UserDto.getDeviceId());
     String sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-    UserDto response = new UserDto();
+    DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
-        response.setUserId(resultSet.getString(tableID));
-        response.setLogin(resultSet.getString("login"));
-        response.setPassword(resultSet.getString("password"));
+        response.setDeviceId(resultSet.getString(tableID));
+        response.setUserId(resultSet.getString("user_id"));
+        response.setToken(resultSet.getString("token"));
       }
       resultSet.close();
     } catch (SQLException e) {
-      LOG.error("Не удалось получить информацию о пользователе", e);
+      LOG.error("Не удалось получить информацию об устройстве", e);
     }
     return response;
   }
 
-  public List<DeviceDto> devicesOfUser(UserDto message) {
-    int id = Integer.parseInt(message.getUserId());
-    String sql = "SELECT d.* " +
-            "FROM devices d " +
-            "JOIN users u ON d.user_id = u.user_id " +
-            "WHERE u.user_id = ?";
-    List<DeviceDto> list = new ArrayList<>();
+  public List<RuleDto> rulesOfDevice(DeviceDto message) {
+    int id = Integer.parseInt(message.getDeviceId());
+    String sql = "SELECT r.* " +
+            "FROM rules r " +
+            "JOIN devices d ON r.device_id = d.device_id " +
+            "WHERE d.device_id = ?";
+    List<RuleDto> list = new ArrayList<>();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       preparedStatement.setInt(1, id);
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
-        DeviceDto response = new DeviceDto();
-        response.setDeviceId(resultSet.getString("device_id"));
-        response.setToken(resultSet.getString("token"));
+        RuleDto response = new RuleDto();
+        response.setDeviceId(resultSet.getString("rule_id"));
+        response.setRule(resultSet.getString("rule"));
         list.add(response);
       }
       resultSet.close();
     } catch (SQLException e) {
-      LOG.error("Не удалось получить информацию об устройствах пользователя", e);
+      LOG.error("Не удалось получить информацию об правилах устройства", e);
     }
     return list;
   }
 
   @Override
-  public UserDto update(UserDto entity) {
+  public DeviceDto update(DeviceDto entity) {
     String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    UserDto response = new UserDto();
-
+    DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql);
       switch (entity.getColumnTitle()) {
-        case "login" -> preparedStatement.setString(1, entity.getLogin());
-        case "password" -> preparedStatement.setString(1, entity.getPassword());
+        case "user_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+        case "token" -> preparedStatement.setString(1, entity.getToken());
       }
-      preparedStatement.setInt(2, Integer.parseInt(entity.getUserId()));
+      preparedStatement.setInt(2, Integer.parseInt(entity.getDeviceId()));
       preparedStatement.executeUpdate();
 
       sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
       preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+      preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
-        response.setUserId(resultSet.getString(tableID));
-        response.setLogin(resultSet.getString("login"));
-        response.setPassword(resultSet.getString("password"));
+        response.setDeviceId(resultSet.getString(tableID));
+        response.setUserId(resultSet.getString("user_id"));
+        response.setToken(resultSet.getString("token"));
       }
-      resultSet.close();
     } catch (SQLException e) {
-      LOG.error("Не удалось изменить данные о пользователе", e);
+      LOG.error("Не удалось изменить данные об устройстве", e);
     }
     return response;
   }
 
   @Override
-  public UserDto delete(UserDto message) {
-    int id = Integer.parseInt(message.getUserId());
-    UserDto response = new UserDto();
+  public DeviceDto delete(DeviceDto message) {
+    int id = Integer.parseInt(message.getDeviceId());
+    DeviceDto response = new DeviceDto();
     String sql = "DELETE FROM " + tableName + " WHERE " + tableID + " = ?";
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
@@ -157,30 +155,30 @@ public class UsersRepository extends AbstractRepository<UserDto> {
       preparedStatement.executeUpdate();
       response.setSuccessful(true);
     } catch (SQLException e) {
-      LOG.error("Не удалось удалить пользователя", e);
+      LOG.error("Не удалось удалить устройство", e);
       response.setSuccessful(false);
     }
     return response;
   }
 
   @Override
-  public UserDto create(UserDto entity) {
-    String sql = "INSERT INTO " + tableName + " (login, password) VALUES (?, ?)";
-    UserDto response = new UserDto();
+  public DeviceDto create(DeviceDto entity) {
+    String sql = "INSERT INTO " + tableName + " (user_id, token) VALUES (?, ?)";
+    DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-      preparedStatement.setString(1, entity.getLogin());
-      preparedStatement.setString(2, entity.getPassword());
+      preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
+      preparedStatement.setString(2, entity.getToken());
       preparedStatement.executeUpdate();
+      response.setSuccessful(true);
       ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
       if (generatedKeys.next()) {
-        long userId = generatedKeys.getLong(1);
-        response.setUserId(String.valueOf(userId));
+        long deviceId = generatedKeys.getLong(1);
+        response.setDeviceId(String.valueOf(deviceId));
       }
-      response.setSuccessful(true);
     } catch (SQLException e) {
-      LOG.error("Не удалось создать пользователя", e);
+      LOG.error("Не удалось создать устройство", e);
       response.setSuccessful(false);
     }
     return response;

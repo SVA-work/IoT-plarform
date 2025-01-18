@@ -1,21 +1,28 @@
 package service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
-
 import dto.DbConnectionDto;
 import dto.devices.MicroclimateSensor;
 import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
-import tables.DevicesRepository;
+import dto.entity.TelegramTokenDto;
+import repository.DevicesRepository;
+import repository.TelegramTokenRepository;
+import telegrambot.bot.IoTServiceBot;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.List;
 
 public class TelemetryService {
 
   private final DevicesRepository devicesRepository;
+  private final IoTServiceBot iotServiceBot;
+  private final TelegramTokenRepository telegramTokenRepository;
 
   public TelemetryService(DbConnectionDto dbConnectionDto) {
     devicesRepository = new DevicesRepository(dbConnectionDto);
+    iotServiceBot = new IoTServiceBot("7614249328:AAF6E3EFO1yLqxlbQhBCR4P977EA8VWxuWY");
+    telegramTokenRepository = new TelegramTokenRepository(dbConnectionDto);
   }
 
   public String decodeBase64(String base64Data) {
@@ -29,12 +36,21 @@ public class TelemetryService {
   public void reportProcessing(String uuid, MicroclimateSensor deviceDto) {
     DeviceDto device = new DeviceDto();
 
-    // Предполагается, что uuid == token
     device.setToken(uuid);
     List<DeviceDto> allDevices = devicesRepository.getAll();
-    for (DeviceDto correntDevice : allDevices) {
-      if (correntDevice.getToken().equals(uuid)) {
-        device.setDeviceId(correntDevice.getDeviceId());
+    for (DeviceDto currentDevice : allDevices) {
+      if (currentDevice.getToken().equals(uuid)) {
+        device.setDeviceId(currentDevice.getDeviceId());
+      }
+    }
+
+    TelegramTokenDto telegramToken = new TelegramTokenDto();
+    device = devicesRepository.getById(device);
+    telegramToken.setUserId(device.getUserId());
+    List<TelegramTokenDto> telegramTokens = telegramTokenRepository.getAll();
+    for (TelegramTokenDto telegramTokennDto : telegramTokens) {
+      if (telegramToken.getUserId().equals(telegramTokennDto.getUserId())) {
+        telegramToken.setTelegramToken(telegramTokennDto.getTelegramToken());
       }
     }
 
@@ -43,14 +59,14 @@ public class TelemetryService {
       String rule = ruleDto.getRule();
       String[] parts = rule.split("/");
       if (parts[0].equals("Temperature")) {
-        float deviceTemperature = Float.parseFloat(deviceDto.getTemperature());
-        float lowTemperature = Float.parseFloat(parts[1]);
-        float hightTemperature = Float.parseFloat(parts[2]);
+        double deviceTemperature = Float.parseFloat(deviceDto.getTemperature());
+        double lowTemperature = Float.parseFloat(parts[1]);
+        double highTemperature = Float.parseFloat(parts[2]);
         if (deviceTemperature < lowTemperature) {
-          // говорим пользователю, что температура слишком низкая
+          iotServiceBot.sendLowerTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[1]);
         }
-        if (deviceTemperature > hightTemperature) {
-          // говорим пользователю, что температура слишком высокая
+        if (deviceTemperature > highTemperature) {
+          iotServiceBot.sendHighTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[2]);
         }
       }
     }
