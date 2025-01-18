@@ -1,5 +1,8 @@
 package dto.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RuleDto extends BaseDto {
   private String ruleId;
   private String rule;

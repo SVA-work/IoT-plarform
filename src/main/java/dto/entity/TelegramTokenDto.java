@@ -1,5 +1,8 @@
 package dto.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TelegramTokenDto extends BaseDto {
   private String userId;
   private String telegramToken;

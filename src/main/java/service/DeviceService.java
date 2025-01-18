@@ -5,6 +5,7 @@ import dto.entity.DeviceDto;
 import dto.entity.RuleDto;
 import dto.entity.UserDto;
 import repository.DevicesRepository;
+import repository.RulesRepository;
 import repository.UsersRepository;
 
 import java.util.List;
@@ -14,10 +15,12 @@ public class DeviceService {
 
   private final UsersRepository usersRepository;
   private final DevicesRepository devicesRepository;
+  private final RulesRepository rulesRepository;
   private final DbConnectionDto dbConnectionDto;
 
   public DeviceService(DbConnectionDto dbConnectionDto) {
     usersRepository = new UsersRepository(dbConnectionDto);
+    rulesRepository =  new RulesRepository(dbConnectionDto);
     devicesRepository = new DevicesRepository(dbConnectionDto);
     this.dbConnectionDto = dbConnectionDto;
   }
@@ -77,6 +80,12 @@ public class DeviceService {
     boolean hasDeletedAnyDevice = false;
     for (DeviceDto currentDeviceDto : allDevicesOfUser) {
       if (Objects.equals(currentDeviceDto.getToken(), deviceDto.getToken())) {
+
+        List<RuleDto> allRulesOfDevice = devicesRepository.rulesOfDevice(currentDeviceDto);
+        for (RuleDto rule : allRulesOfDevice) {
+          rulesRepository.delete(rule);
+        }
+
         devicesRepository.delete(currentDeviceDto);
         hasDeletedAnyDevice = true;
         break;

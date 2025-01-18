@@ -98,7 +98,8 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
         RuleDto response = new RuleDto();
-        response.setDeviceId(resultSet.getString("rule_id"));
+        response.setRuleId(resultSet.getString("rule_id"));
+        response.setDeviceId(resultSet.getString("device_id"));
         response.setRule(resultSet.getString("rule"));
         list.add(response);
       }
