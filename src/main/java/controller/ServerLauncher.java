@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import netty.library.json.JsonParserDefault;
+import org.flywaydb.core.Flyway;
 import repository.DevicesRepository;
 import repository.RulesRepository;
 import repository.TelegramTokenRepository;

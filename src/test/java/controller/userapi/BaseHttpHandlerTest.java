@@ -34,25 +34,12 @@ public abstract class BaseHttpHandlerTest {
     }
   });
 
-
   @BeforeAll
   static void beforeAll() throws InterruptedException {
-    String postgresJdbcUrl = POSTGRES.getJdbcUrl();
-    dbConnectionDto.url = postgresJdbcUrl;
+    dbConnectionDto.url = POSTGRES.getJdbcUrl();
     dbConnectionDto.user = POSTGRES.getUsername();
     dbConnectionDto.password = POSTGRES.getPassword();
-    initFlyway(postgresJdbcUrl);
     startServer();
-  }
-
-  private static void initFlyway(String postgresJdbcUrl) {
-    Flyway flyway =
-            Flyway.configure()
-                    .outOfOrder(true)
-                    .locations("classpath:db/migrations")
-                    .dataSource(postgresJdbcUrl, POSTGRES.getUsername(), POSTGRES.getPassword())
-                    .load();
-    flyway.migrate();
   }
 
   private static void startServer() throws InterruptedException {
