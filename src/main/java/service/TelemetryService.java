@@ -80,10 +80,10 @@ public class TelemetryService {
     double highTemperature = Float.parseFloat(parts[2]);
 
     if (deviceTemperature < lowTemperature) {
-      iotServiceBot.sendLowerTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[1]);
+      iotServiceBot.sendLowerTempNotification(telegramToken.getTelegramToken(), device.getToken(), device.getType(), parts[1]);
     }
     if (deviceTemperature > highTemperature) {
-      iotServiceBot.sendHighTempNotification(telegramToken.getTelegramToken(), device.getToken(), parts[2]);
+      iotServiceBot.sendHighTempNotification(telegramToken.getTelegramToken(), device.getToken(), device.getType(), parts[2]);
     }
   }
 }

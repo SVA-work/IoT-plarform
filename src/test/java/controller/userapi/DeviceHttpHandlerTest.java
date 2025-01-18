@@ -43,7 +43,8 @@ class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
                                             """
                                                         {
                                                           "login": "testUser",
-                                                          "token": "testDevice"
+                                                          "token": "testDevice",
+                                                          "type": "temp"
                                                         }
                                                     """
                                     )
@@ -89,7 +90,7 @@ class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
 
   @Test
   void deviceInformation() throws IOException, InterruptedException {
-    String sqlCreateUserInfo = "insert into devices (device_id, user_id, token) VALUES ('0', '0', 'testDevice')";
+    String sqlCreateUserInfo = "insert into devices (device_id, user_id, token, type) VALUES ('0', '0', 'testDevice', 'temp')";
     try {
       Statement statement = connection.createStatement();
       statement.executeUpdate(sqlCreateUserInfo);
@@ -111,7 +112,7 @@ class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
 
   @Test
   void deleteDevices() throws IOException, InterruptedException {
-    String sqlCreateUserInfo = "insert into devices (device_id, user_id, token) VALUES ('1', '0', 'testDevice')";
+    String sqlCreateUserInfo = "insert into devices (device_id, user_id, token, type) VALUES ('1', '0', 'testDevice', 'type')";
     try {
       Statement statement = connection.createStatement();
       statement.executeUpdate(sqlCreateUserInfo);

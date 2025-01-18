@@ -49,13 +49,13 @@ public class IoTServiceBot extends TelegramLongPollingBot {
     sendMessage(chatIdStr, formattedText);
   }
 
-  public void sendLowerTempNotification(String chatId, String deviceName, String lowerBorderOfTemperature) {
-    String message = temperatureNotification.lowerTempNotification(deviceName, lowerBorderOfTemperature);
+  public void sendLowerTempNotification(String chatId, String deviceToken, String deviceType, String lowerBorderOfTemperature) {
+    String message = temperatureNotification.lowerTempNotification(deviceToken, deviceType, lowerBorderOfTemperature);
     sendMessage(chatId, message);
   }
 
-  public void sendHighTempNotification(String chatId, String deviceName, String highBorderOfTemperature) {
-    String message = temperatureNotification.highTempNotification(deviceName, highBorderOfTemperature);
+  public void sendHighTempNotification(String chatId, String deviceToken, String deviceType, String highBorderOfTemperature) {
+    String message = temperatureNotification.highTempNotification(deviceToken, deviceType, highBorderOfTemperature);
     sendMessage(chatId, message);
   }
 

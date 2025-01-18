@@ -26,7 +26,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
       Statement statement = connection.createStatement();
       statement.executeUpdate("DELETE FROM rules");
       statement.executeUpdate("DELETE FROM devices");
-      statement.executeUpdate("insert into devices (device_id, user_id, token) VALUES ('0', '0', 'testDevice')");
+      statement.executeUpdate("insert into devices (device_id, user_id, token, type) VALUES ('0', '0', 'testDevice', 'temp')");
       statement.executeUpdate("DELETE FROM users");
       statement.executeUpdate("insert into users (user_id, login, password) VALUES ('0', 'testUser', '123')");
     } catch (SQLException e) {
@@ -82,7 +82,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                                                         {
                                                           "login": "testUser",
                                                           "token": "testDevice",
-                                                          "rule": "testRule/1/2"
+                                                          "rule": "Temperature/1/2"
                                                         }
                                                     """
                                     )
@@ -101,7 +101,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
       PreparedStatement preparedStatement = connection.prepareStatement(sqlGetUserInfo);
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
-        assertEquals("testRule/1/2", resultSet.getString("rule"));
+        assertEquals("Temperature/1/2", resultSet.getString("rule"));
       }
     } catch (SQLException e) {
       LOG.error("Соединение не удалось", e);
@@ -110,7 +110,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
 
   @Test
   void deleteDeviceRule() throws IOException, InterruptedException {
-    String sqlCreateUserInfo = "insert into rules (rule_id, device_id, rule) VALUES ('0', '0', 'testRule')";
+    String sqlCreateUserInfo = "insert into rules (rule_id, device_id, rule) VALUES ('0', '0', 'testRule/1/2')";
     try {
       Statement statement = connection.createStatement();
       statement.executeUpdate(sqlCreateUserInfo);
@@ -126,7 +126,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                                                         {
                                                           "login": "testUser",
                                                           "token": "testDevice",
-                                                          "rule": "testRule"
+                                                          "rule": "testRule/1/2"
                                                         }
                                                     """
                                     )

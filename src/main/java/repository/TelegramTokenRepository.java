@@ -21,22 +21,18 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
     this.dbConnectionDto = dbConnectionDto;
   }
 
-  public TelegramTokenDto createTable() {
+  public void createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "telegram_token_id SERIAL PRIMARY KEY," +
             "user_id INTEGER REFERENCES users(user_id)," +
             "telegram_token VARCHAR(255) NOT NULL)";
-    TelegramTokenDto response = new TelegramTokenDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
-      response.setSuccessful(true);
     } catch (SQLException e) {
       LOG.error("Соединение не удалось", e);
-      response.setSuccessful(false);
     }
-    return response;
   }
 
   @Override
@@ -84,35 +80,6 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
   }
 
   @Override
-  public TelegramTokenDto update(TelegramTokenDto entity) {
-    String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    TelegramTokenDto response = new TelegramTokenDto();
-    try {
-      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      switch (entity.getColumnTitle()) {
-        case "user_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-        case "telegram_token" -> preparedStatement.setString(1, entity.getTelegramToken());
-      }
-      preparedStatement.setInt(2, Integer.parseInt(entity.getTelegramTokenId()));
-      preparedStatement.executeUpdate();
-
-      sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-      preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getTelegramTokenId()));
-      ResultSet resultSet = preparedStatement.executeQuery();
-      if (resultSet.next()) {
-        response.setTelegramTokenId(resultSet.getString(tableID));
-        response.setUserId(resultSet.getString("user_id"));
-        response.setTelegramToken(resultSet.getString("telegram_token"));
-      }
-    } catch (SQLException e) {
-      LOG.error("Не удалось изменить данные telegram-токена", e);
-    }
-    return response;
-  }
-
-  @Override
   public TelegramTokenDto delete(TelegramTokenDto message) {
     int id = Integer.parseInt(message.getTelegramTokenId());
     TelegramTokenDto response = new TelegramTokenDto();
@@ -151,37 +118,5 @@ public class TelegramTokenRepository extends AbstractRepository<TelegramTokenDto
       response.setSuccessful(false);
     }
     return response;
-  }
-
-  public void createFunction() {
-    String sql = "CREATE OR REPLACE FUNCTION insert_into_telegram_tokens() " +
-            "RETURNS TRIGGER AS $$ " +
-            "BEGIN " +
-            "INSERT INTO telegram_tokens (user_id, telegram_token)" +
-            "VALUES (NEW.user_id, NEW.telegram_token);" +
-            "RETURN NEW;" +
-            "END;" +
-            "$$ LANGUAGE plpgsql;";
-    try {
-      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.executeUpdate();
-    } catch (SQLException e) {
-      LOG.error("Не удалось создать функцию", e);
-    }
-  }
-
-  public void createTrigger() {
-    String sql = "CREATE TRIGGER after_insert_users " +
-            "AFTER INSERT ON users " +
-            "FOR EACH ROW " +
-            "EXECUTE FUNCTION insert_into_telegram_tokens();";
-    try {
-      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.executeUpdate();
-    } catch (SQLException e) {
-      LOG.error("Не удалось запустить trigger", e);
-    }
   }
 }

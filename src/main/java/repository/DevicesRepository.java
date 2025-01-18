@@ -23,23 +23,19 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
   }
 
   @Override
-  public DeviceDto createTable() {
+  public void createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "device_id SERIAL PRIMARY KEY," +
             "user_id INTEGER REFERENCES users(user_id)," +
             "token VARCHAR(255) NOT NULL," +
             "type VARCHAR(255) NOT NULL)";
-    DeviceDto response = new DeviceDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
-      response.setSuccessful(true);
     } catch (SQLException e) {
       LOG.error("Соединение не удалось", e);
-      response.setSuccessful(false);
     }
-    return response;
   }
 
   @Override
@@ -111,37 +107,6 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
       LOG.error("Не удалось получить информацию об правилах устройства", e);
     }
     return list;
-  }
-
-  @Override
-  public DeviceDto update(DeviceDto entity) {
-    String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    DeviceDto response = new DeviceDto();
-    try {
-      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      switch (entity.getColumnTitle()) {
-        case "user_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-        case "token" -> preparedStatement.setString(1, entity.getToken());
-        case "type" -> preparedStatement.setString(1, entity.getType());
-      }
-      preparedStatement.setInt(2, Integer.parseInt(entity.getDeviceId()));
-      preparedStatement.executeUpdate();
-
-      sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-      preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
-      ResultSet resultSet = preparedStatement.executeQuery();
-      if (resultSet.next()) {
-        response.setDeviceId(resultSet.getString(tableID));
-        response.setUserId(resultSet.getString("user_id"));
-        response.setToken(resultSet.getString("token"));
-        response.setType(resultSet.getString("type"));
-      }
-    } catch (SQLException e) {
-      LOG.error("Не удалось изменить данные об устройстве", e);
-    }
-    return response;
   }
 
   @Override

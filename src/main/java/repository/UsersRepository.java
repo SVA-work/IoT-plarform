@@ -23,22 +23,18 @@ public class UsersRepository extends AbstractRepository<UserDto> {
   }
 
   @Override
-  public UserDto createTable() {
+  public void createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "user_id SERIAL PRIMARY KEY," +
             "login VARCHAR(255) UNIQUE NOT NULL," +
             "password VARCHAR(255) NOT NULL)";
-    UserDto response = new UserDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
-      response.setSuccessful(true);
     } catch (SQLException e) {
       LOG.error("Соединение не удалось", e);
-      response.setSuccessful(false);
     }
-    return response;
   }
 
   @Override
@@ -108,37 +104,6 @@ public class UsersRepository extends AbstractRepository<UserDto> {
       LOG.error("Не удалось получить информацию об устройствах пользователя", e);
     }
     return list;
-  }
-
-  @Override
-  public UserDto update(UserDto entity) {
-    String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    UserDto response = new UserDto();
-
-    try {
-      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      switch (entity.getColumnTitle()) {
-        case "login" -> preparedStatement.setString(1, entity.getLogin());
-        case "password" -> preparedStatement.setString(1, entity.getPassword());
-      }
-      preparedStatement.setInt(2, Integer.parseInt(entity.getUserId()));
-      preparedStatement.executeUpdate();
-
-      sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-      preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-      ResultSet resultSet = preparedStatement.executeQuery();
-      if (resultSet.next()) {
-        response.setUserId(resultSet.getString(tableID));
-        response.setLogin(resultSet.getString("login"));
-        response.setPassword(resultSet.getString("password"));
-      }
-      resultSet.close();
-    } catch (SQLException e) {
-      LOG.error("Не удалось изменить данные о пользователе", e);
-    }
-    return response;
   }
 
   @Override

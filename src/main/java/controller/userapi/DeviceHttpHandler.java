@@ -47,6 +47,7 @@ public class DeviceHttpHandler extends AbstractHttpMappingHandler {
 
     DeviceDto deviceDto = new DeviceDto();
     deviceDto.setToken(deviceRequestDto.getToken());
+    deviceDto.setType(deviceRequestDto.getType());
 
     return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.copiedBuffer(device.addDevice(userDto, deviceDto), StandardCharsets.UTF_8));

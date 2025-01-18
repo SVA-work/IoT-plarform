@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class DeviceRequestDto {
   private String login;
   private String token;
+  private String type;
 
   public String getLogin() {
     return login;
@@ -13,5 +14,13 @@ public class DeviceRequestDto {
 
   public String getToken() {
     return token;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 }

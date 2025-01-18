@@ -22,22 +22,18 @@ public class RulesRepository extends AbstractRepository<RuleDto> {
   }
 
   @Override
-  public RuleDto createTable() {
+  public void createTable() {
     String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" +
             "rule_id SERIAL PRIMARY KEY," +
             "device_id INTEGER REFERENCES devices(device_id)," +
             "rule VARCHAR(255) NOT NULL)";
-    RuleDto response = new RuleDto();
     try {
       Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
-      response.setSuccessful(true);
     } catch (SQLException e) {
       LOG.error("Соединение не удалось", e);
-      response.setSuccessful(false);
     }
-    return response;
   }
 
   @Override
@@ -80,36 +76,6 @@ public class RulesRepository extends AbstractRepository<RuleDto> {
       resultSet.close();
     } catch (SQLException e) {
       LOG.error("Не удалось получить информацию о правиле", e);
-    }
-    return response;
-  }
-
-  @Override
-  public RuleDto update(RuleDto entity) {
-    String sql = "UPDATE " + tableName + " SET " + entity.getColumnTitle() + " = ? WHERE " + tableID + " = ?";
-    RuleDto response = new RuleDto();
-    try {
-      Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      switch (entity.getColumnTitle()) {
-        case "device_id" -> preparedStatement.setInt(1, Integer.parseInt(entity.getDeviceId()));
-        case "rule" -> preparedStatement.setString(1, entity.getRule());
-      }
-      preparedStatement.setInt(2, Integer.parseInt(entity.getRuleId()));
-      preparedStatement.executeUpdate();
-
-      sql = "SELECT * FROM " + tableName + " WHERE " + tableID + " = ?";
-      preparedStatement = connection.prepareStatement(sql);
-      preparedStatement.setInt(1, Integer.parseInt(entity.getRuleId()));
-      ResultSet resultSet = preparedStatement.executeQuery();
-
-      if (resultSet.next()) {
-        response.setRuleId(resultSet.getString(tableID));
-        response.setDeviceId(resultSet.getString("device_id"));
-        response.setRule(resultSet.getString("rule"));
-      }
-    } catch (SQLException e) {
-      LOG.error("Не удалось изменить данные о правиле", e);
     }
     return response;
   }
