@@ -18,26 +18,26 @@ import java.nio.charset.StandardCharsets;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class TelemetryHttpHandler extends AbstractHttpMappingHandler {
-  TelemetryService telemetryService;
-  private final JsonParser jsonParser;
+    private final JsonParser jsonParser;
+    private final TelemetryService telemetryService;
 
 
-  public TelemetryHttpHandler(JsonParser parser, DbConnectionDto dbConnectionDto) {
-    super(parser);
-    this.jsonParser = parser;
-    telemetryService = new TelemetryService(dbConnectionDto);
-  }
+    public TelemetryHttpHandler(JsonParser parser, DbConnectionDto dbConnectionDto) {
+        super(parser);
+        this.jsonParser = parser;
+        telemetryService = new TelemetryService(dbConnectionDto);
+    }
 
-  @Post(ServerConfig.SHORT_LINK_REPORT)
-  public DefaultFullHttpResponse report(@RequestBody MicroclimateSensor message) {
-    String uuid = message.getUuid();
-    String base64Message = message.getBase64Message();
-    String decodedMessage = telemetryService.decodeBase64(base64Message);
-    ByteBuf byteBuf = Unpooled.copiedBuffer(decodedMessage, StandardCharsets.UTF_8);
-    Object parsedObject = jsonParser.parse(decodedMessage, byteBuf, MicroclimateSensor.class);
-    MicroclimateSensor deviceDto = (MicroclimateSensor) parsedObject;
-    telemetryService.reportProcessing(uuid, deviceDto);
-    return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-            Unpooled.copiedBuffer("", StandardCharsets.UTF_8));
-  }
+    @Post(ServerConfig.SHORT_LINK_REPORT)
+    public DefaultFullHttpResponse report(@RequestBody MicroclimateSensor message) {
+        String uuid = message.getUuid();
+        String base64Message = message.getBase64Message();
+        String decodedMessage = telemetryService.decodeBase64(base64Message);
+        ByteBuf byteBuf = Unpooled.copiedBuffer(decodedMessage, StandardCharsets.UTF_8);
+        Object parsedObject = jsonParser.parse(decodedMessage, byteBuf, MicroclimateSensor.class);
+        MicroclimateSensor deviceDto = (MicroclimateSensor) parsedObject;
+        telemetryService.reportProcessing(uuid, deviceDto);
+        return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+                Unpooled.copiedBuffer("", StandardCharsets.UTF_8));
+    }
 }

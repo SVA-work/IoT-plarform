@@ -2,35 +2,34 @@ package netty.library;
 
 public class MethodParam {
 
-  public enum TypeParam {
-    PATH_PARAM, QUERY_PARAM, REQUEST_BODY
-  }
+    private final String name;
+    private final Class<?> type;
+    private final boolean required;
+    private final TypeParam typeParam;
+    public MethodParam(String name, Class<?> type, boolean required, TypeParam typeParam) {
+        this.name = name;
+        this.type = type;
+        this.required = required;
+        this.typeParam = typeParam;
+    }
 
-  private final String name;
-  private final Class<?> type;
-  private final boolean required;
-  private final TypeParam typeParam;
+    public String getName() {
+        return name;
+    }
 
-  public MethodParam(String name, Class<?> type, boolean required, TypeParam typeParam) {
-    this.name = name;
-    this.type = type;
-    this.required = required;
-    this.typeParam = typeParam;
-  }
+    public Class<?> getType() {
+        return type;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public boolean isRequired() {
+        return required;
+    }
 
-  public Class<?> getType() {
-    return type;
-  }
+    public TypeParam getTypeParam() {
+        return typeParam;
+    }
 
-  public boolean isRequired() {
-    return required;
-  }
-
-  public TypeParam getTypeParam() {
-    return typeParam;
-  }
+    public enum TypeParam {
+        PATH_PARAM, QUERY_PARAM, REQUEST_BODY
+    }
 }

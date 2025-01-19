@@ -1,8 +1,8 @@
 package netty.library.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import netty.library.exception.JsonParseException;
 import io.netty.buffer.ByteBuf;
+import netty.library.exception.JsonParseException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

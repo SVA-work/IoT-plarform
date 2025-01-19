@@ -28,17 +28,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      
+
       - name: Install PostgreSQL client
         run: sudo apt-get install postgresql-client
-    
+
       - name: List running containers
         run: docker ps
 
@@ -48,7 +48,7 @@ jobs:
             echo "Waiting for PostgreSQL to be ready..."
             sleep 2
           done
-      
+
       - name: Build with Maven
         env:
           DATABASE_URL: jdbc:postgresql://localhost:5433/postgres
