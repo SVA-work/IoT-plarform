@@ -5,15 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DeviceRequestDto {
     private String login;
-    private String token;
+    private String uuid;
     private String type;
 
     public String getLogin() {
         return login;
     }
 
-    public String getToken() {
-        return token;
+    public String getUuid() {
+        return uuid;
     }
 
     public String getType() {

@@ -3,7 +3,7 @@ package dto.objects;
 public class DeviceDto extends BaseDto {
     private String userId;
     private String deviceId;
-    private String token;
+    private String uuid;
     private String type;
 
     public DeviceDto() {
@@ -25,12 +25,12 @@ public class DeviceDto extends BaseDto {
         this.deviceId = deviceId;
     }
 
-    public String getToken() {
-        return token;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getType() {

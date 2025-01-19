@@ -30,7 +30,7 @@ public class RuleService {
     public String getAllAvailableRules() {
         return "1) Датчик температуры. \n" +
                 "Отправьте запрос на адрес: " + ServerConfig.LINK_APPLY_RULE + "\n" +
-                "Укажите название устройства и приемлемую для вас температуры в таком формате: {login: 99, token: 123, rule: Temperature/lowTemperature/highTemperature}";
+                "Укажите название устройства и приемлемую для вас температуры в таком формате: {login: 99, uuid: 123, rule: Temperature/lowTemperature/highTemperature}";
     }
 
     public boolean existenceUser(UserDto userDto) {
@@ -47,8 +47,8 @@ public class RuleService {
         if (allDevices != null) {
             for (DeviceDto currentMessage : allDevices) {
                 String token = getTokenByDeviceId(userDto, currentMessage);
-                currentMessage.setToken(token);
-                if (currentMessage.getToken().equals(deviceDto.getToken())) {
+                currentMessage.setUuid(token);
+                if (currentMessage.getUuid().equals(deviceDto.getUuid())) {
                     return true;
                 }
             }
@@ -135,7 +135,7 @@ public class RuleService {
         for (UserDto currentUserDto : usersRepository.getAll()) {
             if (userDto.getLogin().equals(currentUserDto.getLogin())) {
                 for (DeviceDto currentDeviceDto : usersRepository.devicesOfUser(currentUserDto)) {
-                    if (deviceDto.getToken().equals(currentDeviceDto.getToken())) {
+                    if (deviceDto.getUuid().equals(currentDeviceDto.getUuid())) {
                         return currentDeviceDto.getDeviceId();
                     }
                 }
@@ -149,7 +149,7 @@ public class RuleService {
             if (userDto.getLogin().equals(currentUserDto.getLogin())) {
                 for (DeviceDto currentDeviceDto : usersRepository.devicesOfUser(currentUserDto)) {
                     if (deviceDto.getDeviceId().equals(currentDeviceDto.getDeviceId())) {
-                        return currentDeviceDto.getToken();
+                        return currentDeviceDto.getUuid();
                     }
                 }
             }

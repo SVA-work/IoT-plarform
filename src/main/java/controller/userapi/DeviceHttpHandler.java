@@ -46,7 +46,7 @@ public class DeviceHttpHandler extends AbstractHttpMappingHandler {
         userDto.setLogin(deviceRequestDto.getLogin());
 
         DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setToken(deviceRequestDto.getToken());
+        deviceDto.setUuid(deviceRequestDto.getUuid());
         deviceDto.setType(deviceRequestDto.getType());
 
         return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
@@ -60,7 +60,7 @@ public class DeviceHttpHandler extends AbstractHttpMappingHandler {
         userDto.setLogin(deviceRequestDto.getLogin());
 
         DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setToken(deviceRequestDto.getToken());
+        deviceDto.setUuid(deviceRequestDto.getUuid());
 
         return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
                 Unpooled.copiedBuffer(device.deleteDevice(userDto, deviceDto), StandardCharsets.UTF_8));

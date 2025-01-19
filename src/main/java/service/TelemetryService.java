@@ -36,7 +36,7 @@ public class TelemetryService {
 
     public void reportProcessing(String uuid, MicroclimateSensor InfoAboutDevice) {
         DeviceDto device = new DeviceDto();
-        device.setToken(uuid);
+        device.setUuid(uuid);
         device.setDeviceId(getDeviceIdByToken(device));
 
         TelegramTokenDto telegramToken = new TelegramTokenDto();
@@ -58,7 +58,7 @@ public class TelemetryService {
         List<DeviceDto> allDevices = devicesRepository.getAll();
 
         for (DeviceDto currentDevice : allDevices) {
-            if (currentDevice.getToken().equals(deviceDto.getToken())) {
+            if (currentDevice.getUuid().equals(deviceDto.getUuid())) {
                 return currentDevice.getDeviceId();
             }
         }
@@ -85,13 +85,13 @@ public class TelemetryService {
 
         if (deviceTemperature < lowTemperature) {
             iotServiceBot.sendLowerTempNotification(telegramToken.getTelegramToken(),
-                    device.getToken(),
+                    device.getUuid(),
                     device.getType(),
                     parts[1]);
         }
         if (deviceTemperature > highTemperature) {
             iotServiceBot.sendHighTempNotification(telegramToken.getTelegramToken(),
-                    device.getToken(),
+                    device.getUuid(),
                     device.getType(),
                     parts[2]);
         }

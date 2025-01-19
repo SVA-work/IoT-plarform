@@ -29,10 +29,10 @@ public class TelemetryHttpHandler extends AbstractHttpMappingHandler {
     }
 
     @Post(ServerConfig.SHORT_LINK_REPORT)
-    public DefaultFullHttpResponse report(@RequestBody MicroclimateSensor message) {
-        String uuid = message.getUuid();
-        String base64Message = message.getBase64Message();
-        String decodedMessage = telemetryService.decodeBase64(base64Message);
+    public DefaultFullHttpResponse report(@RequestBody MicroclimateSensor report) {
+        String uuid = report.getUuid();
+        String message = report.getMessage();
+        String decodedMessage = telemetryService.decodeBase64(message);
         ByteBuf byteBuf = Unpooled.copiedBuffer(decodedMessage, StandardCharsets.UTF_8);
         Object parsedObject = jsonParser.parse(decodedMessage, byteBuf, MicroclimateSensor.class);
         MicroclimateSensor deviceDto = (MicroclimateSensor) parsedObject;

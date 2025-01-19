@@ -42,7 +42,7 @@ public class RulesHttpHandler extends AbstractHttpMappingHandler {
         userDto.setLogin(login);
 
         DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setToken(token);
+        deviceDto.setUuid(token);
 
         return new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
                 Unpooled.copiedBuffer(rule.getDeviceRules(userDto, deviceDto), StandardCharsets.UTF_8));
@@ -55,7 +55,7 @@ public class RulesHttpHandler extends AbstractHttpMappingHandler {
         userDto.setLogin(ruleRequestDto.getLogin());
 
         DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setToken(ruleRequestDto.getToken());
+        deviceDto.setUuid(ruleRequestDto.getUuid());
 
         RuleDto ruleDto = new RuleDto();
         ruleDto.setRule(ruleRequestDto.getRule());
@@ -71,7 +71,7 @@ public class RulesHttpHandler extends AbstractHttpMappingHandler {
         userDto.setLogin(ruleRequestDto.getLogin());
 
         DeviceDto deviceDto = new DeviceDto();
-        deviceDto.setToken(ruleRequestDto.getToken());
+        deviceDto.setUuid(ruleRequestDto.getUuid());
 
         RuleDto ruleDto = new RuleDto();
         ruleDto.setRule(ruleRequestDto.getRule());
