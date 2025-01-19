@@ -11,7 +11,7 @@ public class MicroclimateSensor {
     private String rssi;
     private String snr;
     private String uuid;
-    private String base64Message;
+    private String message;
 
     public MicroclimateSensor() {
     }
@@ -90,11 +90,11 @@ public class MicroclimateSensor {
         this.uuid = uuid;
     }
 
-    public String getBase64Message() {
-        return base64Message;
+    public String getMessage() {
+        return message;
     }
 
-    public void setBase64Message(String base64Message) {
-        this.base64Message = base64Message;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

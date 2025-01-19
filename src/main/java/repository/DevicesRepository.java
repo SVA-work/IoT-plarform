@@ -26,7 +26,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
                 + tableName + "("
                 + "device_id SERIAL PRIMARY KEY,"
                 + "user_id INTEGER REFERENCES users(user_id),"
-                + "token VARCHAR(255) NOT NULL,"
+                + "uuid VARCHAR(255) NOT NULL,"
                 + "type VARCHAR(255) NOT NULL)";
         try {
             Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
@@ -49,7 +49,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
                 DeviceDto response = new DeviceDto();
                 response.setDeviceId(resultSet.getString(tableID));
                 response.setUserId(resultSet.getString("user_id"));
-                response.setToken(resultSet.getString("token"));
+                response.setUuid(resultSet.getString("uuid"));
                 response.setType(resultSet.getString("type"));
                 list.add(response);
             }
@@ -73,7 +73,7 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
             if (resultSet.next()) {
                 response.setDeviceId(resultSet.getString(tableID));
                 response.setUserId(resultSet.getString("user_id"));
-                response.setToken(resultSet.getString("token"));
+                response.setUuid(resultSet.getString("uuid"));
                 response.setType(resultSet.getString("type"));
             }
             resultSet.close();
@@ -97,7 +97,8 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 RuleDto response = new RuleDto();
-                response.setDeviceId(resultSet.getString("rule_id"));
+                response.setDeviceId(resultSet.getString("device_id"));
+                response.setRuleId(resultSet.getString("rule_id"));
                 response.setRule(resultSet.getString("rule"));
                 list.add(response);
             }
@@ -128,13 +129,13 @@ public class DevicesRepository extends AbstractRepository<DeviceDto> {
 
     @Override
     public DeviceDto create(DeviceDto entity) {
-        String sql = "INSERT INTO " + tableName + " (user_id, token, type) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO " + tableName + " (user_id, uuid, type) VALUES (?, ?, ?)";
         DeviceDto response = new DeviceDto();
         try {
             Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, Integer.parseInt(entity.getUserId()));
-            preparedStatement.setString(2, entity.getToken());
+            preparedStatement.setString(2, entity.getUuid());
             preparedStatement.setString(3, entity.getType());
             preparedStatement.executeUpdate();
             response.setSuccessful(true);

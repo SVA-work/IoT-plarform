@@ -43,7 +43,7 @@ class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
                                                 """
                                                             {
                                                               "login": "testUser",
-                                                              "token": "testDevice",
+                                                              "uuid": "testDevice",
                                                               "type": "temp"
                                                             }
                                                         """
@@ -66,7 +66,7 @@ class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
             PreparedStatement preparedStatement = connection.prepareStatement(sqlGetUserInfo);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                assertEquals("testDevice", resultSet.getString("token"));
+                assertEquals("testDevice", resultSet.getString("uuid"));
             }
         } catch (SQLException e) {
             LOG.error("Соединение не удалось", e);
@@ -90,7 +90,7 @@ class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
 
     @Test
     void deviceInformation() throws IOException, InterruptedException {
-        String sqlCreateUserInfo = "insert into devices (device_id, user_id, token, type) VALUES ('0', '0', 'testDevice', 'temp')";
+        String sqlCreateUserInfo = "insert into devices (device_id, user_id, uuid, type) VALUES ('0', '0', 'testDevice', 'temp')";
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate(sqlCreateUserInfo);
@@ -112,7 +112,7 @@ class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
 
     @Test
     void deleteDevices() throws IOException, InterruptedException {
-        String sqlCreateUserInfo = "insert into devices (device_id, user_id, token, type) VALUES ('1', '0', 'testDevice', 'type')";
+        String sqlCreateUserInfo = "insert into devices (device_id, user_id, uuid, type) VALUES ('1', '0', 'testDevice', 'type')";
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate(sqlCreateUserInfo);
@@ -127,7 +127,7 @@ class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
                                                 """
                                                             {
                                                               "login": "testUser",
-                                                              "token": "testDevice"
+                                                              "uuid": "testDevice"
                                                             }
                                                         """
                                         )

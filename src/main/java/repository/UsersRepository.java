@@ -95,7 +95,7 @@ public class UsersRepository extends AbstractRepository<UserDto> {
             while (resultSet.next()) {
                 DeviceDto response = new DeviceDto();
                 response.setDeviceId(resultSet.getString("device_id"));
-                response.setToken(resultSet.getString("token"));
+                response.setUuid(resultSet.getString("uuid"));
                 list.add(response);
             }
             resultSet.close();

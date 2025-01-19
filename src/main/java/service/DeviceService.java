@@ -5,6 +5,7 @@ import dto.objects.DeviceDto;
 import dto.objects.RuleDto;
 import dto.objects.UserDto;
 import repository.DevicesRepository;
+import repository.RulesRepository;
 import repository.UsersRepository;
 
 import java.util.List;
@@ -14,11 +15,13 @@ public class DeviceService {
 
     private final UsersRepository usersRepository;
     private final DevicesRepository devicesRepository;
+    private final RulesRepository rulesRepository;
     private final DbConnectionDto dbConnectionDto;
 
     public DeviceService(DbConnectionDto dbConnectionDto) {
         this.usersRepository = new UsersRepository(dbConnectionDto);
         this.devicesRepository = new DevicesRepository(dbConnectionDto);
+        this.rulesRepository = new RulesRepository(dbConnectionDto);
         this.dbConnectionDto = dbConnectionDto;
     }
 
@@ -34,7 +37,7 @@ public class DeviceService {
 
         StringBuilder info = new StringBuilder();
         for (DeviceDto currentDeviceDto : allDevicesOfUser) {
-            info.append(currentDeviceDto.getToken()).append('\n');
+            info.append(currentDeviceDto.getUuid()).append('\n');
             for (RuleDto ruleDto : devicesRepository.rulesOfDevice(currentDeviceDto)) {
                 info.append("  ").append(ruleDto.getRule()).append("\n");
             }
@@ -76,7 +79,13 @@ public class DeviceService {
 
         boolean hasDeletedAnyDevice = false;
         for (DeviceDto currentDeviceDto : allDevicesOfUser) {
-            if (Objects.equals(currentDeviceDto.getToken(), deviceDto.getToken())) {
+            if (Objects.equals(currentDeviceDto.getUuid(), deviceDto.getUuid())) {
+
+                List<RuleDto> rules = devicesRepository.rulesOfDevice(currentDeviceDto);
+                for (RuleDto rule : rules) {
+                    rulesRepository.delete(rule);
+                }
+
                 devicesRepository.delete(currentDeviceDto);
                 hasDeletedAnyDevice = true;
                 break;

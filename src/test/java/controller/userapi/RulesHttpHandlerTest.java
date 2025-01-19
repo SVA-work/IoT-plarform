@@ -26,7 +26,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM rules");
             statement.executeUpdate("DELETE FROM devices");
-            statement.executeUpdate("insert into devices (device_id, user_id, token, type) VALUES ('0', '0', 'testDevice', 'temp')");
+            statement.executeUpdate("insert into devices (device_id, user_id, uuid, type) VALUES ('0', '0', 'testDevice', 'temp')");
             statement.executeUpdate("DELETE FROM users");
             statement.executeUpdate("insert into users (user_id, login, password) VALUES ('0', 'testUser', '123')");
         } catch (SQLException e) {
@@ -39,7 +39,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
         HttpResponse<String> getRuleResponse = HttpClient.newHttpClient()
                 .send(HttpRequest.newBuilder()
                                 .GET()
-                                .uri(URI.create(ServerConfig.LINK_DEVICE_RULES + "?login=testUser&token=testDevice"))
+                                .uri(URI.create(ServerConfig.LINK_DEVICE_RULES + "?login=testUser&uuid=testDevice"))
                                 .build(),
                         HttpResponse.BodyHandlers.ofString(UTF_8)
                 );
@@ -61,7 +61,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
         HttpResponse<String> getDeviceResponse = HttpClient.newHttpClient()
                 .send(HttpRequest.newBuilder()
                                 .GET()
-                                .uri(URI.create(ServerConfig.LINK_DEVICE_RULES + "?login=testUser&token=testDevice"))
+                                .uri(URI.create(ServerConfig.LINK_DEVICE_RULES + "?login=testUser&uuid=testDevice"))
                                 .build(),
                         HttpResponse.BodyHandlers.ofString(UTF_8)
                 );
@@ -81,7 +81,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                                                 """
                                                             {
                                                               "login": "testUser",
-                                                              "token": "testDevice",
+                                                              "uuid": "testDevice",
                                                               "rule": "Temperature/1/2"
                                                             }
                                                         """
@@ -125,7 +125,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                                                 """
                                                             {
                                                               "login": "testUser",
-                                                              "token": "testDevice",
+                                                              "uuid": "testDevice",
                                                               "rule": "testRule/1/2"
                                                             }
                                                         """

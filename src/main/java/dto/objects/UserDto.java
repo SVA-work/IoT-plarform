@@ -8,7 +8,7 @@ public class UserDto extends BaseDto {
     private String login;
     private String password;
     private String deviceId;
-    private String token;
+    private String uuid;
 
     public String getUserId() {
         return userId;
@@ -42,11 +42,11 @@ public class UserDto extends BaseDto {
         this.deviceId = deviceId;
     }
 
-    public String getToken() {
-        return token;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }
