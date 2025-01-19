@@ -36,7 +36,7 @@ public class RulesHttpHandler extends AbstractHttpMappingHandler {
     }
 
     @Get(ServerConfig.SHORT_LINK_DEVICE_RULES)
-    public DefaultFullHttpResponse deviceRules(@QueryParam("login") String login, @QueryParam("token") String token) {
+    public DefaultFullHttpResponse deviceRules(@QueryParam("login") String login, @QueryParam("uuid") String token) {
 
         UserDto userDto = new UserDto();
         userDto.setLogin(login);
