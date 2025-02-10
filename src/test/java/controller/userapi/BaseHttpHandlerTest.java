@@ -1,13 +1,13 @@
 package controller.userapi;
 
-import controller.ServerLauncher;
+import application.ServerLauncher;
 import dto.DbConnectionDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import repository.DatabaseConnection;
+import application.repository.DatabaseConnection;
 
 import java.sql.Connection;
 
