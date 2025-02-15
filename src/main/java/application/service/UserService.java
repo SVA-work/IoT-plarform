@@ -1,73 +1,92 @@
 package application.service;
 
-import application.config.ServerConfig;
-import application.dto.DbConnectionDto;
-import application.dto.objects.TelegramTokenDto;
-import application.dto.objects.UserDto;
-import application.repository.TelegramTokenRepository;
-import application.repository.UsersRepository;
-import org.springframework.stereotype.Service;
+import application.dto.request.UserRequest;
+import application.dto.response.DeviceResponse;
+import application.dto.response.UserResponse;
+import application.entity.Device;
+import application.entity.TelegramToken;
+import application.entity.User;
+import application.repository.UserRepository;
+import jakarta.validation.constraints.NotNull;
 
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.ArrayList;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
-    private final UsersRepository usersRepository;
-    private final TelegramTokenRepository telegramTokenRepository;
+    private final UserRepository userRepository;
+    private final DeviceService deviceService;
 
-    public UserService(DbConnectionDto dbConnectionDto) {
-        usersRepository = new UsersRepository(dbConnectionDto);
-        telegramTokenRepository = new TelegramTokenRepository(dbConnectionDto);
+    public UserResponse registration(@NotNull UserRequest request) {
+        User user = buildUserRequest(request);
+        if (!checkUserExistence(user)) {
+            userRepository.save(user);
+            return buildUserResponse(user);
+        } else {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Пользователь уже существует");
+        }
     }
 
-    public String registration(UserDto userDto, TelegramTokenDto telegramTokenDto) {
-        if (existenceUser(userDto)) {
-            return "Пользователь с таким логином уже существует.";
+    public UserResponse entry(@NotNull UserRequest request) {
+        User user = buildUserRequest(request);
+        if (checkUserExistence(user)) {
+            return buildUserResponse(user);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
+        }
+    }
+
+    public List<DeviceResponse> listOfDevicesOfUser(@NotNull UserRequest request) {
+        Optional<User> optionalUser = userRepository.findByLogin(request.getLogin());
+        User user = new User();
+
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
         }
 
-        telegramTokenDto.setUserId(usersRepository.create(userDto).getUserId());
-        telegramTokenRepository.create(telegramTokenDto);
-
-        return "Вы успешно зарегистрировались.\n"
-                + "Ваш логин: " + userDto.getLogin() + "\n"
-                + "Ваш пароль: " + userDto.getPassword();
+        UserResponse userResponse = buildUserResponse(user);
+        return userResponse.getDevices();
     }
 
-    public boolean existenceUser(UserDto userDto) {
-        for (UserDto currentUser : usersRepository.getAll()) {
-            if (userDto.getLogin().equals(currentUser.getLogin())) {
-                return true;
-            }
+    private UserResponse buildUserResponse(@NotNull User user) {
+        UserResponse userResponse = new UserResponse();
+        userResponse.setLogin(user.getLogin());
+        userResponse.setPassword(user.getPassword());
+        userResponse.setTelegramToken(user.getTelegramToken().getToken());
+
+        List<DeviceResponse> devicesResponse = new ArrayList<>();
+        List<Device> devices = user.getDevices();
+        
+        for (Device device : devices) {
+            devicesResponse.add(deviceService.buildDeviceResponse(device));
         }
-        return false;
+        userResponse.setDevices(devicesResponse);
+        return userResponse;
     }
 
-    public String userVerification(UserDto userDto) {
-        for (UserDto currentUser : usersRepository.getAll()) {
-            if (userDto.getLogin().equals(currentUser.getLogin()) &&
-                    userDto.getPassword().equals(currentUser.getPassword())) {
-                return successfulEntry();
-            }
-        }
-        return failedEntry();
+    private User buildUserRequest(@NotNull UserRequest request) {
+        User user = new User();
+        user.setLogin(request.getLogin());
+        user.setPassword(request.getPassword());
+        TelegramToken telegramToken = new TelegramToken();
+        telegramToken.setToken(request.getTelegramToken());
+        telegramToken.setUser(user);
+        user.setTelegramToken(telegramToken);
+        return user;
     }
-
-    public String successfulEntry() {
-        return "Вы успешно вошли в систему.\n" +
-                "Список доступных команд:\n" +
-                "1) Добавить устройство.\n" +
-                "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
-                ServerConfig.LINK_ADD_DEVICE + "\n" +
-                "2) Удалить устройство.\n" +
-                "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
-                ServerConfig.LINK_DELETE_DEVICE + "\n" +
-                "3) Посмотреть список устройств.\n" +
-                ServerConfig.LINK_GET_DEVICE_INFORMATION + "\n" +
-                "4) Посмотреть список доступных правил для устройств." +
-                "Для доступа к команде нужно отправить POST запрос на сервер по адресу: \n" +
-                ServerConfig.LINK_DEVICE_RULES;
-    }
-
-    public String failedEntry() {
-        return "Неверный пароль или логин.\n";
+    
+    private boolean checkUserExistence(@NotNull User user) {
+        return userRepository.existsByLogin(user.getLogin());
     }
 }

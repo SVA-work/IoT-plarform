@@ -1,108 +1,118 @@
 package application.service;
 
-import application.dto.DbConnectionDto;
-import application.dto.objects.DeviceDto;
-import application.dto.objects.RuleDto;
-import application.dto.objects.UserDto;
-import application.repository.DevicesRepository;
-import application.repository.UsersRepository;
-import org.springframework.stereotype.Service;
+import application.dto.request.DeviceRequest;
+import application.dto.response.DeviceResponse;
+import application.dto.response.RuleResponse;
+import application.entity.Device;
+import application.entity.Rule;
+import application.entity.User;
+import application.repository.DeviceRepository;
+import application.repository.UserRepository;
 
+import jakarta.validation.constraints.NotNull;
+
+import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+@RequiredArgsConstructor
 @Service
 public class DeviceService {
 
-    private final UsersRepository usersRepository;
-    private final DevicesRepository devicesRepository;
-    private final DbConnectionDto dbConnectionDto;
-
-    public DeviceService(DbConnectionDto dbConnectionDto) {
-        this.usersRepository = new UsersRepository(dbConnectionDto);
-        this.devicesRepository = new DevicesRepository(dbConnectionDto);
-        this.dbConnectionDto = dbConnectionDto;
+    private final DeviceRepository deviceRepository;
+    private final UserRepository userRepository; 
+    private final RuleService ruleService;
+        
+    public DeviceResponse addDevice(DeviceRequest deviceRequest) {
+        Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
+        User user = new User();
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
+        }
+        Optional<Device> optionalDevice = deviceRepository.findByUuid(deviceRequest.getUuid());
+        if (optionalDevice.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Устройство с таким названием уже существует");
+        }
+        Device device = buildDeviceRequest(deviceRequest, user);
+        deviceRepository.save(device);
+        DeviceResponse deviceResponse = buildDeviceResponse(device);
+        return deviceResponse;
     }
 
-    public String listOfDevicesOfUser(UserDto userDto) {
-
-        userDto.setUserId(getUserIdByLogin(userDto));
-
-        List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
-
-        if (allDevicesOfUser.isEmpty()) {
-            return "У вас нет устройств.";
+    public DeviceResponse deleteDevice(DeviceRequest deviceRequest) {
+        Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
+        User user = new User();
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
         }
-
-        StringBuilder info = new StringBuilder();
-        for (DeviceDto currentDeviceDto : allDevicesOfUser) {
-            info.append(currentDeviceDto.getToken()).append('\n');
-            for (RuleDto ruleDto : devicesRepository.rulesOfDevice(currentDeviceDto)) {
-                info.append("  ").append(ruleDto.getRule()).append("\n");
-            }
+        Optional<Device> optionalDevice = deviceRepository.findByUuid(deviceRequest.getUuid());
+        if (!optionalDevice.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Устройство с таким названием не найдено");
         }
-
-        String result = info.toString();
-        return result.substring(0, result.length() - 1);
+        Device device = optionalDevice.get();
+        if (!user.equals(device.getUser())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Устройство принадлежит не этому пользователю");
+        }
+        DeviceResponse deviceResponse = buildDeviceResponse(device);
+        deviceRepository.delete(device);
+        return deviceResponse;
     }
 
-    public String addDevice(UserDto userDto, DeviceDto deviceDto) {
-        String userId = getUserIdByLogin(userDto);
-
-        if (userId == null) {
-            return "Нет такого пользователя";
+    public List<RuleResponse> getDeviceRules(DeviceRequest deviceRequest) {
+        Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
+        User user = new User();
+        
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
         }
 
-        RuleService ruleService = new RuleService(dbConnectionDto);
-        userDto.setUserId(userId);
-
-        if (ruleService.existenceUserDevice(userDto, deviceDto)) {
-            return "У этого пользователя уже есть устройство с таким названием";
+        Optional<Device> optionalDevice = deviceRepository.findByUuid(deviceRequest.getUuid());
+        if (!optionalDevice.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Устройство с таким названием не найдено");
         }
 
-        deviceDto.setUserId(getUserIdByLogin(userDto));
-        devicesRepository.create(deviceDto);
+        Device device = optionalDevice.get();
+        if (!user.equals(device.getUser())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Устройство принадлежит не этому пользователю");
+        }
 
-        return "Устройство успешно добавлено.\n" + "Список ваших устройств:\n" + listOfDevicesOfUser(userDto);
+        DeviceResponse deviceResponse = buildDeviceResponse(device);
+        return deviceResponse.getRules();
     }
 
-    public String deleteDevice(UserDto userDto, DeviceDto deviceDto) {
-        String userId = getUserIdByLogin(userDto);
+    public DeviceResponse buildDeviceResponse(@NotNull Device device) {
+        DeviceResponse deviceResponse = new DeviceResponse();
+        deviceResponse.setUuid(device.getUuid());
+        deviceResponse.setType(device.getType());
+        deviceResponse.setLogin(device.getUser().getLogin());
 
-        if (userId == null) {
-            return "Нет такого пользователя";
+        List<RuleResponse> rulesResponse = new ArrayList<>();
+        List<Rule> rules = device.getRules();
+        for (Rule rule : rules) {
+            rulesResponse.add(ruleService.buildRuleResponse(rule));
         }
+        deviceResponse.setRules(rulesResponse);
 
-        userDto.setUserId(getUserIdByLogin(userDto));
-        List<DeviceDto> allDevicesOfUser = usersRepository.devicesOfUser(userDto);
-
-        boolean hasDeletedAnyDevice = false;
-        for (DeviceDto currentDeviceDto : allDevicesOfUser) {
-            if (Objects.equals(currentDeviceDto.getToken(), deviceDto.getToken())) {
-                devicesRepository.delete(currentDeviceDto);
-                hasDeletedAnyDevice = true;
-                break;
-            }
-        }
-
-        if (!hasDeletedAnyDevice) {
-            return "У вас нет такого устройства.";
-        }
-
-        String infoAboutDevices = listOfDevicesOfUser(userDto);
-        if (Objects.equals(infoAboutDevices, "У вас нет устройств.")) {
-            return "У вас больше нет устройств.";
-        }
-
-        return ("Список ваших устройств:\n" + infoAboutDevices);
+        return deviceResponse;
     }
 
-    public String getUserIdByLogin(UserDto userDto) {
-        for (UserDto currentUserDto : usersRepository.getAll()) {
-            if (userDto.getLogin().equals(currentUserDto.getLogin())) {
-                return currentUserDto.getUserId();
-            }
-        }
-        return null;
+    private Device buildDeviceRequest(@NotNull DeviceRequest request, User user) {
+        Device device = new Device();
+        device.setUuid(request.getUuid());
+        device.setType(request.getType());
+        device.setUser(user);
+        return device;
     }
 }

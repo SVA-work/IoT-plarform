@@ -1,5 +1,8 @@
 package application.telegrambot.devicenotification;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class TemperatureNotification {
 
     public String lowerTempNotification(String deviceToken, String deviceType, String lowerBorderOfTemperature) {
