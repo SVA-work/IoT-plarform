@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ServerConfig {
 
-  public static String botToken;
+    public static String botToken;
 
-  public ServerConfig(@Value("${bot.token}") String token) {
-    botToken = token;
-  }
+    public ServerConfig(@Value("${bot.token}") String token) {
+        botToken = token;
+    }
 }

@@ -8,18 +8,18 @@ import application.entity.TelegramToken;
 import application.entity.User;
 import application.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
-
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.ArrayList;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class UserService {
 
@@ -32,6 +32,7 @@ public class UserService {
             userRepository.save(user);
             return buildUserResponse(user);
         } else {
+            log.error("Пользователь \"" + request.getLogin() + "\" уже существует в базе данных");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Пользователь уже существует");
         }
     }
@@ -41,18 +42,21 @@ public class UserService {
         if (checkUserExistence(user)) {
             return buildUserResponse(user);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
+            log.error("Пользователь \"" + request.getLogin() + "\" не найден в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
     }
 
     public List<DeviceResponse> listOfDevicesOfUser(@NotNull UserRequest request) {
         Optional<User> optionalUser = userRepository.findByLogin(request.getLogin());
-        User user = new User();
+        User user;
 
         if (optionalUser.isPresent()) {
             user = optionalUser.get();
+            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
+            log.error("Пользователь \"" + request.getLogin() + "\" не найден в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
         UserResponse userResponse = buildUserResponse(user);
@@ -67,7 +71,7 @@ public class UserService {
 
         List<DeviceResponse> devicesResponse = new ArrayList<>();
         List<Device> devices = user.getDevices();
-        
+
         for (Device device : devices) {
             devicesResponse.add(deviceService.buildDeviceResponse(device));
         }
@@ -85,7 +89,7 @@ public class UserService {
         user.setTelegramToken(telegramToken);
         return user;
     }
-    
+
     private boolean checkUserExistence(@NotNull User user) {
         return userRepository.existsByLogin(user.getLogin());
     }

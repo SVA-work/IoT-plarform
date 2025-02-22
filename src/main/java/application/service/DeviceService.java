@@ -8,60 +8,66 @@ import application.entity.Rule;
 import application.entity.User;
 import application.repository.DeviceRepository;
 import application.repository.UserRepository;
-
 import jakarta.validation.constraints.NotNull;
-
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class DeviceService {
 
     private final DeviceRepository deviceRepository;
-    private final UserRepository userRepository; 
+    private final UserRepository userRepository;
     private final RuleService ruleService;
-        
+
     public DeviceResponse addDevice(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
-        User user = new User();
+        User user;
         if (optionalUser.isPresent()) {
             user = optionalUser.get();
+            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
+            log.error("Пользователь \"" + deviceRequest.getLogin() + "\" не найден в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
         Optional<Device> optionalDevice = deviceRepository.findByUuid(deviceRequest.getUuid());
         if (optionalDevice.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,"Устройство с таким названием уже существует");
+            log.error("Устройство \"" + deviceRequest.getUuid() + "\" не найдено в базе данных");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство с таким названием уже существует");
         }
+        log.info("Получено устройство \"" + deviceRequest.getUuid() + "\" из базы данных");
         Device device = buildDeviceRequest(deviceRequest, user);
         deviceRepository.save(device);
-        DeviceResponse deviceResponse = buildDeviceResponse(device);
-        return deviceResponse;
+        return buildDeviceResponse(device);
     }
 
     public DeviceResponse deleteDevice(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
-        User user = new User();
+        User user;
         if (optionalUser.isPresent()) {
             user = optionalUser.get();
+            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
+            log.error("Пользователь \"" + deviceRequest.getLogin() + "\" не найден в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
         Optional<Device> optionalDevice = deviceRepository.findByUuid(deviceRequest.getUuid());
-        if (!optionalDevice.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Устройство с таким названием не найдено");
+        if (optionalDevice.isEmpty()) {
+            log.error("Устройство \"" + deviceRequest.getUuid() + "\" не найдено в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }
         Device device = optionalDevice.get();
         if (!user.equals(device.getUser())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,"Устройство принадлежит не этому пользователю");
+            log.error("У пользователя \"" + deviceRequest.getLogin() + "\" отсутсвует устройство \"" + deviceRequest.getUuid() + "\"");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
         }
         DeviceResponse deviceResponse = buildDeviceResponse(device);
         deviceRepository.delete(device);
@@ -70,22 +76,26 @@ public class DeviceService {
 
     public List<RuleResponse> getDeviceRules(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
-        User user = new User();
-        
+        User user;
+
         if (optionalUser.isPresent()) {
             user = optionalUser.get();
+            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден");
+            log.error("Пользователь \"" + deviceRequest.getLogin() + "\" не найден в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
         Optional<Device> optionalDevice = deviceRepository.findByUuid(deviceRequest.getUuid());
-        if (!optionalDevice.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Устройство с таким названием не найдено");
+        if (optionalDevice.isEmpty()) {
+            log.error("Устройство \"" + deviceRequest.getUuid() + "\" не найдено в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }
 
         Device device = optionalDevice.get();
         if (!user.equals(device.getUser())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,"Устройство принадлежит не этому пользователю");
+            log.error("У пользователя \"" + deviceRequest.getLogin() + "\" отсутсвует устройство \"" + deviceRequest.getUuid() + "\"");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
         }
 
         DeviceResponse deviceResponse = buildDeviceResponse(device);

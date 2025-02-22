@@ -1,8 +1,7 @@
 package application.telegrambot.bot;
 
 import application.telegrambot.devicenotification.TemperatureNotification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -12,9 +11,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 
 @Component
+@Slf4j
 public class IoTServiceBot extends TelegramLongPollingBot {
-
-    private static final Logger LOG = LoggerFactory.getLogger(IoTServiceBot.class);
 
     private static final String START = "/start";
 
@@ -70,7 +68,7 @@ public class IoTServiceBot extends TelegramLongPollingBot {
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
-            LOG.error("Ошибка отправки сообщения", e);
+            log.error("Ошибка отправки сообщения", e);
         }
     }
 
