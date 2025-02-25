@@ -9,4 +9,5 @@ public class DeviceRequest {
     private String login;
     private String uuid;
     private String type;
+    private String deviceName;
 }

@@ -20,6 +20,9 @@ public class Device {
     @Column(name = "type", nullable = false)
     private String type;
 
+    @Column(name = "device_name", nullable = false)
+    private String deviceName;
+
     @ManyToOne
     @JoinColumn(name = "login", foreignKey = @ForeignKey(name = "fk_devices_login"))
     private User user;

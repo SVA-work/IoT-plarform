@@ -30,6 +30,7 @@ public class UserService {
         User user = buildUserRequest(request);
         if (!checkUserExistence(user)) {
             userRepository.save(user);
+            log.info("Пользователь \"" + request.getLogin() + "\" сохранен");
             return buildUserResponse(user);
         } else {
             log.error("Пользователь \"" + request.getLogin() + "\" уже существует в базе данных");

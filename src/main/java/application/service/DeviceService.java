@@ -106,6 +106,7 @@ public class DeviceService {
         DeviceResponse deviceResponse = new DeviceResponse();
         deviceResponse.setUuid(device.getUuid());
         deviceResponse.setType(device.getType());
+        deviceResponse.setDeviceName(device.getDeviceName());
         deviceResponse.setLogin(device.getUser().getLogin());
 
         List<RuleResponse> rulesResponse = new ArrayList<>();
@@ -122,6 +123,7 @@ public class DeviceService {
         Device device = new Device();
         device.setUuid(request.getUuid());
         device.setType(request.getType());
+        device.setDeviceName(request.getDeviceName());
         device.setUser(user);
         return device;
     }
