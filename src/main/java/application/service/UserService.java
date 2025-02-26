@@ -73,8 +73,10 @@ public class UserService {
         List<DeviceResponse> devicesResponse = new ArrayList<>();
         List<Device> devices = user.getDevices();
 
-        for (Device device : devices) {
-            devicesResponse.add(deviceService.buildDeviceResponse(device));
+        if (devices != null) {
+            for (Device device : devices) {
+                devicesResponse.add(deviceService.buildDeviceResponse(device));
+            }
         }
         userResponse.setDevices(devicesResponse);
         return userResponse;

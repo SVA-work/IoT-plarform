@@ -23,7 +23,7 @@ public class DevicesController {
         return deviceService.addDevice(device);
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public DeviceResponse deleteDevice(@RequestBody DeviceRequest device) {
         log.info("Получен запрос на удаление устройства");
         return deviceService.deleteDevice(device);

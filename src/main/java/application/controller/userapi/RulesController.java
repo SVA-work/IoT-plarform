@@ -5,6 +5,8 @@ import application.dto.response.RuleResponse;
 import application.service.RuleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +25,7 @@ public class RulesController {
         return ruleService.applyRule(ruleRequest);
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public RuleResponse deleteDeviceRule(@RequestBody RuleRequest ruleRequest) {
         log.info("Получен запрос на удаление правила у устройства");
         return ruleService.deleteDeviceRule(ruleRequest);

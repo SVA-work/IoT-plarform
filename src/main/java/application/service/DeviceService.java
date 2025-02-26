@@ -111,8 +111,11 @@ public class DeviceService {
 
         List<RuleResponse> rulesResponse = new ArrayList<>();
         List<Rule> rules = device.getRules();
-        for (Rule rule : rules) {
-            rulesResponse.add(ruleService.buildRuleResponse(rule));
+
+        if (rules != null) {
+            for (Rule rule : rules) {
+                rulesResponse.add(ruleService.buildRuleResponse(rule));
+            }
         }
         deviceResponse.setRules(rulesResponse);
 
