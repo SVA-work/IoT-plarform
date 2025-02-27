@@ -9,4 +9,7 @@ public class RuleRequest {
     private String login;
     private String uuid;
     private String rule;
+    private Integer lowestValue;
+    private Integer highestValue;
+    private String updateRule;
 }

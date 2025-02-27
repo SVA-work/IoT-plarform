@@ -51,7 +51,10 @@ public class TelemetryService {
         List<Rule> allRulesOfDevice = device.getRules();
 
         for (Rule rule : allRulesOfDevice) {
-            String[] parts = rule.getRule().split("/");
+            String ruleName = rule.getRule();
+            String lowestValue = rule.getLowestValue().toString();
+            String highestValue = rule.getHighestValue().toString();
+            String[] parts = {ruleName, lowestValue, highestValue};
             if (parts[0].equals("Temperature")) {
                 TemperatureCheck(parts, device, infoAboutDevice, token);
                 return ResponseEntity.ok().build();

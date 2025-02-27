@@ -56,9 +56,9 @@ public class RuleService {
             log.error("У устройства \"" + ruleRequest.getUuid() + "\" уже есть правило \"" + ruleRequest.getRule());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Правило с таким название уже есть у этого устройства");
         }
-
-        String pattern = "^Temperature/[-+]?\\d+(\\.\\d+)?/[-+]?\\d+(\\.\\d+)?$";
-        if (!Pattern.matches(pattern, ruleRequest.getRule())) {
+        Integer low = ruleRequest.getLowestValue();
+        Integer hight = ruleRequest.getHighestValue();
+        if ((low == null || hight == null) || !(ruleRequest.getRule().equals("Temperature"))) {
             log.error("Правило \"" + ruleRequest.getRule() + "\" не соответствует формату");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Неверный формат правила");
         }
@@ -109,9 +109,53 @@ public class RuleService {
         return ruleResponse;
     }
 
+    public RuleResponse updateDeviceRule(RuleRequest ruleRequest) {
+        Optional<User> optionalUser = userRepository.findByLogin(ruleRequest.getLogin());
+        User user;
+
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
+        } else {
+            log.error("Пользователь \"" + ruleRequest.getLogin() + "\" не найден в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
+        }
+
+        Optional<Device> optionalDevice = deviceRepository.findByUuid(ruleRequest.getUuid());
+        if (optionalDevice.isEmpty()) {
+            log.error("Устройство \"" + ruleRequest.getUuid() + "\" не найдено в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
+        }
+
+        Device device = optionalDevice.get();
+        if (!user.equals(device.getUser())) {
+            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getUuid() + "\"");
+
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
+        }
+
+        Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleRequest.getRule(), device);
+        if (optionalRule.isEmpty()) {
+
+            log.error("У устройства \"" + ruleRequest.getUuid() + "\" отсутсвует правило \"" + ruleRequest.getRule() + "\"");
+
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Правило с таким названием не найдено");
+        }
+
+        Rule rule = optionalRule.get();
+        rule.setLowestValue(ruleRequest.getLowestValue());
+        rule.setHighestValue(ruleRequest.getHighestValue());
+        RuleResponse ruleResponse = buildRuleResponse(rule);
+        ruleRepository.save(rule);
+        log.info("Правило \"" + ruleRequest.getRule() + "\" обновлено");
+        return ruleResponse;
+    }
+
     public RuleResponse buildRuleResponse(@NotNull Rule rule) {
         RuleResponse ruleResponse = new RuleResponse();
         ruleResponse.setRule(rule.getRule());
+        ruleResponse.setLowestValue(rule.getLowestValue());
+        ruleResponse.setHighestValue(rule.getHighestValue());
         ruleResponse.setUuid(rule.getDevice().getUuid());
         return ruleResponse;
     }
@@ -120,6 +164,8 @@ public class RuleService {
         Rule rule = new Rule();
         rule.setRule(request.getRule());
         rule.setDevice(device);
+        rule.setLowestValue(request.getLowestValue());
+        rule.setHighestValue(request.getHighestValue());
         return rule;
     }
 }
