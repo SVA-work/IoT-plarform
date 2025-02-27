@@ -64,7 +64,7 @@ public class TelemetryService {
     }
 
     private void TemperatureCheck(String[] parts, Device device, MicroclimateSensor InfoAboutDevice, String token) {
-        IoTServiceBot iotServiceBot = new IoTServiceBot(ServerConfig.botToken);
+        IoTServiceBot iotServiceBot = new IoTServiceBot(ServerConfig.BOT_TOKEN);
         double deviceTemperature = Float.parseFloat(InfoAboutDevice.getTemperature());
         double lowTemperature = Float.parseFloat(parts[1]);
         double highTemperature = Float.parseFloat(parts[2]);
