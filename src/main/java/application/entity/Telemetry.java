@@ -1,5 +1,7 @@
 package application.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -30,7 +32,15 @@ public class Telemetry {
     @Column(name = "snr")
     private String snr;
 
+    @Column(name = "time", nullable = false)
+    private LocalDateTime time;
+
     @ManyToOne
     @JoinColumn(name = "device_id", foreignKey = @ForeignKey(name = "fk_telemetry_device_id"))
     private Device device;
+
+    @PrePersist
+    protected void onCreate() {
+        time = LocalDateTime.now();
+    }
 }

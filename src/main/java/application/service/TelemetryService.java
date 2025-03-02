@@ -98,6 +98,7 @@ public class TelemetryService {
         telemetryResponse.setRssi(telemetry.getRssi());
         telemetryResponse.setPressure(telemetry.getPressure());
         telemetryResponse.setHumidity(telemetry.getHumidity());
+        telemetryResponse.setTime(telemetry.getTime());
         return telemetryResponse;
 
     }
