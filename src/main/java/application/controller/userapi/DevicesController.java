@@ -29,12 +29,21 @@ public class DevicesController {
         return deviceService.deleteDevice(device);
     }
 
-    @GetMapping("/{login}/rules/{uuid}")
-    public List<RuleResponse> deviceRules(@PathVariable String login, @PathVariable String uuid) {
+    @GetMapping("/{login}/rules/{deviceName}")
+    public List<RuleResponse> deviceRules(@PathVariable String login, @PathVariable String deviceName) {
         log.info("Получен запрос на получение списка правила у устройства");
         DeviceRequest deviceRequest = new DeviceRequest();
         deviceRequest.setLogin(login);
-        deviceRequest.setUuid(uuid);
+        deviceRequest.setUuid(deviceName);
+        return deviceService.getDeviceRules(deviceRequest);
+    }
+
+    @GetMapping("/{login}/{deviceName}/telemetry")
+    public List<RuleResponse> deviceTelemetry(@PathVariable String login, @PathVariable String deviceName) {
+        log.info("Получен запрос на получение телеметрии устройства");
+        DeviceRequest deviceRequest = new DeviceRequest();
+        deviceRequest.setLogin(login);
+        deviceRequest.setDeviceName(deviceName);
         return deviceService.getDeviceRules(deviceRequest);
     }
 }

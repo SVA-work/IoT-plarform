@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -38,22 +37,22 @@ public class RuleService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
-        Optional<Device> optionalDevice = deviceRepository.findByUuid(ruleRequest.getUuid());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(ruleRequest.getDeviceName());
         if (optionalDevice.isEmpty()) {
-            log.error("Устройство \"" + ruleRequest.getUuid() + "\" не найдено в базе данных");
+            log.error("Устройство \"" + ruleRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }
 
         Device device = optionalDevice.get();
         if (!user.equals(device.getUser())) {
-            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getUuid());
+            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getDeviceName());
 
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
         }
 
         Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleRequest.getRule(), device);
         if (optionalRule.isPresent()) {
-            log.error("У устройства \"" + ruleRequest.getUuid() + "\" уже есть правило \"" + ruleRequest.getRule());
+            log.error("У устройства \"" + ruleRequest.getDeviceName() + "\" уже есть правило \"" + ruleRequest.getRule());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Правило с таким название уже есть у этого устройства");
         }
         Integer low = ruleRequest.getLowestValue();
@@ -81,15 +80,15 @@ public class RuleService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
-        Optional<Device> optionalDevice = deviceRepository.findByUuid(ruleRequest.getUuid());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(ruleRequest.getDeviceName());
         if (optionalDevice.isEmpty()) {
-            log.error("Устройство \"" + ruleRequest.getUuid() + "\" не найдено в базе данных");
+            log.error("Устройство \"" + ruleRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }
 
         Device device = optionalDevice.get();
         if (!user.equals(device.getUser())) {
-            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getUuid() + "\"");
+            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getDeviceName() + "\"");
 
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
         }
@@ -97,7 +96,7 @@ public class RuleService {
         Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleRequest.getRule(), device);
         if (optionalRule.isEmpty()) {
 
-            log.error("У устройства \"" + ruleRequest.getUuid() + "\" отсутсвует правило \"" + ruleRequest.getRule() + "\"");
+            log.error("У устройства \"" + ruleRequest.getDeviceName() + "\" отсутсвует правило \"" + ruleRequest.getRule() + "\"");
 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Правило с таким названием не найдено");
         }
@@ -121,15 +120,15 @@ public class RuleService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
-        Optional<Device> optionalDevice = deviceRepository.findByUuid(ruleRequest.getUuid());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(ruleRequest.getDeviceName());
         if (optionalDevice.isEmpty()) {
-            log.error("Устройство \"" + ruleRequest.getUuid() + "\" не найдено в базе данных");
+            log.error("Устройство \"" + ruleRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }
 
         Device device = optionalDevice.get();
         if (!user.equals(device.getUser())) {
-            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getUuid() + "\"");
+            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getDeviceName() + "\"");
 
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
         }
@@ -137,7 +136,7 @@ public class RuleService {
         Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleRequest.getRule(), device);
         if (optionalRule.isEmpty()) {
 
-            log.error("У устройства \"" + ruleRequest.getUuid() + "\" отсутсвует правило \"" + ruleRequest.getRule() + "\"");
+            log.error("У устройства \"" + ruleRequest.getDeviceName() + "\" отсутсвует правило \"" + ruleRequest.getRule() + "\"");
 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Правило с таким названием не найдено");
         }
@@ -156,7 +155,7 @@ public class RuleService {
         ruleResponse.setRule(rule.getRule());
         ruleResponse.setLowestValue(rule.getLowestValue());
         ruleResponse.setHighestValue(rule.getHighestValue());
-        ruleResponse.setUuid(rule.getDevice().getUuid());
+        ruleResponse.setDeviceName(rule.getDevice().getDeviceName());
         return ruleResponse;
     }
 

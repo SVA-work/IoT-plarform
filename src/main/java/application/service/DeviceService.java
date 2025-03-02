@@ -3,8 +3,10 @@ package application.service;
 import application.dto.request.DeviceRequest;
 import application.dto.response.DeviceResponse;
 import application.dto.response.RuleResponse;
+import application.dto.response.TelemetryResponse;
 import application.entity.Device;
 import application.entity.Rule;
+import application.entity.Telemetry;
 import application.entity.User;
 import application.repository.DeviceRepository;
 import application.repository.UserRepository;
@@ -27,6 +29,7 @@ public class DeviceService {
     private final DeviceRepository deviceRepository;
     private final UserRepository userRepository;
     private final RuleService ruleService;
+    private final TelemetryService telemetryService;
 
     public DeviceResponse addDevice(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
@@ -38,12 +41,12 @@ public class DeviceService {
             log.error("Пользователь \"" + deviceRequest.getLogin() + "\" не найден в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
-        Optional<Device> optionalDevice = deviceRepository.findByUuid(deviceRequest.getUuid());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(deviceRequest.getDeviceName());
         if (optionalDevice.isPresent()) {
-            log.error("Устройство \"" + deviceRequest.getUuid() + "\" не найдено в базе данных");
+            log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство с таким названием уже существует");
         }
-        log.info("Получено устройство \"" + deviceRequest.getUuid() + "\" из базы данных");
+        log.info("Получено устройство \"" + deviceRequest.getDeviceName() + "\" из базы данных");
         Device device = buildDeviceRequest(deviceRequest, user);
         deviceRepository.save(device);
         return buildDeviceResponse(device);
@@ -59,9 +62,9 @@ public class DeviceService {
             log.error("Пользователь \"" + deviceRequest.getLogin() + "\" не найден в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
-        Optional<Device> optionalDevice = deviceRepository.findByUuid(deviceRequest.getUuid());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(deviceRequest.getDeviceName());
         if (optionalDevice.isEmpty()) {
-            log.error("Устройство \"" + deviceRequest.getUuid() + "\" не найдено в базе данных");
+            log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }
         Device device = optionalDevice.get();
@@ -86,20 +89,55 @@ public class DeviceService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
-        Optional<Device> optionalDevice = deviceRepository.findByUuid(deviceRequest.getUuid());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(deviceRequest.getDeviceName());
         if (optionalDevice.isEmpty()) {
-            log.error("Устройство \"" + deviceRequest.getUuid() + "\" не найдено в базе данных");
+            log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }
 
         Device device = optionalDevice.get();
         if (!user.equals(device.getUser())) {
-            log.error("У пользователя \"" + deviceRequest.getLogin() + "\" отсутсвует устройство \"" + deviceRequest.getUuid() + "\"");
+            log.error("У пользователя \"" + deviceRequest.getLogin() + "\" отсутсвует устройство \"" + deviceRequest.getDeviceName() + "\"");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
         }
 
         DeviceResponse deviceResponse = buildDeviceResponse(device);
         return deviceResponse.getRules();
+    }
+
+    public List<TelemetryResponse> getDeviceTelemetry(DeviceRequest deviceRequest) {
+        Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
+        User user;
+
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
+        } else {
+            log.error("Пользователь \"" + deviceRequest.getLogin() + "\" не найден в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
+        }
+
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(deviceRequest.getDeviceName());
+        if (optionalDevice.isEmpty()) {
+            log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
+        }
+
+        Device device = optionalDevice.get();
+        if (!user.equals(device.getUser())) {
+            log.error("У пользователя \"" + deviceRequest.getLogin() + "\" отсутсвует устройство \"" + deviceRequest.getDeviceName() + "\"");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
+        }
+
+        List<TelemetryResponse> telemetryResponse = new ArrayList<>();
+        List<Telemetry> telemetryy = device.getTelemetry();
+        if (telemetryy != null) {
+            for (Telemetry telemetry : telemetryy) {
+                telemetryResponse.add(telemetryService.buildTelemetryResponse(telemetry));
+            }
+        }
+
+        return telemetryResponse;
     }
 
     public DeviceResponse buildDeviceResponse(@NotNull Device device) {

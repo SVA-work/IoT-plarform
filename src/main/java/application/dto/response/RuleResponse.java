@@ -7,5 +7,5 @@ public class RuleResponse {
     private String rule;
     private Integer lowestValue;
     private Integer highestValue;
-    private String uuid;
+    private String deviceName;
 }

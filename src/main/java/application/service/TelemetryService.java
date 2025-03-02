@@ -2,11 +2,15 @@ package application.service;
 
 import application.config.ServerConfig;
 import application.dto.request.devices.MicroclimateSensor;
+import application.dto.response.RuleResponse;
+import application.dto.response.TelemetryResponse;
 import application.entity.Device;
 import application.entity.Rule;
 import application.entity.TelegramToken;
+import application.entity.Telemetry;
 import application.entity.User;
 import application.repository.DeviceRepository;
+import application.repository.TelemetryRepository;
 import application.telegrambot.bot.IoTServiceBot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +30,7 @@ import java.util.Optional;
 public class TelemetryService {
 
     private final DeviceRepository devicesRepository;
+    private final TelemetryRepository telemetryRepository;
 
     public String decodeBase64(String base64Data) {
         if (base64Data == null || base64Data.isEmpty()) {
@@ -45,6 +50,12 @@ public class TelemetryService {
         log.info("Устройство \"" + infoAboutDevice.getUuid() + "\" найдено");
 
         Device device = optionalDevice.get();
+
+        Telemetry telemetry = new Telemetry();
+        telemetry.setTemperature(infoAboutDevice.getTemperature());
+        telemetry.setDevice(device);
+        telemetryRepository.save(telemetry);
+
         User user = device.getUser();
         TelegramToken telegramToken = user.getTelegramToken();
         String token = telegramToken.getToken();
@@ -78,5 +89,16 @@ public class TelemetryService {
             log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
             iotServiceBot.sendHighTempNotification(token, device.getUuid(), device.getType(), parts[2]);
         }
+    }
+
+    public TelemetryResponse buildTelemetryResponse(Telemetry telemetry) {
+        TelemetryResponse telemetryResponse = new TelemetryResponse();
+        telemetryResponse.setTemperature(telemetry.getTemperature());
+        telemetryResponse.setSnr(telemetry.getSnr());
+        telemetryResponse.setRssi(telemetry.getRssi());
+        telemetryResponse.setPressure(telemetry.getPressure());
+        telemetryResponse.setHumidity(telemetry.getHumidity());
+        return telemetryResponse;
+
     }
 }
