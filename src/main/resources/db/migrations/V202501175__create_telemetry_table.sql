@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS telegramToken
     snr VARCHAR(255),
     time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     device_id INTEGER,
-    FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
+    FOREIGN KEY (device_id) REFERENCES devices(device_id) ON DELETE CASCADE
 )
