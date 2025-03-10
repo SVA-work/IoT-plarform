@@ -2,9 +2,11 @@ package application.dto.response;
 
 import java.time.LocalDateTime;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class TelemetryResponse {
     private String temperature;
     private String humidity;

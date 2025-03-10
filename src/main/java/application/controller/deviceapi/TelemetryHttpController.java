@@ -37,6 +37,6 @@ public class TelemetryHttpController extends AbstractHttpMappingHandler {
         String decodedMessage = telemetryService.decodeBase64(base64Message);
         MicroclimateSensor deviceRequest = objectMapper.readValue(decodedMessage, MicroclimateSensor.class);
         deviceRequest.setUuid(message.getUuid());
-        return telemetryService.reportProcessing(deviceRequest);
+        return telemetryService.reportProcessing(base64Message);
     }
 }

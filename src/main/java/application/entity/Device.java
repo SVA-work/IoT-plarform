@@ -1,12 +1,15 @@
 package application.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "devices")
 public class Device {
 
@@ -24,7 +27,7 @@ public class Device {
     private String deviceName;
 
     @ManyToOne
-    @JoinColumn(name = "login", foreignKey = @ForeignKey(name = "fk_devices_login"))
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_devices_user_id"))
     private User user;
 
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

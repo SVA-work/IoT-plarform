@@ -3,10 +3,13 @@ package application.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import lombok.Data;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "telemetry")
 public class Telemetry {
 
@@ -20,10 +23,10 @@ public class Telemetry {
     @Column(name = "humidity")
     private String humidity;
 
-    @Column(name = "pressure", nullable = false, unique = true)
+    @Column(name = "pressure")
     private String pressure;
 
-    @Column(name = "aqi", nullable = false)
+    @Column(name = "aqi")
     private String aqi;
 
     @Column(name = "rssi")

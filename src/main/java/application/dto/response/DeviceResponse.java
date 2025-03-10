@@ -1,10 +1,12 @@
 package application.dto.response;
 
-import lombok.Data;
-
 import java.util.List;
 
-@Data
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class DeviceResponse {
     private String uuid;
     private String type;

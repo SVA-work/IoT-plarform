@@ -1,8 +1,10 @@
 package application.dto.response;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class RuleResponse {
     private String rule;
     private Integer lowestValue;

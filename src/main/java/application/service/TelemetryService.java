@@ -12,8 +12,10 @@ import application.entity.User;
 import application.repository.DeviceRepository;
 import application.repository.TelemetryRepository;
 import application.telegrambot.bot.IoTServiceBot;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,13 @@ public class TelemetryService {
         return new String(decodedBytes, StandardCharsets.UTF_8);
     }
 
-    public ResponseEntity<Void> reportProcessing(MicroclimateSensor infoAboutDevice) {
+    public ResponseEntity<Void> reportProcessing(MicroclimateSensor message) {
+
+        String base64Message = message.getMessage();
+        String decodedMessage = decodeBase64(base64Message);
+        MicroclimateSensor infoAboutDevice = objectMapper.readValue(decodedMessage, MicroclimateSensor.class);
+        infoAboutDevice.setUuid(message.getUuid());
+
         Optional<Device> optionalDevice = devicesRepository.findByUuid(infoAboutDevice.getUuid());
         if (optionalDevice.isEmpty()) {
             log.error("Устройство \"" + infoAboutDevice.getUuid() + "\" не найдено");
