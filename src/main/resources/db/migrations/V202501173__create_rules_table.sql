@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS rules
     lowestValue INTEGER NOT NULL,
     highestValue INTEGER NOT NULL,
     device_id INTEGER,
-    FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
+    FOREIGN KEY (device_id) REFERENCES devices(device_id) ON DELETE CASCADE
 )
