@@ -34,7 +34,7 @@ public class DevicesController {
         log.info("Получен запрос на получение списка правила у устройства");
         DeviceRequest deviceRequest = new DeviceRequest();
         deviceRequest.setLogin(login);
-        deviceRequest.setUuid(deviceName);
+        deviceRequest.setDeviceName(deviceName);
         return deviceService.getDeviceRules(deviceRequest);
     }
 

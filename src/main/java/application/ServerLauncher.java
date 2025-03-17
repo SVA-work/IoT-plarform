@@ -1,8 +1,8 @@
 package application;
 
 import application.config.ServerConfig;
-import application.controller.deviceapi.TelemetryHttpController;
-import application.netty.library.json.JsonParserDefault;
+//import application.controller.deviceapi.TelemetryHttpController;
+//import application.netty.library.json.JsonParserDefault;
 import application.service.TelemetryService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -29,6 +29,7 @@ public class ServerLauncher {
     }
 
     private final TelemetryService telemetryService;
+    /*
 
     @Bean
     public Channel serverBootstrap() {
@@ -64,4 +65,5 @@ public class ServerLauncher {
             bossGroup.shutdownGracefully();
         }
     }
+    */
 }

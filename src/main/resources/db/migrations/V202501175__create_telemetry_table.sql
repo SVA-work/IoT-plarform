@@ -1,6 +1,6 @@
-CREATE TABLE IF NOT EXISTS telegramToken
+CREATE TABLE IF NOT EXISTS telemetry
 (
-    telemetry_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     temperature VARCHAR(255),
     humidity VARCHAR(255),
     pressure VARCHAR(255),
@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS telegramToken
     snr VARCHAR(255),
     time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     device_id INTEGER,
-    FOREIGN KEY (device_id) REFERENCES devices(device_id) ON DELETE CASCADE
+    FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
 )

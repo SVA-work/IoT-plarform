@@ -39,7 +39,6 @@ public class RuleService {
             log.error("Пользователь \"" + ruleRequest.getLogin() + "\" не найден в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
-
         Optional<Device> optionalDevice = deviceRepository.findByDeviceName(ruleRequest.getDeviceName());
         if (optionalDevice.isEmpty()) {
             log.error("Устройство \"" + ruleRequest.getDeviceName() + "\" не найдено в базе данных");

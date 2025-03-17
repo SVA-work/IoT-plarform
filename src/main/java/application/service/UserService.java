@@ -97,6 +97,11 @@ public class UserService {
     }
 
     private boolean checkUserExistence(@NotNull User user) {
-        return userRepository.existsByLogin(user.getLogin());
+        try {
+            return userRepository.existsByLogin(user.getLogin());
+        } catch (Exception e) {
+            log.error("Ошибка при проверке существования пользователя: " + e.getMessage());
+            return false;
+        }
     }
 }

@@ -83,7 +83,6 @@ public class DeviceService {
     public List<RuleResponse> getDeviceRules(DeviceRequest deviceRequest) {
         Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
         User user;
-
         if (optionalUser.isPresent()) {
             user = optionalUser.get();
             log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
@@ -92,6 +91,7 @@ public class DeviceService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
+        System.out.println(deviceRequest.getDeviceName());
         Optional<Device> optionalDevice = deviceRepository.findByDeviceName(deviceRequest.getDeviceName());
         if (optionalDevice.isEmpty()) {
             log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");

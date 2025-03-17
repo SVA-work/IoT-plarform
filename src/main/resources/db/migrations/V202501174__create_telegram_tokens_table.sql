@@ -1,7 +1,7 @@
-CREATE TABLE IF NOT EXISTS telegramToken
+CREATE TABLE IF NOT EXISTS telegram_tokens
 (
-    telegram_token_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(user_id),
     telegram_token VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )

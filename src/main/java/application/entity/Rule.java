@@ -18,10 +18,10 @@ public class Rule {
     @Column(name = "rule", nullable = false)
     private String rule;
 
-    @Column(name = "lowestValue", nullable = false)
+    @Column(name = "lowest_value", nullable = false)
     private Integer lowestValue;
 
-    @Column(name = "highestValue", nullable = false)
+    @Column(name = "highest_value", nullable = false)
     private Integer highestValue;
 
     @ManyToOne

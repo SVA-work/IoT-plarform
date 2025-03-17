@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -31,8 +33,11 @@ import java.util.Optional;
 @Service
 public class TelemetryService {
 
+    /*
     private final DeviceRepository devicesRepository;
     private final TelemetryRepository telemetryRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     public String decodeBase64(String base64Data) {
         if (base64Data == null || base64Data.isEmpty()) {
@@ -98,7 +103,7 @@ public class TelemetryService {
             iotServiceBot.sendHighTempNotification(token, device.getUuid(), device.getType(), parts[2]);
         }
     }
-
+    */
     public TelemetryResponse buildTelemetryResponse(Telemetry telemetry) {
         TelemetryResponse telemetryResponse = new TelemetryResponse();
         telemetryResponse.setTemperature(telemetry.getTemperature());

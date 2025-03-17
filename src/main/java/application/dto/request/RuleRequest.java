@@ -10,7 +10,7 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RuleRequest {
     private String login;
-    private String DeviceName;
+    private String deviceName;
     private String rule;
     private Integer lowestValue;
     private Integer highestValue;
