@@ -45,7 +45,7 @@ public class DeviceService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
-        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(deviceRequest.getDeviceName());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceRequest.getDeviceName(), user.getId());
         if (optionalDevice.isPresent()) {
             log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство с таким названием уже существует");
@@ -69,7 +69,7 @@ public class DeviceService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
-        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(deviceRequest.getDeviceName());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceRequest.getDeviceName(), user.getId());
         if (optionalDevice.isEmpty()) {
             log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
@@ -98,7 +98,7 @@ public class DeviceService {
         }
 
         System.out.println(deviceRequest.getDeviceName());
-        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(deviceRequest.getDeviceName());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceRequest.getDeviceName(), user.getId());
         if (optionalDevice.isEmpty()) {
             log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
@@ -126,7 +126,7 @@ public class DeviceService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
-        Optional<Device> optionalDevice = deviceRepository.findByDeviceName(deviceRequest.getDeviceName());
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceRequest.getDeviceName(), user.getId());
         if (optionalDevice.isEmpty()) {
             log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");

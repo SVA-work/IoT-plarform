@@ -1,6 +1,7 @@
 package controller.userapi;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import java.net.http.HttpResponse;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Slf4j
 class UserHttpHandlerTest extends BaseHttpHandlerTest {
 
     @Autowired
@@ -30,7 +32,7 @@ class UserHttpHandlerTest extends BaseHttpHandlerTest {
             jdbcTemplate.update("DELETE FROM devices");
             jdbcTemplate.update("DELETE FROM users");
         } catch (Exception e) {
-                LOG.error("Соединение не удалось", e);
+                log.error("Соединение не удалось", e);
         }
     }
 
@@ -56,6 +58,7 @@ class UserHttpHandlerTest extends BaseHttpHandlerTest {
                         HttpResponse.BodyHandlers.ofString(UTF_8)
                 );
 
+        System.out.println(createUserResponse.body());
         assertEquals(200, createUserResponse.statusCode());
 
         String responseText = createUserResponse.body();

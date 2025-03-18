@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import application.ServerLauncher;
 
 @SpringBootTest(classes = ServerLauncher.class)
-public class ServerLauncherTests {
+class ServerLauncherTests {
 
     @Test
 	void contextLoads() {

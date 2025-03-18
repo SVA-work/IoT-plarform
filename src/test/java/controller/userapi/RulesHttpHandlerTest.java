@@ -1,5 +1,6 @@
 package controller.userapi;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import java.net.http.HttpResponse;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Slf4j
 class RulesHttpHandlerTest extends BaseHttpHandlerTest {
 
     @Autowired
@@ -28,7 +30,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
             jdbcTemplate.update("INSERT INTO users (id, login, password) VALUES ('1', 'testUser ', '123')");
             jdbcTemplate.update("INSERT INTO devices (id, user_id, device_name, type, uuid) VALUES ('1', '1', 'testDevice', 'temp', '55')");
         } catch (Exception e) {
-            LOG.error("Соединение не удалось", e);
+            log.error("Соединение не удалось", e);
         }
     }
 
@@ -56,6 +58,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                         HttpResponse.BodyHandlers.ofString(UTF_8)
                 );
 
+        System.out.println(addRuleResponse.body());
         assertEquals(200, addRuleResponse.statusCode());
         assertEquals("{\"rule\":\"Temperature\",\"lowestValue\":10,\"highestValue\":100,\"deviceName\":\"testDevice\"}", addRuleResponse.body());
 

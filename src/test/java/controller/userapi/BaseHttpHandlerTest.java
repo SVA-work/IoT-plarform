@@ -1,50 +1,53 @@
 package controller.userapi;
 
 import application.ServerLauncher;
-
 import lombok.extern.slf4j.Slf4j;
-
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = ServerLauncher.class)
+@SpringBootTest(classes = ServerLauncher.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Testcontainers
 public abstract class BaseHttpHandlerTest {
 
-    @Container
-    public static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:13");
-    protected static final Logger LOG = LoggerFactory.getLogger(UserHttpHandlerTest.class);
+  @Container
+  public static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:13");
 
-    private static ExecutorService executorService;
+  static {
+    POSTGRES.start();
+  }
 
-    static {
-        POSTGRES.start();
+  @DynamicPropertySource
+  static void configureDataSource(DynamicPropertyRegistry registry) {
+    registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+    registry.add("spring.datasource.username", POSTGRES::getUsername);
+    registry.add("spring.datasource.password", POSTGRES::getPassword);
+  }
+
+  @BeforeAll
+  private static void waitForServerToStart() throws InterruptedException {
+    int maxAttempts = 30;
+    for (int i = 0; i < maxAttempts; i++) {
+      try (Connection connection = DriverManager.getConnection(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())) {
+        log.info("PostgreSQL is ready to accept connections");
+        return; // База данных готова
+      } catch (SQLException e) {
+        log.warn("PostgreSQL is not ready yet, retrying...");
+        Thread.sleep(1000); // Пауза 1 секунда
+      }
     }
-
-    @Bean
-    public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl(POSTGRES.getJdbcUrl());
-        dataSource.setUsername(POSTGRES.getUsername());
-        dataSource.setPassword(POSTGRES.getPassword());
-        return dataSource;
-    }
+    throw new RuntimeException("PostgreSQL did not start in time");
+  }
 }

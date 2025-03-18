@@ -1,13 +1,16 @@
 package controller.userapi;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -15,6 +18,7 @@ import java.net.http.HttpResponse;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Slf4j
 class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
 
     @Autowired
@@ -31,7 +35,7 @@ class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
             jdbcTemplate.update("DELETE FROM users");
             jdbcTemplate.update("insert into users (id, login, password) VALUES ('1', 'testUser', '123')");
         } catch (Exception e) {
-            LOG.error("Соединение не удалось", e);
+            log.error("Соединение не удалось", e);
         }
     }
 
