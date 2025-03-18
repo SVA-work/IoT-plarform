@@ -1,6 +1,6 @@
 package application.controller.deviceapi;
 
-/*import application.dto.request.devices.MicroclimateSensor;
+import application.dto.request.devices.MicroclimateSensor;
 import application.netty.library.AbstractHttpMappingHandler;
 import application.netty.library.annotation.Post;
 import application.netty.library.annotation.RequestBody;
@@ -28,7 +28,6 @@ public class TelemetryHttpController extends AbstractHttpMappingHandler {
     @Post("/telemetry")
     public ResponseEntity<Void> report(@RequestBody MicroclimateSensor message) throws JsonProcessingException {
         log.info("Полученно сообщение от устройства по http");
-        return telemetryService.reportProcessing(message);
+        return telemetryService.reportProcessingAndSend(message);
     }
 }
-*/

@@ -33,36 +33,10 @@ public abstract class BaseHttpHandlerTest {
     public static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:13");
     protected static final Logger LOG = LoggerFactory.getLogger(UserHttpHandlerTest.class);
 
-    private static boolean serverStarted = false;
     private static ExecutorService executorService;
 
     static {
         POSTGRES.start();
-    }
-
-    @BeforeAll
-    static void beforeAll() throws InterruptedException {
-        if (!serverStarted) {
-            startServer();
-            serverStarted = true;
-        }
-    }
-
-    private static void startServer() throws InterruptedException {
-        executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(() -> {
-            try {
-                ServerLauncher.main(new String[0]);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        waitForServerToStart();
-    }
-
-    private static void waitForServerToStart() throws InterruptedException {
-        Thread.sleep(10000);
     }
 
     @Bean
@@ -72,10 +46,5 @@ public abstract class BaseHttpHandlerTest {
         dataSource.setUsername(POSTGRES.getUsername());
         dataSource.setPassword(POSTGRES.getPassword());
         return dataSource;
-    }
-
-    @AfterAll
-    static void afterAll() {
-        executorService.shutdownNow();
     }
 }

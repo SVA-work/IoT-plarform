@@ -2,7 +2,6 @@ package application.service;
 
 import application.config.ServerConfig;
 import application.dto.request.devices.MicroclimateSensor;
-import application.dto.response.RuleResponse;
 import application.dto.response.TelemetryResponse;
 import application.entity.Device;
 import application.entity.Rule;
@@ -13,6 +12,9 @@ import application.repository.DeviceRepository;
 import application.repository.TelemetryRepository;
 import application.telegrambot.bot.IoTServiceBot;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,8 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -33,10 +33,9 @@ import java.util.Optional;
 @Service
 public class TelemetryService {
 
-    /*
+
     private final DeviceRepository devicesRepository;
     private final TelemetryRepository telemetryRepository;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     public String decodeBase64(String base64Data) {
@@ -47,12 +46,16 @@ public class TelemetryService {
         return new String(decodedBytes, StandardCharsets.UTF_8);
     }
 
-    public ResponseEntity<Void> reportProcessing(MicroclimateSensor message) {
+    public ResponseEntity<Void> reportProcessingAndSend(MicroclimateSensor message) throws JsonProcessingException {
 
-        String base64Message = message.getMessage();
-        String decodedMessage = decodeBase64(base64Message);
-        MicroclimateSensor infoAboutDevice = objectMapper.readValue(decodedMessage, MicroclimateSensor.class);
+        MicroclimateSensor infoAboutDevice = getMicroclimateSensorInfoPackage(message);
         infoAboutDevice.setUuid(message.getUuid());
+
+        return sendReport(infoAboutDevice);
+    }
+
+    @Transactional
+    public ResponseEntity<Void> sendReport(MicroclimateSensor infoAboutDevice) {
 
         Optional<Device> optionalDevice = devicesRepository.findByUuid(infoAboutDevice.getUuid());
         if (optionalDevice.isEmpty()) {
@@ -80,16 +83,23 @@ public class TelemetryService {
             String highestValue = rule.getHighestValue().toString();
             String[] parts = {ruleName, lowestValue, highestValue};
             if (parts[0].equals("Temperature")) {
-                TemperatureCheck(parts, device, infoAboutDevice, token);
+                temperatureCheck(parts, device, infoAboutDevice, token);
                 return ResponseEntity.ok().build();
             }
         }
         return ResponseEntity.noContent().build();
     }
 
-    private void TemperatureCheck(String[] parts, Device device, MicroclimateSensor InfoAboutDevice, String token) {
+    private MicroclimateSensor getMicroclimateSensorInfoPackage(MicroclimateSensor message) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String base64Message = message.getMessage();
+        String decodedMessage = decodeBase64(base64Message);
+        return objectMapper.readValue(decodedMessage, MicroclimateSensor.class);
+    }
+
+    private void temperatureCheck(String[] parts, Device device, MicroclimateSensor infoAboutDevice, String token) {
         IoTServiceBot iotServiceBot = new IoTServiceBot(ServerConfig.BOT_TOKEN);
-        double deviceTemperature = Float.parseFloat(InfoAboutDevice.getTemperature());
+        double deviceTemperature = Float.parseFloat(infoAboutDevice.getTemperature());
         double lowTemperature = Float.parseFloat(parts[1]);
         double highTemperature = Float.parseFloat(parts[2]);
 
@@ -103,7 +113,7 @@ public class TelemetryService {
             iotServiceBot.sendHighTempNotification(token, device.getUuid(), device.getType(), parts[2]);
         }
     }
-    */
+
     public TelemetryResponse buildTelemetryResponse(Telemetry telemetry) {
         TelemetryResponse telemetryResponse = new TelemetryResponse();
         telemetryResponse.setTemperature(telemetry.getTemperature());

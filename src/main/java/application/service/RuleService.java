@@ -57,6 +57,7 @@ public class RuleService {
             log.error("У устройства \"" + ruleRequest.getDeviceName() + "\" уже есть правило \"" + ruleRequest.getRule());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Правило с таким название уже есть у этого устройства");
         }
+
         Integer low = ruleRequest.getLowestValue();
         Integer hight = ruleRequest.getHighestValue();
         if ((low == null || hight == null) || !(ruleRequest.getRule().equals("Temperature"))) {
