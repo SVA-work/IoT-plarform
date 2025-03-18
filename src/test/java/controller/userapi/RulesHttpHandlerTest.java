@@ -1,10 +1,22 @@
 package controller.userapi;
 
+import application.ServerLauncher;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,7 +28,27 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = ServerLauncher.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Testcontainers
 class RulesHttpHandlerTest extends BaseHttpHandlerTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Container
+    public static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:13");
+
+    static {
+        POSTGRES.start();
+    }
+
+    @DynamicPropertySource
+    static void configureDataSource(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES::getUsername);
+        registry.add("spring.datasource.password", POSTGRES::getPassword);
+    }
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -52,13 +84,12 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                                                 """
                                         )
                                 )
-                                .uri(URI.create("http://localhost:8091/rule/apply"))
+                                .uri(URI.create("http://localhost:" + port + "/rule/apply"))
                                 .header("Content-Type", "application/json")
                                 .build(),
                         HttpResponse.BodyHandlers.ofString(UTF_8)
                 );
 
-        System.out.println(addRuleResponse.body());
         assertEquals(200, addRuleResponse.statusCode());
         assertEquals("{\"rule\":\"Temperature\",\"lowestValue\":10,\"highestValue\":100,\"deviceName\":\"testDevice\"}", addRuleResponse.body());
 
@@ -87,7 +118,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                                                 """
                                         )
                                 )
-                                .uri(URI.create("http://localhost:8091/rule/delete"))
+                                .uri(URI.create("http://localhost:" + port + "/rule/delete"))
                                 .header("Content-Type", "application/json")
                                 .build(),
                         HttpResponse.BodyHandlers.ofString(UTF_8)
@@ -98,5 +129,10 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
 
         var rules = jdbcTemplate.queryForList("SELECT * FROM rules");
         assertEquals(0, rules.size());
+    }
+
+    @AfterAll
+    static void stopContainer() {
+        POSTGRES.stop();
     }
 }
