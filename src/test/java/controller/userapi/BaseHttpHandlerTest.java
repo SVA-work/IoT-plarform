@@ -1,48 +1,37 @@
 package controller.userapi;
 
-import controller.ServerLauncher;
-import dto.DbConnectionDto;
+import application.ServerLauncher;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import repository.DatabaseConnection;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 
 public abstract class BaseHttpHandlerTest {
-
-    @Container
-    public static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:13");
-    protected static final Logger LOG = LoggerFactory.getLogger(UserHttpHandlerTest.class);
-    protected static final DbConnectionDto dbConnectionDto = new DbConnectionDto();
-    private static final Thread thread = new Thread(() -> {
-        try {
-            ServerLauncher.runApplication(new String[0], dbConnectionDto);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    });
-
-    static {
-        POSTGRES.start();
-    }
-
-    Connection connection = DatabaseConnection.getConnection(dbConnectionDto);
-
-    @BeforeAll
-    static void beforeAll() throws InterruptedException {
-        dbConnectionDto.url = POSTGRES.getJdbcUrl();
-        dbConnectionDto.user = POSTGRES.getUsername();
-        dbConnectionDto.password = POSTGRES.getPassword();
-        startServer();
-    }
-
-    private static void startServer() throws InterruptedException {
-        if (!thread.isAlive()) {
-            thread.start();
-        }
-        Thread.sleep(10000);
-    }
+//
+//  @BeforeAll
+//  private static void waitForServerToStart() throws InterruptedException {
+//    int maxAttempts = 30;
+//    for (int i = 0; i < maxAttempts; i++) {
+//      try (Connection connection = DriverManager.getConnection(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())) {
+//        log.info("PostgreSQL is ready to accept connections");
+//        return; // База данных готова
+//      } catch (SQLException e) {
+//        log.warn("PostgreSQL is not ready yet, retrying...");
+//        Thread.sleep(1000); // Пауза 1 секунда
+//      }
+//    }
+//    throw new RuntimeException("PostgreSQL did not start in time");
+//  }
 }

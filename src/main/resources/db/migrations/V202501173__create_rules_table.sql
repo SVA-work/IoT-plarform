@@ -1,6 +1,9 @@
 CREATE TABLE IF NOT EXISTS rules
 (
-    rule_id SERIAL PRIMARY KEY,
-    device_id INTEGER REFERENCES devices(device_id),
-    rule VARCHAR(255) NOT NULL
+    id SERIAL PRIMARY KEY,
+    rule VARCHAR(255) NOT NULL,
+    lowest_value INTEGER NOT NULL,
+    highest_value INTEGER NOT NULL,
+    device_id INTEGER,
+    FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
 )
