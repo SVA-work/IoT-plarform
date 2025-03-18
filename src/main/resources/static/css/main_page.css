@@ -51,7 +51,7 @@ label {
     width: 272px;
     height: 74px;
     border-radius: 20px;
-    margin: 0 20px 0 20px;
+    margin: 0 40px 0 40px;
 }
 
 .device-list {
@@ -209,7 +209,7 @@ label {
     padding: 20px;
     border-radius: 40px;
     width: 400px;
-    height: 400px;
+    height: auto;
     text-align: center;
     display: flex;
     flex-direction: column;
