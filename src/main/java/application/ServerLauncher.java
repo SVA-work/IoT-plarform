@@ -1,8 +1,5 @@
 package application;
 
-import application.config.ServerConfig;
-//import application.controller.deviceapi.TelemetryHttpController;
-//import application.netty.library.json.JsonParserDefault;
 import application.controller.deviceapi.TelemetryHttpController;
 import application.netty.library.json.JsonParserDefault;
 import application.service.TelemetryService;
@@ -60,8 +57,8 @@ public class ServerLauncher {
 
         new Thread(() -> {
             try {
-                ChannelFuture future = boot.bind(8080).sync();
-                log.info("Netty server started on port 8080");
+                ChannelFuture future = boot.bind(8083).sync();
+                log.info("Netty server started on port 8083");
                 future.channel().closeFuture().sync();
             } catch (InterruptedException e) {
                 log.error("Netty failed to start", e);
