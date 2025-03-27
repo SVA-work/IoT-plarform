@@ -97,7 +97,6 @@ public class DeviceService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
 
-        System.out.println(deviceRequest.getDeviceName());
         Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceRequest.getDeviceName(), user.getId());
         if (optionalDevice.isEmpty()) {
             log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
