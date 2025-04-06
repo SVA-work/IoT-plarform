@@ -6,7 +6,7 @@ import application.dto.response.RuleResponse;
 import application.dto.response.TelemetryResponse;
 import application.entity.Device;
 import application.entity.Rule;
-import application.entity.Telemetry;
+import application.kafka.dto.Telemetry;
 import application.entity.User;
 import application.repository.DeviceRepository;
 import application.repository.UserRepository;
@@ -112,41 +112,6 @@ public class DeviceService {
 
         DeviceResponse deviceResponse = buildDeviceResponse(device);
         return deviceResponse.getRules();
-    }
-
-    public List<TelemetryResponse> getDeviceTelemetry(DeviceRequest deviceRequest) {
-        Optional<User> optionalUser = userRepository.findByLogin(deviceRequest.getLogin());
-        User user;
-
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
-            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
-        } else {
-            log.error("Пользователь \"" + deviceRequest.getLogin() + "\" не найден в базе данных");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
-        }
-
-        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceRequest.getDeviceName(), user.getId());
-        if (optionalDevice.isEmpty()) {
-            log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
-        }
-
-        Device device = optionalDevice.get();
-        if (!user.equals(device.getUser())) {
-            log.error("У пользователя \"" + deviceRequest.getLogin() + "\" отсутсвует устройство \"" + deviceRequest.getDeviceName() + "\"");
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
-        }
-
-        List<TelemetryResponse> telemetryResponse = new ArrayList<>();
-        List<Telemetry> telemetryy = device.getTelemetry();
-        if (telemetryy != null) {
-            for (Telemetry telemetry : telemetryy) {
-                telemetryResponse.add(telemetryService.buildTelemetryResponse(telemetry));
-            }
-        }
-
-        return telemetryResponse;
     }
 
     public DeviceResponse buildDeviceResponse(@NotNull Device device) {

@@ -1,5 +1,6 @@
 package application.entity;
 
+import application.kafka.dto.Telemetry;
 import jakarta.persistence.*;
 
 import lombok.Getter;
@@ -32,7 +33,4 @@ public class Device {
 
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Rule> rules;
-
-    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Telemetry> telemetry;
 }
