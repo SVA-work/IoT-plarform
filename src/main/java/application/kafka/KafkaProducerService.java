@@ -39,4 +39,6 @@ public class KafkaProducerService {
 
     CompletableFuture<SendResult<String, String>> sendResult = kafkaTemplate.send(topic, message);
   }
+
+
 }
