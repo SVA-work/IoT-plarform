@@ -14,13 +14,14 @@ import application.telegrambot.bot.IoTServiceBot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
@@ -33,10 +34,8 @@ import java.util.Optional;
 @Service
 public class TelemetryService {
 
-
     private final DeviceRepository devicesRepository;
     private final TelemetryRepository telemetryRepository;
-
 
     public String decodeBase64(String base64Data) {
         if (base64Data == null || base64Data.isEmpty()) {
@@ -57,14 +56,14 @@ public class TelemetryService {
     @Transactional
     public ResponseEntity<Void> sendReport(MicroclimateSensor infoAboutDevice) {
 
-        Optional<Device> optionalDevice = devicesRepository.findByUuid(infoAboutDevice.getUuid());
+        Optional<Device> optionalDevice = devicesRepository.findByUuidWithRulesAndToken(infoAboutDevice.getUuid());
+
         if (optionalDevice.isEmpty()) {
             log.error("Устройство \"" + infoAboutDevice.getUuid() + "\" не найдено");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }
 
         log.info("Устройство \"" + infoAboutDevice.getUuid() + "\" найдено");
-
         Device device = optionalDevice.get();
 
         Telemetry telemetry = new Telemetry();
@@ -102,7 +101,6 @@ public class TelemetryService {
         double deviceTemperature = Float.parseFloat(infoAboutDevice.getTemperature());
         double lowTemperature = Float.parseFloat(parts[1]);
         double highTemperature = Float.parseFloat(parts[2]);
-
 
         if (deviceTemperature < lowTemperature) {
             log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
