@@ -51,6 +51,12 @@ public class DeviceService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство с таким названием уже существует");
         }
 
+        Optional<Device> optionalDeviceUuid = deviceRepository.findByUuid(deviceRequest.getUuid());
+        if (optionalDeviceUuid.isPresent()) {
+            log.error("Устройство \"" + deviceRequest.getDeviceName() + "\" не найдено в базе данных");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство с таким uuid уже существует");
+        }
+
         log.info("Получено устройство \"" + deviceRequest.getDeviceName() + "\" из базы данных");
 
         Device device = buildDeviceRequest(deviceRequest, user);
@@ -144,7 +150,6 @@ public class DeviceService {
                 telemetryResponse.add(telemetryService.buildTelemetryResponse(telemetry));
             }
         }
-
         return telemetryResponse;
     }
 

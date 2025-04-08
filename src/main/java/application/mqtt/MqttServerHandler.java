@@ -1,13 +1,20 @@
 package application.mqtt;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.mqtt.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import application.dto.request.devices.MicroclimateSensor;
+import application.service.TelemetryService;
 
 import java.nio.charset.StandardCharsets;
 
@@ -17,8 +24,13 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<MqttMessage> 
     private static final Logger logger = LoggerFactory.getLogger(MqttServerHandler.class);
     private final ChannelGroup channelGroup;
 
-    public MqttServerHandler(ChannelGroup channelGroup) {
+    private final TelemetryService telemetryService;
+    private final ObjectMapper objectMapper;
+
+    public MqttServerHandler(ChannelGroup channelGroup, ObjectMapper objectMapper, TelemetryService telemetryService) {
         this.channelGroup = channelGroup;
+        this.objectMapper = objectMapper;
+        this.telemetryService = telemetryService;
     }
 
     @Override
@@ -86,23 +98,15 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<MqttMessage> 
         String topic = msg.variableHeader().topicName();
         String message = msg.payload().toString(StandardCharsets.UTF_8);
     
-        logger.info("Получено сообщение:");
+        logger.info("Получено сообщение");
         logger.info("Тема: {}", topic);
         logger.info("Сообщение: {}", message);
-    
-        channelGroup.removeIf(channel -> channel.remoteAddress() == null || !channel.isActive());
-    
-        for (Channel channel : channelGroup) {
-            if (channel.remoteAddress() != null && channel.isActive()) {
-                channel.writeAndFlush(msg.retain()).addListener(future -> {
-                    if (!future.isSuccess()) {
-                        logger.error("Ошибка отправки сообщения клиенту: {}", channel.remoteAddress(), future.cause());
-                        channelGroup.remove(channel);
-                    }
-                });
-            }   else {
-                logger.info("Подключение null или неактивно: {}", channel.remoteAddress());
-            }
+
+        try {
+            MicroclimateSensor sensorData = objectMapper.readValue(message, MicroclimateSensor.class);
+            telemetryService.reportProcessingAndSend(sensorData);
+        } catch (JsonProcessingException e) {
+            logger.error("Ошибка при парсинге сообщения: {}", e.getMessage());
         }
     }
 

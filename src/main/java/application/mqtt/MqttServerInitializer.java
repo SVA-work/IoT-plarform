@@ -11,16 +11,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import application.service.TelemetryService;
+
 @Component
 public class MqttServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final Logger logger = LoggerFactory.getLogger(MqttServerInitializer.class);
 
     private final ChannelGroup channelGroup;
+    private final ObjectMapper objectMapper;
+    private final TelemetryService telemetryService;
 
     @Autowired
-    public MqttServerInitializer(ChannelGroup channelGroup) {
+    public MqttServerInitializer(ChannelGroup channelGroup, ObjectMapper objectMapper, TelemetryService telemetryService) {
         this.channelGroup = channelGroup;
+        this.objectMapper = objectMapper;
+        this.telemetryService = telemetryService;
     }
 
     @Override
@@ -29,6 +37,6 @@ public class MqttServerInitializer extends ChannelInitializer<SocketChannel> {
 
         ch.pipeline().addLast(new MqttDecoder(8092));
         ch.pipeline().addLast(MqttEncoder.INSTANCE);
-        ch.pipeline().addLast(new MqttServerHandler(channelGroup));
+        ch.pipeline().addLast(new MqttServerHandler(channelGroup, objectMapper, telemetryService));
     }
 }
