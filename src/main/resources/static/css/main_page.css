@@ -58,7 +58,7 @@ label {
     background-color: #375D89;
     padding: 20px;
     border-radius: 40px;
-    width: 854px;
+    width: 998px;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -119,8 +119,6 @@ label {
     height: 74px;
     border: none;
     cursor: pointer;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
     background-color: white;
     position: relative;
     transition: background-color 0.3s ease, transform 0.3s ease-in-out;
@@ -170,6 +168,25 @@ label {
 
 .settings:hover {
     background-image: url("../images/SETTINGS_ON_CLICK.svg");
+}
+
+/* DELETE */
+.trash {
+    background-image: none;
+    width: 125px;
+    height: 74px;
+    background-size: contain;
+    border-radius: 0 20px 20px 0;
+    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    margin-left: 20px;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+
+.trash:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
 }
 
 
@@ -257,3 +274,16 @@ label {
 .confirm_addition:hover {
     color: #E2EDFA;
 }
+
+.rule-modal-content {
+    width: 600px;
+    height: 200px;
+    border-radius: 50px;
+}
+
+#rule-modal .input_field {
+    width: 560px;
+    height: 60px;
+    font-size: 30px;
+}
+
