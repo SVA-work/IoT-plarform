@@ -78,9 +78,9 @@ public class TelemetryService {
 
         for (Rule rule : allRulesOfDevice) {
             String ruleName = rule.getRule();
-            String lowestValue = rule.getLowestValue().toString();
-            String highestValue = rule.getHighestValue().toString();
-            String[] parts = {ruleName, lowestValue, highestValue};
+            String value = rule.getValue().toString();
+            String compare = rule.getComparison();
+            String[] parts = {ruleName, value, compare};
             if (parts[0].equals("Temperature")) {
                 temperatureCheck(parts, device, infoAboutDevice, token);
                 return ResponseEntity.ok().build();
@@ -99,14 +99,14 @@ public class TelemetryService {
     private void temperatureCheck(String[] parts, Device device, MicroclimateSensor infoAboutDevice, String token) {
         IoTServiceBot iotServiceBot = new IoTServiceBot(ServerConfig.BOT_TOKEN);
         double deviceTemperature = Float.parseFloat(infoAboutDevice.getTemperature());
-        double lowTemperature = Float.parseFloat(parts[1]);
-        double highTemperature = Float.parseFloat(parts[2]);
+        double value = Float.parseFloat(parts[1]);
+        String compare = parts[2];
 
-        if (deviceTemperature < lowTemperature) {
+        if (deviceTemperature < value && (compare.equals(">") || compare.equals("="))) {
             log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
             iotServiceBot.sendLowerTempNotification(token, device.getUuid(), device.getType(), parts[1]);
         }
-        if (deviceTemperature > highTemperature) {
+        if (deviceTemperature > value && (compare.equals("<") || compare.equals("="))) {
             log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
             iotServiceBot.sendHighTempNotification(token, device.getUuid(), device.getType(), parts[2]);
         }

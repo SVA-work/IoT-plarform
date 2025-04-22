@@ -12,7 +12,7 @@ public class RuleRequest {
     private String login;
     private String deviceName;
     private String rule;
-    private Integer lowestValue;
-    private Integer highestValue;
+    private Double value;
+    private String comparison;
     private String updateRule;
 }

@@ -58,9 +58,9 @@ public class RuleService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Правило с таким название уже есть у этого устройства");
         }
 
-        Integer low = ruleRequest.getLowestValue();
-        Integer hight = ruleRequest.getHighestValue();
-        if ((low == null || hight == null) || !(ruleRequest.getRule().equals("Temperature"))) {
+        Double value = ruleRequest.getValue();
+        String comparison = ruleRequest.getComparison();
+        if ((value == null || comparison == null) || !(ruleRequest.getRule().equals("Temperature"))) {
             log.error("Правило \"" + ruleRequest.getRule() + "\" не соответствует формату");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Неверный формат правила");
         }
@@ -145,8 +145,8 @@ public class RuleService {
         }
 
         Rule rule = optionalRule.get();
-        rule.setLowestValue(ruleRequest.getLowestValue());
-        rule.setHighestValue(ruleRequest.getHighestValue());
+        rule.setValue(ruleRequest.getValue());
+        rule.setComparison(ruleRequest.getComparison());
         RuleResponse ruleResponse = buildRuleResponse(rule);
         ruleRepository.save(rule);
         log.info("Правило \"" + ruleRequest.getRule() + "\" обновлено");
@@ -156,8 +156,8 @@ public class RuleService {
     public RuleResponse buildRuleResponse(@NotNull Rule rule) {
         RuleResponse ruleResponse = new RuleResponse();
         ruleResponse.setRule(rule.getRule());
-        ruleResponse.setLowestValue(rule.getLowestValue());
-        ruleResponse.setHighestValue(rule.getHighestValue());
+        ruleResponse.setValue(rule.getValue());
+        ruleResponse.setComparison(rule.getComparison());
         ruleResponse.setDeviceName(rule.getDevice().getDeviceName());
         return ruleResponse;
     }
@@ -166,8 +166,8 @@ public class RuleService {
         Rule rule = new Rule();
         rule.setRule(request.getRule());
         rule.setDevice(device);
-        rule.setLowestValue(request.getLowestValue());
-        rule.setHighestValue(request.getHighestValue());
+        rule.setValue(request.getValue());
+        rule.setComparison(request.getComparison());
         return rule;
     }
 }
