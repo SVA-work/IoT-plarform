@@ -1,19 +1,15 @@
 package application.service;
 
-import application.config.ServerConfig;
 import application.dto.request.devices.MicroclimateSensor;
-import application.dto.response.TelemetryResponse;
 import application.entity.Device;
 import application.entity.Rule;
 import application.entity.TelegramToken;
 import application.entity.User;
 import application.kafka.Command;
-import application.kafka.dto.KafkaMessage;
 import application.kafka.KafkaProducerService;
 import application.kafka.dto.SaveTelemetryDto;
 import application.kafka.dto.Telemetry;
 import application.repository.DeviceRepository;
-import application.telegrambot.bot.IoTServiceBot;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -94,7 +90,6 @@ public class TelemetryService {
   }
 
   private void temperatureCheck(String[] parts, Device device, MicroclimateSensor infoAboutDevice, String token) {
-    IoTServiceBot iotServiceBot = new IoTServiceBot(ServerConfig.BOT_TOKEN);
     double deviceTemperature = Float.parseFloat(infoAboutDevice.getTemperature());
     double lowTemperature = Float.parseFloat(parts[1]);
     double highTemperature = Float.parseFloat(parts[2]);
@@ -102,11 +97,9 @@ public class TelemetryService {
 
     if (deviceTemperature < lowTemperature) {
       log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
-      iotServiceBot.sendLowerTempNotification(token, device.getUuid(), device.getType(), parts[1]);
     }
     if (deviceTemperature > highTemperature) {
       log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
-      iotServiceBot.sendHighTempNotification(token, device.getUuid(), device.getType(), parts[2]);
     }
   }
 

@@ -16,14 +16,17 @@ import java.util.concurrent.CompletableFuture;
 public class KafkaProducerService {
   private final KafkaTemplate<String, String> kafkaTemplate;
   private final ObjectMapper objectMapper;
-  private final String topic;
+  private final String telemetryTopic;
+  private String notificationTopic;
 
   public KafkaProducerService(KafkaTemplate<String, String> kafkaTemplate,
                               ObjectMapper objectMapper,
-                              @Value("${topic-to-send-message}") String topic) {
+                              @Value("${topic-to-send-telemetry}") String telemetryTopic,
+                              @Value("${topic-to-send-notification}") String notificationTopic) {
     this.kafkaTemplate = kafkaTemplate;
     this.objectMapper = objectMapper;
-    this.topic = topic;
+    this.telemetryTopic = telemetryTopic;
+    this.notificationTopic = notificationTopic;
   }
 
   public void sendMessageWriteTelemetry(SaveTelemetryDto dtoMessage){
@@ -37,8 +40,20 @@ public class KafkaProducerService {
       throw new JsonParseException(e);
     }
 
-    CompletableFuture<SendResult<String, String>> sendResult = kafkaTemplate.send(topic, message);
+    CompletableFuture<SendResult<String, String>> sendResult = kafkaTemplate.send(telemetryTopic, message);
   }
 
+  public void sendNotification(SaveTelemetryDto dtoMessage){
+    String message;
+    try {
+      KafkaMessage kafkaMessage =
+          new KafkaMessage(dtoMessage.getCommand(),
+              objectMapper.writeValueAsString(dtoMessage.getMessage()));
+      message = objectMapper.writeValueAsString(kafkaMessage);
+    } catch (JsonProcessingException e) {
+      throw new JsonParseException(e);
+    }
 
+    CompletableFuture<SendResult<String, String>> sendResult = kafkaTemplate.send(telemetryTopic, message);
+  }
 }
