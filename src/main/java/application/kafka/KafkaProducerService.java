@@ -1,7 +1,8 @@
 package application.kafka;
 
-import application.kafka.dto.KafkaMessage;
-import application.kafka.dto.SaveTelemetryDto;
+import application.dto.kafka.KafkaMessage;
+import application.dto.kafka.SaveTelemetryDto;
+import application.dto.kafka.SendNotificationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParseException;
@@ -33,7 +34,7 @@ public class KafkaProducerService {
     String message;
     try {
       KafkaMessage kafkaMessage =
-          new KafkaMessage(dtoMessage.getCommand(),
+          new KafkaMessage(dtoMessage.getTelemetryCommand(),
               objectMapper.writeValueAsString(dtoMessage.getMessage()));
       message = objectMapper.writeValueAsString(kafkaMessage);
     } catch (JsonProcessingException e) {
@@ -43,7 +44,7 @@ public class KafkaProducerService {
     CompletableFuture<SendResult<String, String>> sendResult = kafkaTemplate.send(telemetryTopic, message);
   }
 
-  public void sendNotification(SaveTelemetryDto dtoMessage){
+  public void sendNotification(SendNotificationDto dtoMessage){
     String message;
     try {
       KafkaMessage kafkaMessage =

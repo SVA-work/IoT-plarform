@@ -1,12 +1,12 @@
-package application.kafka.dto;
+package application.dto.kafka;
 
-import application.kafka.Command;
+import application.kafka.command.TelemetryCommand;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
 public class SaveTelemetryDto {
-  private Command command;
+  private TelemetryCommand telemetryCommand;
   private Telemetry message;
 }

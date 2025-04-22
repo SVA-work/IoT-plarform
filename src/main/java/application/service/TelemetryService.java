@@ -5,20 +5,21 @@ import application.entity.Device;
 import application.entity.Rule;
 import application.entity.TelegramToken;
 import application.entity.User;
-import application.kafka.Command;
+import application.kafka.command.TelemetryCommand;
 import application.kafka.KafkaProducerService;
-import application.kafka.dto.SaveTelemetryDto;
-import application.kafka.dto.Telemetry;
+import application.kafka.command.NotificationCommand;
+import application.dto.kafka.NotificationDto;
+import application.dto.kafka.SaveTelemetryDto;
+import application.dto.kafka.SendNotificationDto;
+import application.dto.kafka.Telemetry;
 import application.repository.DeviceRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
@@ -50,7 +51,6 @@ public class TelemetryService {
     return sendReport(infoAboutDevice);
   }
 
-  @Transactional
   public ResponseEntity<Void> sendReport(MicroclimateSensor infoAboutDevice) {
 
     Optional<Device> optionalDevice = devicesRepository.findByUuid(infoAboutDevice.getUuid());
@@ -72,9 +72,9 @@ public class TelemetryService {
 
     for (Rule rule : allRulesOfDevice) {
       String ruleName = rule.getRule();
-      String lowestValue = rule.getLowestValue().toString();
-      String highestValue = rule.getHighestValue().toString();
-      String[] parts = {ruleName, lowestValue, highestValue};
+      String value = rule.getValue().toString();
+      String compare = rule.getComparison();
+      String[] parts = {ruleName, value, compare};
       if (parts[0].equals("Temperature")) {
         temperatureCheck(parts, device, infoAboutDevice, token);
         return ResponseEntity.ok().build();
@@ -90,28 +90,38 @@ public class TelemetryService {
     return objectMapper.readValue(decodedMessage, MicroclimateSensor.class);
   }
 
-    private void temperatureCheck(String[] parts, Device device, MicroclimateSensor infoAboutDevice, String token) {
-        IoTServiceBot iotServiceBot = new IoTServiceBot(ServerConfig.BOT_TOKEN);
-        double deviceTemperature = Float.parseFloat(infoAboutDevice.getTemperature());
-        double value = Float.parseFloat(parts[1]);
-        String compare = parts[2];
+  private void temperatureCheck(String[] parts, Device device, MicroclimateSensor infoAboutDevice, String token) {
+    double deviceTemperature = Float.parseFloat(infoAboutDevice.getTemperature());
+    double value = Float.parseFloat(parts[1]);
+    String compare = parts[2];
 
-        if (deviceTemperature < value && (compare.equals(">") || compare.equals("="))) {
-            log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
-            iotServiceBot.sendLowerTempNotification(token, device.getUuid(), device.getType(), parts[1]);
-        }
-        if (deviceTemperature > value && (compare.equals("<") || compare.equals("="))) {
-            log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
-            iotServiceBot.sendHighTempNotification(token, device.getUuid(), device.getType(), parts[2]);
-        }
+    if (deviceTemperature < value && (compare.equals(">") || compare.equals("="))) {
+      log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
+      saveNotification(NotificationCommand.LOW_TEMPERATURE, token, device.getUuid(), device.getType(), parts[1]);
     }
+    if (deviceTemperature > value && (compare.equals("<") || compare.equals("="))) {
+      log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
+      saveNotification(NotificationCommand.HIGH_TEMPERATURE, token, device.getUuid(), device.getType(), parts[2]);
+    }
+  }
+
+  private void saveNotification(NotificationCommand command, String token, String deviceUuid, String deviceType, String value) {
+    NotificationDto notificationDto = new NotificationDto(token, deviceUuid, deviceType, value);
+
+    SendNotificationDto sendNotificationDto =
+        new SendNotificationDto(command, notificationDto);
+
+    kafkaProducerService.sendNotification(sendNotificationDto);
+  }
 
   private void saveTelemetry(MicroclimateSensor infoAboutDevice, Device device) {
     Telemetry telemetry = new Telemetry();
     telemetry.setTemperature(infoAboutDevice.getTemperature());
     telemetry.setDeviceId(device.getId().toString());
+
     SaveTelemetryDto saveTelemetryDto =
-        new SaveTelemetryDto(Command.WRITE_TELEMETRY, telemetry);
+        new SaveTelemetryDto(TelemetryCommand.WRITE_TELEMETRY, telemetry);
+
     kafkaProducerService.sendMessageWriteTelemetry(saveTelemetryDto);
   }
 }

@@ -1,4 +1,4 @@
-package application.kafka.dto;
+package application.dto.kafka;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

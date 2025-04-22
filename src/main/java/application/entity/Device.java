@@ -1,6 +1,5 @@
 package application.entity;
 
-import application.kafka.dto.Telemetry;
 import jakarta.persistence.*;
 
 import lombok.Getter;
