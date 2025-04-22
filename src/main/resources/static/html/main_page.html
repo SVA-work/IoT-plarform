@@ -7,10 +7,10 @@
     <title>UpHome - управление умным домом</title>
     <link rel="stylesheet" href="../css/main_page.css">
 </head>
-<body>
+<body onload="preloadDevices()">
 
 <header>
-    <button class="logo" onclick="location.href='home.html'"></button>
+    <button class="logo" onclick=""></button>
     <span class="site-name">UpHome</span>
     <button class="profile" onclick="location.href='login_page.html'"></button>
 </header>
@@ -19,7 +19,7 @@
     <div class="device-list">
         <div id="list">
         </div>
-        <button class="add-button" onclick="addItem()"></button>
+        <button class="add-button" onclick="openModal()"></button>
     </div>
 </main>
 
@@ -37,12 +37,22 @@
         <label for="device-type">Тип устройства:</label>
         <input type="text" id="device-type" class="input_field" placeholder="">
 
-        <label for="device-rule">Правило устройства:</label>
-        <input type="text" id="device-rule" class="input_field" placeholder="">
-
-        <button class="confirm_addition" onclick="saveItem()">Добавить</button>
+        <button class="confirm_addition">Добавить</button>
     </div>
 </div>
+
+<div id="rule-modal" class="modal">
+    <div class="modal-content rule-modal-content">
+        <span class="close" onclick="closeRuleModal()">&times;</span>
+        <h2>Добавьте новое правило для устройства</h2>
+
+        <label for="rule"></label>
+        <input type="text" id="rule" class="input_field" placeholder="">
+
+        <button class="confirm_addition">Добавить</button>
+    </div>
+</div>
+
 
 <script src="../js/script.js"></script>
 

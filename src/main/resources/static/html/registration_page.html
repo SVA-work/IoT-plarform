@@ -10,7 +10,7 @@
 <body>
 
 <header>
-  <button class="logo" onclick="location.href='home.html'"></button>
+  <button class="logo" onclick=""></button>
 </header>
 
 <main>
@@ -18,13 +18,17 @@
     <label for="login">Логин</label>
     <input type="text" id="login" class="input_field" placeholder="">
 
+    <label for="telegram_token">Телеграм токен</label>
+    <input type="text" id="telegram_token" class="input_field" placeholder="">
+
     <label for="password">Пароль</label>
     <input type="password" id="password" class="input_field" placeholder="">
 
-    <button class="register_button" onclick="location.href='main_page.html'">Регистрация</button>
+    <button class="register_button" onclick="registerUser()">Регистрация</button>
   </div>
   <button class="no_account-button" onclick="location.href='login_page.html'">Уже есть аккаунт?</button>
 </main>
 
+<script src="../js/script.js"></script>
 </body>
 </html>
