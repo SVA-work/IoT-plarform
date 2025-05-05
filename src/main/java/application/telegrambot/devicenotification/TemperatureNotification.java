@@ -14,4 +14,9 @@ public class TemperatureNotification {
         String response = "Температура на вашем устройсте \"%s\" типа \"%s\" поднялась выше %s";
         return String.format(response, deviceToken, deviceType, highBorderOfTemperature);
     }
+
+    public String ForbiddenValueTempNotification(String deviceToken, String deviceType, String forbiddenValueTempNotification) {
+        String response = "Температура на вашем устройсте \"%s\" типа \"%s\" равна запрещённому значению: %s";
+        return String.format(response, deviceToken, deviceType, forbiddenValueTempNotification);
+    }
 }

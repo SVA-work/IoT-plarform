@@ -8,7 +8,6 @@ import application.entity.User;
 import application.repository.DeviceRepository;
 import application.repository.RuleRepository;
 import application.repository.UserRepository;
-
 import jakarta.validation.constraints.NotNull;
 
 import lombok.RequiredArgsConstructor;
@@ -25,32 +24,13 @@ import java.util.Optional;
 @Service
 public class RuleService {
 
-    private final UserRepository userRepository;
     private final DeviceRepository deviceRepository;
+    private final UserRepository userRepository;
     private final RuleRepository ruleRepository;
 
     public RuleResponse applyRule(RuleRequest ruleRequest) {
-        Optional<User> optionalUser = userRepository.findByLogin(ruleRequest.getLogin());
-        User user;
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
-            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
-        } else {
-            log.error("Пользователь \"" + ruleRequest.getLogin() + "\" не найден в базе данных");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
-        }
-        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(ruleRequest.getDeviceName(), user.getId());
-        if (optionalDevice.isEmpty()) {
-            log.error("Устройство \"" + ruleRequest.getDeviceName() + "\" не найдено в базе данных");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
-        }
-
-        Device device = optionalDevice.get();
-        if (!user.equals(device.getUser())) {
-            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getDeviceName());
-
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
-        }
+        User user = getUserByLogin(ruleRequest.getLogin());
+        Device device = getDeviceByUserAndName(user, ruleRequest.getDeviceName());
 
         Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleRequest.getRule(), device);
         if (optionalRule.isPresent()) {
@@ -72,39 +52,10 @@ public class RuleService {
     }
 
     public RuleResponse deleteDeviceRule(RuleRequest ruleRequest) {
-        Optional<User> optionalUser = userRepository.findByLogin(ruleRequest.getLogin());
-        User user;
+        User user = getUserByLogin(ruleRequest.getLogin());
+        Device device = getDeviceByUserAndName(user, ruleRequest.getDeviceName());
+        Rule rule = getRuleForDevice(ruleRequest.getRule(), device);
 
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
-            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
-        } else {
-            log.error("Пользователь \"" + ruleRequest.getLogin() + "\" не найден в базе данных");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
-        }
-
-        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(ruleRequest.getDeviceName(), user.getId());
-        if (optionalDevice.isEmpty()) {
-            log.error("Устройство \"" + ruleRequest.getDeviceName() + "\" не найдено в базе данных");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
-        }
-
-        Device device = optionalDevice.get();
-        if (!user.equals(device.getUser())) {
-            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getDeviceName() + "\"");
-
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
-        }
-
-        Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleRequest.getRule(), device);
-        if (optionalRule.isEmpty()) {
-
-            log.error("У устройства \"" + ruleRequest.getDeviceName() + "\" отсутсвует правило \"" + ruleRequest.getRule() + "\"");
-
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Правило с таким названием не найдено");
-        }
-
-        Rule rule = optionalRule.get();
         RuleResponse ruleResponse = buildRuleResponse(rule);
         ruleRepository.delete(rule);
         log.info("Правило \"" + ruleRequest.getRule() + "\" удалено");
@@ -112,45 +63,51 @@ public class RuleService {
     }
 
     public RuleResponse updateDeviceRule(RuleRequest ruleRequest) {
-        Optional<User> optionalUser = userRepository.findByLogin(ruleRequest.getLogin());
-        User user;
+        User user = getUserByLogin(ruleRequest.getLogin());
+        Device device = getDeviceByUserAndName(user, ruleRequest.getDeviceName());
+        Rule rule = getRuleForDevice(ruleRequest.getRule(), device);
 
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
-            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
-        } else {
-            log.error("Пользователь \"" + ruleRequest.getLogin() + "\" не найден в базе данных");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
-        }
-
-        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(ruleRequest.getDeviceName(), user.getId());
-        if (optionalDevice.isEmpty()) {
-            log.error("Устройство \"" + ruleRequest.getDeviceName() + "\" не найдено в базе данных");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
-        }
-
-        Device device = optionalDevice.get();
-        if (!user.equals(device.getUser())) {
-            log.error("У пользователя \"" + ruleRequest.getLogin() + "\" отсутсвует устройство \"" + ruleRequest.getDeviceName() + "\"");
-
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
-        }
-
-        Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleRequest.getRule(), device);
-        if (optionalRule.isEmpty()) {
-
-            log.error("У устройства \"" + ruleRequest.getDeviceName() + "\" отсутсвует правило \"" + ruleRequest.getRule() + "\"");
-
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Правило с таким названием не найдено");
-        }
-
-        Rule rule = optionalRule.get();
         rule.setValue(ruleRequest.getValue());
         rule.setComparison(ruleRequest.getComparison());
         RuleResponse ruleResponse = buildRuleResponse(rule);
         ruleRepository.save(rule);
         log.info("Правило \"" + ruleRequest.getRule() + "\" обновлено");
         return ruleResponse;
+    }
+
+    private Rule getRuleForDevice(String ruleName, Device device) {
+        Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleName, device);
+        if (!optionalRule.isPresent()) {
+            log.error("У устройства \"{}\" отсутствует правило \"{}\"", device.getDeviceName(), ruleName);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Правило с таким названием не найдено");
+        }
+        return optionalRule.get();
+    }
+
+    public User getUserByLogin(String login) {
+        Optional<User> optionalUser = userRepository.findByLogin(login);
+        if (!optionalUser.isPresent()) {
+            log.error("Пользователь \"{}\" не найден в базе данных", login);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
+        } else {
+            log.info("Получен пользователь \"{}\" из базы данных", login);
+        }
+        return optionalUser.get();
+    }
+
+    public Device getDeviceByUserAndName(User user, String deviceName) {
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceName, user.getId());
+        if (!optionalDevice.isPresent()) {
+            log.error("Устройство \"{}\" не найдено в базе данных", deviceName);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
+        }
+
+        Device device = optionalDevice.get();
+        if (!user.equals(device.getUser())) {
+            log.error("У пользователя \"{}\" отсутствует устройство \"{}\"", user.getLogin(), deviceName);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
+        }
+        return device;
     }
 
     public RuleResponse buildRuleResponse(@NotNull Rule rule) {

@@ -63,6 +63,14 @@ public class IoTServiceBot extends TelegramLongPollingBot {
         sendMessage(chatId, message);
     }
 
+    public void sendForbiddenValueTempNotification(String chatId,
+                                                 String deviceToken,
+                                                 String deviceType,
+                                                 String forbiddenValue) {
+        String message = TEMPERATURE_NOTIFICATION.ForbiddenValueTempNotification(deviceToken, deviceType, forbiddenValue);
+        sendMessage(chatId, message);
+    }
+
     private void sendMessage(String chatId, String text) {
         var sendMessage = new SendMessage(chatId, text);
         try {

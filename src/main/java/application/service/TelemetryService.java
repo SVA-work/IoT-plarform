@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,17 +44,15 @@ public class TelemetryService {
         return new String(decodedBytes, StandardCharsets.UTF_8);
     }
 
-    public ResponseEntity<Void> reportProcessingAndSend(MicroclimateSensor message) throws JsonProcessingException {
-
+    public void reportProcessingAndSend(MicroclimateSensor message) throws JsonProcessingException {
         MicroclimateSensor infoAboutDevice = getMicroclimateSensorInfoPackage(message);
         infoAboutDevice.setUuid(message.getUuid());
 
-        return sendReport(infoAboutDevice);
+        sendReport(infoAboutDevice);
     }
 
     @Transactional
-    public ResponseEntity<Void> sendReport(MicroclimateSensor infoAboutDevice) {
-
+    public void sendReport(MicroclimateSensor infoAboutDevice) {
         Optional<Device> optionalDevice = devicesRepository.findByUuidWithRulesAndToken(infoAboutDevice.getUuid());
 
         if (optionalDevice.isEmpty()) {
@@ -83,10 +80,8 @@ public class TelemetryService {
             String[] parts = {ruleName, value, compare};
             if (parts[0].equals("Temperature")) {
                 temperatureCheck(parts, device, infoAboutDevice, token);
-                return ResponseEntity.ok().build();
             }
         }
-        return ResponseEntity.noContent().build();
     }
 
     private MicroclimateSensor getMicroclimateSensorInfoPackage(MicroclimateSensor message) throws JsonProcessingException {
@@ -109,6 +104,10 @@ public class TelemetryService {
         if (deviceTemperature > value && (compare.equals("<") || compare.equals("="))) {
             log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
             iotServiceBot.sendHighTempNotification(token, device.getUuid(), device.getType(), parts[2]);
+        }
+        if (deviceTemperature == value && (compare.equals("!="))) {
+            log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
+            iotServiceBot.sendForbiddenValueTempNotification(token, device.getUuid(), device.getType(), parts[2]);
         }
     }
 

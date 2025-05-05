@@ -3,6 +3,9 @@ package application;
 import application.controller.deviceapi.TelemetryHttpController;
 import application.netty.library.json.JsonParserDefault;
 import application.service.TelemetryService;
+
+import io.micrometer.core.instrument.MeterRegistry;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -12,12 +15,16 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+
+import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 
 @SpringBootApplication
 @RequiredArgsConstructor
@@ -30,11 +37,15 @@ public class ServerLauncher {
     }
 
     private final TelemetryService telemetryService;
+    private final MeterRegistry meterRegistry;
 
     @Bean
     public Channel serverBootstrap() {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        ExecutorServiceMetrics.monitor(meterRegistry, bossGroup, "netty.boss");
+        ExecutorServiceMetrics.monitor(meterRegistry, workerGroup, "netty.worker");
 
         ServerBootstrap boot = new ServerBootstrap();
         boot.group(bossGroup, workerGroup)
