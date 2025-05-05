@@ -276,14 +276,23 @@ label {
 }
 
 .rule-modal-content {
-    width: 600px;
-    height: 200px;
+    width: 440px;
+    height: auto;
     border-radius: 50px;
 }
 
-#rule-modal .input_field {
-    width: 560px;
-    height: 60px;
-    font-size: 30px;
+.operator_field {
+    width: 100px;
+    height: 50px;
+    border-radius: 10px;
+    border: none;
+    font-size: 26px;
+    text-align: center;
+    color: black;
+    background-color: #FFFFFF;
+    margin-top: 10px;
 }
+
+
+
 

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UpHome - управление умным домом</title>
     <link rel="stylesheet" href="../css/main_page.css">
+    <script src="../js/script.js"></script>
 </head>
 <body onload="preloadDevices()">
 
@@ -46,15 +47,23 @@
         <span class="close" onclick="closeRuleModal()">&times;</span>
         <h2>Добавьте новое правило для устройства</h2>
 
-        <label for="rule"></label>
+        <label for="rule">Введите правило:</label>
         <input type="text" id="rule" class="input_field" placeholder="">
+
+        <label for="operator">Выберите оператор:</label>
+        <select id="operator" class="operator_field">
+            <option value="=">=</option>
+            <option value="!=">≠</option>
+            <option value="<=">≤</option>
+            <option value=">=">≥</option>
+            <option value="<"><</option>
+            <option value=">">></option>
+        </select>
+        <label for="rule-value">Введите значение:</label>
+        <input type="text" id="rule-value" class="input_field" placeholder="">
 
         <button class="confirm_addition">Добавить</button>
     </div>
 </div>
-
-
-<script src="../js/script.js"></script>
-
 </body>
 </html>
