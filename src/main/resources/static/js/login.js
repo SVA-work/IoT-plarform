@@ -25,7 +25,7 @@ async function registerUser() {
         const result = await response.json();
         console.log('Успешная регистрация:', result);
         localStorage.setItem('login', result.login);
-        window.location.href = 'main_page.html';
+        window.location.href = 'index.html';
     } catch (error) {
         alert('Ошибка регистрации: ' + error.message);
     }
@@ -56,7 +56,7 @@ async function signUpUser() {
         const result = await response.json();
         console.log('Успешный вход:', result);
         localStorage.setItem('login', result.login);
-        window.location.href = 'main_page.html';
+        window.location.href = 'index.html';
     } catch (error) {
         alert('Ошибка входа: ' + error.message);
     }

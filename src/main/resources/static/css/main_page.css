@@ -70,7 +70,7 @@ label {
     justify-content: center;
     background: #FFFFFF;
     border-radius: 20px 0 0 20px;
-    width: 563px;
+    width: 533px;
     height: 74px;
     margin: 0 0 20px 0;
 }
@@ -170,12 +170,30 @@ label {
     background-image: url("../images/SETTINGS_ON_CLICK.svg");
 }
 
-/* DELETE */
-.trash {
-    background-image: none;
+/* SCHEDULE */
+.schedule {
     width: 125px;
     height: 74px;
-    background-size: contain;
+    background-size: cover;
+    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    margin: 0 0 0 20px;
+    border: none;
+    cursor: pointer;
+    background-color: #375D89;
+    background-color: #FFFFFF;
+}
+
+.schedule:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
+}
+
+/* DELETE */
+.trash {
+    background-image: url("../images/TRASH.svg");
+    width: 125px;
+    height: 74px;
+    background-size: cover;
     border-radius: 0 20px 20px 0;
     transition: background-image 0.3s ease, transform 0.3s ease-in-out;
     margin-left: 20px;
