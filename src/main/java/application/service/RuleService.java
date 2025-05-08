@@ -32,14 +32,15 @@ public class RuleService {
         User user = getUserByLogin(ruleRequest.getLogin());
         Device device = getDeviceByUserAndName(user, ruleRequest.getDeviceName());
 
-        Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleRequest.getRule(), device);
-        if (optionalRule.isPresent()) {
-            log.error("У устройства \"" + ruleRequest.getDeviceName() + "\" уже есть правило \"" + ruleRequest.getRule());
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Правило с таким название уже есть у этого устройства");
-        }
-
         Double value = ruleRequest.getValue();
         String comparison = ruleRequest.getComparison();
+
+        Optional<Rule> optionalRule = ruleRepository.findByRuleAndValueAndComparisonAndDevice(ruleRequest.getRule(), value, comparison, device);
+        if (optionalRule.isPresent()) {
+            log.error("У устройства \"" + ruleRequest.getDeviceName() + "\" уже есть такое правило");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "У устройства уже есть такое правило");
+        }
+
         if ((value == null || comparison == null) || !(ruleRequest.getRule().equals("Temperature"))) {
             log.error("Правило \"" + ruleRequest.getRule() + "\" не соответствует формату");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Неверный формат правила");
@@ -54,7 +55,7 @@ public class RuleService {
     public RuleResponse deleteDeviceRule(RuleRequest ruleRequest) {
         User user = getUserByLogin(ruleRequest.getLogin());
         Device device = getDeviceByUserAndName(user, ruleRequest.getDeviceName());
-        Rule rule = getRuleForDevice(ruleRequest.getRule(), device);
+        Rule rule = getRuleForDevice(ruleRequest, device);
 
         RuleResponse ruleResponse = buildRuleResponse(rule);
         ruleRepository.delete(rule);
@@ -62,23 +63,10 @@ public class RuleService {
         return ruleResponse;
     }
 
-    public RuleResponse updateDeviceRule(RuleRequest ruleRequest) {
-        User user = getUserByLogin(ruleRequest.getLogin());
-        Device device = getDeviceByUserAndName(user, ruleRequest.getDeviceName());
-        Rule rule = getRuleForDevice(ruleRequest.getRule(), device);
-
-        rule.setValue(ruleRequest.getValue());
-        rule.setComparison(ruleRequest.getComparison());
-        RuleResponse ruleResponse = buildRuleResponse(rule);
-        ruleRepository.save(rule);
-        log.info("Правило \"" + ruleRequest.getRule() + "\" обновлено");
-        return ruleResponse;
-    }
-
-    private Rule getRuleForDevice(String ruleName, Device device) {
-        Optional<Rule> optionalRule = ruleRepository.findByRuleAndDevice(ruleName, device);
+    private Rule getRuleForDevice(RuleRequest ruleRequest, Device device) {
+        Optional<Rule> optionalRule = ruleRepository.findByRuleAndValueAndComparisonAndDevice(ruleRequest.getRule(), ruleRequest.getValue(), ruleRequest.getComparison(), device);
         if (!optionalRule.isPresent()) {
-            log.error("У устройства \"{}\" отсутствует правило \"{}\"", device.getDeviceName(), ruleName);
+            log.error("У устройства \"{}\" отсутствует правило \"{}\"", device.getDeviceName(), ruleRequest.getRule());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Правило с таким названием не найдено");
         }
         return optionalRule.get();

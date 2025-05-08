@@ -22,12 +22,6 @@ public class RulesController {
         return ruleService.applyRule(ruleRequest);
     }
 
-    @PatchMapping("/update")
-    public RuleResponse updateRule(@RequestBody RuleRequest ruleRequest) {
-        log.info("Получен запрос на обновление правила");
-        return ruleService.updateDeviceRule(ruleRequest);
-    }
-
     @DeleteMapping("/delete")
     public RuleResponse deleteDeviceRule(@RequestBody RuleRequest ruleRequest) {
         log.info("Получен запрос на удаление правила у устройства");
