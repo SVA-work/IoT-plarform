@@ -5,14 +5,10 @@ import application.dto.response.RuleResponse;
 import application.entity.Device;
 import application.entity.Rule;
 import application.entity.User;
-import application.repository.DeviceRepository;
 import application.repository.RuleRepository;
-import application.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,13 +20,13 @@ import java.util.Optional;
 @Service
 public class RuleService {
 
-    private final DeviceRepository deviceRepository;
-    private final UserRepository userRepository;
     private final RuleRepository ruleRepository;
+    private final UserService userService;
+    private final DeviceService deviceService;
 
     public RuleResponse applyRule(RuleRequest ruleRequest) {
-        User user = getUserByLogin(ruleRequest.getLogin());
-        Device device = getDeviceByUserAndName(user, ruleRequest.getDeviceName());
+        User user = userService.getUserByLogin(ruleRequest.getLogin());
+        Device device = deviceService.getDeviceByUserAndName(user, ruleRequest.getDeviceName());
 
         Double value = ruleRequest.getValue();
         String comparison = ruleRequest.getComparison();
@@ -53,8 +49,8 @@ public class RuleService {
     }
 
     public RuleResponse deleteDeviceRule(RuleRequest ruleRequest) {
-        User user = getUserByLogin(ruleRequest.getLogin());
-        Device device = getDeviceByUserAndName(user, ruleRequest.getDeviceName());
+        User user = userService.getUserByLogin(ruleRequest.getLogin());
+        Device device = deviceService.getDeviceByUserAndName(user, ruleRequest.getDeviceName());
         Rule rule = getRuleForDevice(ruleRequest, device);
 
         RuleResponse ruleResponse = buildRuleResponse(rule);
@@ -65,42 +61,16 @@ public class RuleService {
 
     private Rule getRuleForDevice(RuleRequest ruleRequest, Device device) {
         Optional<Rule> optionalRule = ruleRepository.findByRuleAndValueAndComparisonAndDevice(ruleRequest.getRule(), ruleRequest.getValue(), ruleRequest.getComparison(), device);
-        if (!optionalRule.isPresent()) {
+        if (optionalRule.isEmpty()) {
             log.error("У устройства \"{}\" отсутствует правило \"{}\"", device.getDeviceName(), ruleRequest.getRule());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Правило с таким названием не найдено");
         }
         return optionalRule.get();
     }
 
-    public User getUserByLogin(String login) {
-        Optional<User> optionalUser = userRepository.findByLogin(login);
-        if (!optionalUser.isPresent()) {
-            log.error("Пользователь \"{}\" не найден в базе данных", login);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
-        } else {
-            log.info("Получен пользователь \"{}\" из базы данных", login);
-        }
-        return optionalUser.get();
-    }
-
-    public Device getDeviceByUserAndName(User user, String deviceName) {
-        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceName, user.getId());
-        if (!optionalDevice.isPresent()) {
-            log.error("Устройство \"{}\" не найдено в базе данных", deviceName);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
-        }
-
-        Device device = optionalDevice.get();
-        if (!user.equals(device.getUser())) {
-            log.error("У пользователя \"{}\" отсутствует устройство \"{}\"", user.getLogin(), deviceName);
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
-        }
-        return device;
-    }
-
     public RuleResponse buildRuleResponse(@NotNull Rule rule) {
         RuleResponse ruleResponse = new RuleResponse();
-        ruleResponse.setRule(rule.getRule());
+        ruleResponse.setRule(rule.getRuleType());
         ruleResponse.setValue(rule.getValue());
         ruleResponse.setComparison(rule.getComparison());
         ruleResponse.setDeviceName(rule.getDevice().getDeviceName());
@@ -109,7 +79,7 @@ public class RuleService {
 
     private Rule buildRuleRequest(@NotNull RuleRequest request, Device device) {
         Rule rule = new Rule();
-        rule.setRule(request.getRule());
+        rule.setRuleType(request.getRule());
         rule.setDevice(device);
         rule.setValue(request.getValue());
         rule.setComparison(request.getComparison());

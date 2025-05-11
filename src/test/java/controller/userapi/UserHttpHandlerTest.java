@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ServerLauncher.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-class UserHttpHandlerTest extends BaseHttpHandlerTest {
+class UserHttpHandlerTest {
 
   @LocalServerPort
   private int port;
@@ -66,9 +66,7 @@ class UserHttpHandlerTest extends BaseHttpHandlerTest {
     } catch (Exception e) {
         try {
             log.error("connection failed" + jdbcTemplate.getDataSource().getConnection().getMetaData().getURL(), e);
-        } catch (SQLException ex) {
-            while (true) {}
-        }
+        } catch (SQLException ignored) {}
     }
   }
 

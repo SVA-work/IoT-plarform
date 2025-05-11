@@ -1,7 +1,6 @@
 package controller.userapi;
 
 import application.ServerLauncher;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ServerLauncher.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-class RulesHttpHandlerTest extends BaseHttpHandlerTest {
+class RulesHttpHandlerTest {
 
     @LocalServerPort
     private int port;
@@ -69,26 +68,26 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
     @Test
     void applyRule() throws IOException, InterruptedException {
         HttpResponse<String> addRuleResponse = HttpClient.newHttpClient()
-                .send(
-                        HttpRequest.newBuilder()
-                                .POST(
-                                        HttpRequest.BodyPublishers.ofString(
-                                                """
-                                                {
-                                                    "login": "testUser ",
-                                                    "deviceName": "testDevice",
-                                                    "rule": "Temperature",
-                                                    "value": 10,
-                                                    "comparison": ">"
-                                                }
-                                                """
-                                        )
-                                )
-                                .uri(URI.create("http://localhost:" + port + "/rule/apply"))
-                                .header("Content-Type", "application/json")
-                                .build(),
-                        HttpResponse.BodyHandlers.ofString(UTF_8)
-                );
+            .send(
+                HttpRequest.newBuilder()
+                    .POST(
+                        HttpRequest.BodyPublishers.ofString(
+                            """
+                                {
+                                    "login": "testUser ",
+                                    "deviceName": "testDevice",
+                                    "rule": "Temperature",
+                                    "value": 10,
+                                    "comparison": ">"
+                                }
+                                """
+                        )
+                    )
+                    .uri(URI.create("http://localhost:" + port + "/rule/apply"))
+                    .header("Content-Type", "application/json")
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(UTF_8)
+            );
 
         assertEquals(200, addRuleResponse.statusCode());
         assertEquals("{\"rule\":\"Temperature\",\"value\":10.0,\"comparison\":\">\",\"deviceName\":\"testDevice\"}", addRuleResponse.body());
@@ -103,26 +102,26 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
         jdbcTemplate.update("INSERT INTO rules (id, device_id, rule, value, comparison) VALUES ('1', '1', 'testRule', 10, '>')");
 
         HttpResponse<String> deleteRuleResponse = HttpClient.newHttpClient()
-                .send(
-                        HttpRequest.newBuilder()
-                                .method("DELETE",
-                                        HttpRequest.BodyPublishers.ofString(
-                                                """
-                                                {
-                                                    "login": "testUser ",
-                                                    "deviceName": "testDevice",
-                                                    "rule": "testRule",
-                                                    "value": 10,
-                                                    "comparison": ">"
-                                                }
-                                                """
-                                        )
-                                )
-                                .uri(URI.create("http://localhost:" + port + "/rule/delete"))
-                                .header("Content-Type", "application/json")
-                                .build(),
-                        HttpResponse.BodyHandlers.ofString(UTF_8)
-                );
+            .send(
+                HttpRequest.newBuilder()
+                    .method("DELETE",
+                        HttpRequest.BodyPublishers.ofString(
+                            """
+                                {
+                                    "login": "testUser ",
+                                    "deviceName": "testDevice",
+                                    "rule": "testRule",
+                                    "value": 10,
+                                    "comparison": ">"
+                                }
+                                """
+                        )
+                    )
+                    .uri(URI.create("http://localhost:" + port + "/rule/delete"))
+                    .header("Content-Type", "application/json")
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(UTF_8)
+            );
 
         assertEquals(200, deleteRuleResponse.statusCode());
         assertEquals("{\"rule\":\"testRule\",\"value\":10.0,\"comparison\":\">\",\"deviceName\":\"testDevice\"}", deleteRuleResponse.body());

@@ -8,8 +8,6 @@ import application.entity.Device;
 import application.entity.Rule;
 import application.entity.User;
 import application.repository.DeviceRepository;
-import application.repository.UserRepository;
-
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +25,11 @@ import java.util.Optional;
 public class DeviceService {
 
     private final DeviceRepository deviceRepository;
+    private final UserService userService;
     private final RuleService ruleService;
 
     public DeviceResponse addDevice(DeviceRequest deviceRequest) {
-        User user = ruleService.getUserByLogin(deviceRequest.getLogin());
+        User user = userService.getUserByLogin(deviceRequest.getLogin());
 
         Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceRequest.getDeviceName(), user.getId());
         if (optionalDevice.isPresent()) {
@@ -52,9 +51,8 @@ public class DeviceService {
     }
 
     public DeviceResponse deleteDevice(DeviceRequest deviceRequest) {
-        User user = ruleService.getUserByLogin(deviceRequest.getLogin());
-
-        Device device = ruleService.getDeviceByUserAndName(user, deviceRequest.getDeviceName());
+        User user = userService.getUserByLogin(deviceRequest.getLogin());
+        Device device = getDeviceByUserAndName(user, deviceRequest.getDeviceName());
 
         DeviceResponse deviceResponse = buildDeviceResponse(device);
         deviceRepository.delete(device);
@@ -62,27 +60,33 @@ public class DeviceService {
     }
 
     public List<RuleResponse> getDeviceRules(DeviceRequest deviceRequest) {
-        User user = ruleService.getUserByLogin(deviceRequest.getLogin());
-
-        Device device = ruleService.getDeviceByUserAndName(user, deviceRequest.getDeviceName());
+        User user = userService.getUserByLogin(deviceRequest.getLogin());
+        Device device = getDeviceByUserAndName(user, deviceRequest.getDeviceName());
 
         DeviceResponse deviceResponse = buildDeviceResponse(device);
         return deviceResponse.getRules();
     }
 
-    public List<TelemetryResponse> getDeviceTelemetry(DeviceRequest deviceRequest) {
-        User user = ruleService.getUserByLogin(deviceRequest.getLogin());
+    public DeviceIdDto getDeviceId(DeviceRequest deviceRequest) {
+        User user = userService.getUserByLogin(deviceRequest.getLogin());
+        Device device = getDeviceByUserAndName(user, deviceRequest.getDeviceName());
 
-        Device device = ruleService.getDeviceByUserAndName(user, deviceRequest.getDeviceName());
+        return new DeviceIdDto(device.getId());
+    }
 
-        List<TelemetryResponse> telemetryResponse = new ArrayList<>();
-        List<Telemetry> telemetryy = device.getTelemetry();
-        if (telemetryy != null) {
-            for (Telemetry telemetry : telemetryy) {
-                telemetryResponse.add(telemetryService.buildTelemetryResponse(telemetry));
-            }
+    public Device getDeviceByUserAndName(User user, String deviceName) {
+        Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceName, user.getId());
+        if (optionalDevice.isEmpty()) {
+            log.error("Устройство \"{}\" не найдено в базе данных", deviceName);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }
-        return telemetryResponse;
+
+        Device device = optionalDevice.get();
+        if (!user.equals(device.getUser())) {
+            log.error("У пользователя \"{}\" отсутствует устройство \"{}\"", user.getLogin(), deviceName);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
+        }
+        return device;
     }
 
     public DeviceResponse buildDeviceResponse(@NotNull Device device) {

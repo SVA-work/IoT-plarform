@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SendNotificationDto {
-  private NotificationCommand command;
-  private NotificationDto message;
+    private NotificationCommand command;
+    private NotificationDto message;
 }

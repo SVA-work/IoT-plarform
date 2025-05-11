@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SaveTelemetryDto {
-  private TelemetryCommand telemetryCommand;
-  private Telemetry message;
+    private TelemetryCommand telemetryCommand;
+    private Telemetry message;
 }

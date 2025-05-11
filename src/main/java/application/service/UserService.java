@@ -7,18 +7,16 @@ import application.entity.Device;
 import application.entity.TelegramToken;
 import application.entity.User;
 import application.repository.UserRepository;
-
 import jakarta.validation.constraints.NotNull;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -27,7 +25,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final DeviceService deviceService;
-    private final RuleService ruleService;
 
     public UserResponse registration(@NotNull UserRequest request) {
         User user = buildUserRequest(request);
@@ -52,10 +49,21 @@ public class UserService {
     }
 
     public List<DeviceResponse> listOfDevicesOfUser(@NotNull UserRequest request) {
-        User user = ruleService.getUserByLogin(request.getLogin());
+        User user = getUserByLogin(request.getLogin());
 
         UserResponse userResponse = buildUserResponse(user);
         return userResponse.getDevices();
+    }
+
+    public User getUserByLogin(String login) {
+        Optional<User> optionalUser = userRepository.findByLogin(login);
+        if (optionalUser.isEmpty()) {
+            log.error("Пользователь \"{}\" не найден в базе данных", login);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
+        } else {
+            log.info("Получен пользователь \"{}\" из базы данных", login);
+        }
+        return optionalUser.get();
     }
 
     private UserResponse buildUserResponse(@NotNull User user) {

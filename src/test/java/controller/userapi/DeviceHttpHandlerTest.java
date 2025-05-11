@@ -2,7 +2,6 @@ package controller.userapi;
 
 
 import application.ServerLauncher;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ServerLauncher.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-class DeviceHttpHandlerTest extends BaseHttpHandlerTest {
+class DeviceHttpHandlerTest {
 
   @LocalServerPort
   private int port;

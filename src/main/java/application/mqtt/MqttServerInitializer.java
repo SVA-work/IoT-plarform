@@ -1,19 +1,16 @@
 package application.mqtt;
 
+import application.service.TelemetryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.mqtt.MqttDecoder;
 import io.netty.handler.codec.mqtt.MqttEncoder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import application.service.TelemetryService;
 
 @Component
 public class MqttServerInitializer extends ChannelInitializer<SocketChannel> {

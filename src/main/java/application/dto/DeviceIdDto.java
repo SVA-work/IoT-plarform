@@ -10,5 +10,5 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DeviceIdDto {
-  private int id;
+    private int id;
 }

@@ -1,12 +1,25 @@
 package application.netty.library;
 
-import application.netty.library.annotation.*;
+import application.netty.library.annotation.Delete;
+import application.netty.library.annotation.Get;
+import application.netty.library.annotation.PathParam;
+import application.netty.library.annotation.Post;
+import application.netty.library.annotation.Put;
+import application.netty.library.annotation.QueryParam;
+import application.netty.library.annotation.RequestBody;
 import application.netty.library.exception.NumException;
 import application.netty.library.exception.ParamException;
 import application.netty.library.json.JsonParser;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpContent;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -101,36 +114,36 @@ public abstract class AbstractHttpMappingHandler extends ChannelInboundHandlerAd
                             RequestBody requestBodyAnnotation = parameter.getAnnotation(RequestBody.class);
 
                             if ((queryParamAnnotation != null && pathParamAnnotation != null)
-                                    || (queryParamAnnotation != null && requestBodyAnnotation != null)
-                                    || (pathParamAnnotation != null && requestBodyAnnotation != null)) {
+                                || (queryParamAnnotation != null && requestBodyAnnotation != null)
+                                || (pathParamAnnotation != null && requestBodyAnnotation != null)) {
                                 throw new ParamException(String.format(
-                                        "Multiple annotations for parameter '%s', path - '%s'",
-                                        parameter.getName(), path));
+                                    "Multiple annotations for parameter '%s', path - '%s'",
+                                    parameter.getName(), path));
                             }
 
                             if (queryParamAnnotation == null && pathParamAnnotation == null
-                                    && requestBodyAnnotation == null) {
+                                && requestBodyAnnotation == null) {
                                 throw new ParamException(String.format("No annotation for parameter '%s', path - '%s'",
-                                        parameter.getName(), path));
+                                    parameter.getName(), path));
                             }
 
                             if (requestBodyAnnotation != null) {
                                 if (parser == null) {
                                     throw new ParamException(String.format(
-                                            "Request body parameters cannot be used, it is necessary to initialize " +
-                                                    "the parser, param - '%s', path - '%s'", parameter.getName(),
-                                            path));
+                                        "Request body parameters cannot be used, it is necessary to initialize " +
+                                            "the parser, param - '%s', path - '%s'", parameter.getName(),
+                                        path));
                                 }
 
                                 if (!HttpMethod.POST.equals(httpMethod) && !HttpMethod.PUT.equals(httpMethod)) {
                                     throw new ParamException(String.format(
-                                            "Request body parameter is available only for post or put requests, " +
-                                                    "param - '%s', path - '%s'", parameter.getName(), path));
+                                        "Request body parameter is available only for post or put requests, " +
+                                            "param - '%s', path - '%s'", parameter.getName(), path));
                                 }
 
                                 if (isExistsRequestBody) {
                                     throw new ParamException(String.format(
-                                            "There can be only one request body parameter, path - '%s'", path));
+                                        "There can be only one request body parameter, path - '%s'", path));
                                 } else {
                                     isExistsRequestBody = true;
                                 }
@@ -151,8 +164,8 @@ public abstract class AbstractHttpMappingHandler extends ChannelInboundHandlerAd
 
                                 if (!pathParamNames.contains(name)) {
                                     throw new ParamException(String.format(
-                                            "Parameter '%s' not specified in the path - '%s'", parameter.getName(),
-                                            path));
+                                        "Parameter '%s' not specified in the path - '%s'", parameter.getName(),
+                                        path));
                                 }
 
                                 methodPathParamNames.add(name);
@@ -162,19 +175,19 @@ public abstract class AbstractHttpMappingHandler extends ChannelInboundHandlerAd
                             }
 
                             Class<?> type = PRIMITIVES_TO_WRAPPERS.get(parameter.getType()) != null ?
-                                    PRIMITIVES_TO_WRAPPERS.get(parameter.getType()) : parameter.getType();
+                                PRIMITIVES_TO_WRAPPERS.get(parameter.getType()) : parameter.getType();
                             params.add(new MethodParam(name, type, isRequired, typeParam));
                         }
 
                         for (String paramNames : pathParamNames) {
                             if (!methodPathParamNames.contains(paramNames)) {
                                 throw new ParamException(String.format(
-                                        "Path parameter '%s' is not specified, path - '%s'", paramNames, path));
+                                    "Path parameter '%s' is not specified, path - '%s'", paramNames, path));
                             }
                         }
 
                         handlers.add(new HttpMethodHandler(httpMethod, path, method,
-                                this, !params.isEmpty() ? params : null, pathParamNames));
+                            this, !params.isEmpty() ? params : null, pathParamNames));
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                     throw new NumException(e);
@@ -213,7 +226,7 @@ public abstract class AbstractHttpMappingHandler extends ChannelInboundHandlerAd
                         for (int i = 0; i < handler.getParams().size(); i++) {
                             if (handler.getParams().get(i).getTypeParam().equals(MethodParam.TypeParam.REQUEST_BODY)) {
                                 parameters[i] = parser.parse(handler.getPath(),
-                                        ((HttpContent) request).content(), handler.getParams().get(i).getType());
+                                    ((HttpContent) request).content(), handler.getParams().get(i).getType());
                                 continue;
                             }
 
@@ -223,7 +236,7 @@ public abstract class AbstractHttpMappingHandler extends ChannelInboundHandlerAd
                                 value = pathParamValues.get(handler.getParams().get(i).getName());
                             } else {
                                 List<String> values =
-                                        queryStringDecoder.parameters().get(handler.getParams().get(i).getName());
+                                    queryStringDecoder.parameters().get(handler.getParams().get(i).getName());
                                 value = values != null && !values.isEmpty() ? values.get(0) : null;
                             }
                             if (value != null && !value.isEmpty()) {
@@ -232,19 +245,19 @@ public abstract class AbstractHttpMappingHandler extends ChannelInboundHandlerAd
                                         parameters[i] = value;
                                     } else {
                                         Method valueOfMethod = handler.getParams().get(i).getType().getMethod("valueOf",
-                                                String.class);
+                                            String.class);
                                         parameters[i] = valueOfMethod.invoke(null, value);
                                     }
                                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                                     throw new ParamException(String.format(
-                                            "Error cast parameter '%s' with value '%s' to '%s, path - '%s'",
-                                            handler.getParams().get(i).getName(), value,
-                                            handler.getParams().get(i).getType(),
-                                            handler.getPath()));
+                                        "Error cast parameter '%s' with value '%s' to '%s, path - '%s'",
+                                        handler.getParams().get(i).getName(), value,
+                                        handler.getParams().get(i).getType(),
+                                        handler.getPath()));
                                 }
                             } else if (handler.getParams().get(i).isRequired()) {
                                 throw new ParamException(String.format("No required parameter '%s', path - '%s'",
-                                        handler.getParams().get(i).getName(), handler.getPath()));
+                                    handler.getParams().get(i).getName(), handler.getPath()));
                             }
                         }
                     }
