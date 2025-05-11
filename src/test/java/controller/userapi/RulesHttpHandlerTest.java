@@ -78,8 +78,8 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                                                     "login": "testUser ",
                                                     "deviceName": "testDevice",
                                                     "rule": "Temperature",
-                                                    "lowestValue": 10,
-                                                    "highestValue": 100
+                                                    "value": 10,
+                                                    "comparison": ">"
                                                 }
                                                 """
                                         )
@@ -91,7 +91,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                 );
 
         assertEquals(200, addRuleResponse.statusCode());
-        assertEquals("{\"rule\":\"Temperature\",\"lowestValue\":10,\"highestValue\":100,\"deviceName\":\"testDevice\"}", addRuleResponse.body());
+        assertEquals("{\"rule\":\"Temperature\",\"value\":10.0,\"comparison\":\">\",\"deviceName\":\"testDevice\"}", addRuleResponse.body());
 
         var rules = jdbcTemplate.queryForList("SELECT * FROM rules");
         assertEquals(1, rules.size());
@@ -100,7 +100,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
 
     @Test
     void deleteDeviceRule() throws IOException, InterruptedException {
-        jdbcTemplate.update("INSERT INTO rules (id, device_id, rule, lowest_value, highest_value) VALUES ('1', '1', 'testRule', 10, 100)");
+        jdbcTemplate.update("INSERT INTO rules (id, device_id, rule, value, comparison) VALUES ('1', '1', 'testRule', 10, '>')");
 
         HttpResponse<String> deleteRuleResponse = HttpClient.newHttpClient()
                 .send(
@@ -112,8 +112,8 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                                                     "login": "testUser ",
                                                     "deviceName": "testDevice",
                                                     "rule": "testRule",
-                                                    "lowestValue": 10,
-                                                    "highestValue": 100
+                                                    "value": 10,
+                                                    "comparison": ">"
                                                 }
                                                 """
                                         )
@@ -125,7 +125,7 @@ class RulesHttpHandlerTest extends BaseHttpHandlerTest {
                 );
 
         assertEquals(200, deleteRuleResponse.statusCode());
-        assertEquals("{\"rule\":\"testRule\",\"lowestValue\":10,\"highestValue\":100,\"deviceName\":\"testDevice\"}", deleteRuleResponse.body());
+        assertEquals("{\"rule\":\"testRule\",\"value\":10.0,\"comparison\":\">\",\"deviceName\":\"testDevice\"}", deleteRuleResponse.body());
 
         var rules = jdbcTemplate.queryForList("SELECT * FROM rules");
         assertEquals(0, rules.size());

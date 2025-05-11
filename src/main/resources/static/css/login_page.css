@@ -43,8 +43,9 @@ label {
     font-size: 26px;
     font-weight: 700;
     width: 602px;
-    height: 454px;
+    height: auto;
     border-radius: 40px;
+    padding-bottom: 20px;
 }
 
 .input_field {

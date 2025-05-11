@@ -58,7 +58,7 @@ label {
     background-color: #375D89;
     padding: 20px;
     border-radius: 40px;
-    width: 854px;
+    width: 998px;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -70,9 +70,10 @@ label {
     justify-content: center;
     background: #FFFFFF;
     border-radius: 20px 0 0 20px;
-    width: 563px;
+    width: 398px;
     height: 74px;
-    margin: 0 0 20px 0;
+    margin-right: 10px;
+    margin-bottom: 20px;
 }
 
 /* PLUS */
@@ -119,14 +120,14 @@ label {
     height: 74px;
     border: none;
     cursor: pointer;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
     background-color: white;
     position: relative;
     transition: background-color 0.3s ease, transform 0.3s ease-in-out;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .info::before {
@@ -142,7 +143,7 @@ label {
 .info::after {
     content: '';
     width: 7px;
-    height: 30px;
+    height: 25px;
     border-radius: 20px;
     background-color: #375D89;
     position: absolute;
@@ -157,37 +158,83 @@ label {
 
 /* SETTINGS */
 .settings {
-    background-image: url("../images/SETTINGS_ON_VIEW.svg");
+    background-image: url("../images/SETTINGS.svg");
     width: 125px;
     height: 74px;
-    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 43px 43px;
     transition: background-image 0.3s ease, transform 0.3s ease-in-out;
-    margin: 0 20px;
-    border: none;
-    cursor: pointer;
-    background-color: #375D89;
-}
-
-.settings:hover {
-    background-image: url("../images/SETTINGS_ON_CLICK.svg");
-}
-
-
-/* PROFILE */
-.profile {
-    background-image: url("../images/PROFILE_ON_VIEW.svg");
-    width: 62px;
-    height: 74px;
-    background-size: contain;
-    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    margin-left: 10px;
+    margin-right: 10px;
     border: none;
     cursor: pointer;
     background-color: white;
 }
 
+.settings:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
+}
+
+/* DELETE */
+.trash {
+    background-image: url("../images/TRASH.svg");
+    width: 125px;
+    height: 74px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 37px 43px;
+    border-radius: 0 20px 20px 0;
+    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+
+
+.trash:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
+}
+
+/* PROFILE */
+.profile {
+    background-image: url("../images/PROFILE1.svg");
+    width: 62px;
+    height: 74px;
+    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    border: none;
+    cursor: pointer;
+    border-radius: 30px;
+    background-color: white;
+}
+
 .profile:hover {
-    background-image: url("../images/PROFILE_ON_CLICK.svg");
-    transform: scale(0.95);
+    background-image: url("../images/PROFILE2.svg");
+}
+
+/* RULES */
+.rules {
+    background-image: url("../images/LIST.svg");
+    width: 125px;
+    height: 74px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 35px 25px;
+    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    margin-right: 10px;
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+
+
+.rules:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
 }
 
 .modal {
@@ -206,9 +253,9 @@ label {
 .modal-content {
     color: #FFFFFF;
     background-color: #375D89;
-    padding: 20px;
+    padding: 30px;
     border-radius: 40px;
-    width: 400px;
+    width: auto;
     height: auto;
     text-align: center;
     display: flex;
@@ -217,6 +264,7 @@ label {
     position: relative;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .modal-content h2 {
@@ -257,3 +305,81 @@ label {
 .confirm_addition:hover {
     color: #E2EDFA;
 }
+
+.rule-modal-content {
+    width: 440px;
+    height: auto;
+    border-radius: 50px;
+}
+
+.operator_field {
+    width: 100px;
+    height: 50px;
+    border: none;
+    font-size: 26px;
+    text-align: center;
+    color: black;
+    background-color: #FFFFFF;
+    margin-top: 10px;
+}
+
+.rule_field {
+    width: 200px;
+    height: 50px;
+    border-radius: 20px;
+    border: none;
+    font-size: 26px;
+    text-align: center;
+    color: black;
+    background-color: #FFFFFF;
+    margin-top: 10px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    gap: 10px;
+}
+
+.rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    width: 100%;
+    text-align: left;
+}
+
+.rules-list div {
+    background-color: #4A76A8;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 30px;
+    color: #fff;
+}
+
+.rule-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #4A76A8;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 30px;
+    color: #fff;
+}
+
+.delete-rule-btn {
+    font-size: 32px;
+    cursor: pointer;
+    margin-left: 12px;
+    color: #fff;
+    transition: color 0.3s ease-in-out;
+}
+
+.delete-rule-btn:hover {
+    color: #ff6b6b;
+}
+

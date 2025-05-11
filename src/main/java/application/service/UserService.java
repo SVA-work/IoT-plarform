@@ -19,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -28,6 +27,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final DeviceService deviceService;
+    private final RuleService ruleService;
 
     public UserResponse registration(@NotNull UserRequest request) {
         User user = buildUserRequest(request);
@@ -52,16 +52,7 @@ public class UserService {
     }
 
     public List<DeviceResponse> listOfDevicesOfUser(@NotNull UserRequest request) {
-        Optional<User> optionalUser = userRepository.findByLogin(request.getLogin());
-        User user;
-
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
-            log.info("Получен пользователь \"" + user.getLogin() + "\" из базы данных");
-        } else {
-            log.error("Пользователь \"" + request.getLogin() + "\" не найден в базе данных");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
-        }
+        User user = ruleService.getUserByLogin(request.getLogin());
 
         UserResponse userResponse = buildUserResponse(user);
         return userResponse.getDevices();

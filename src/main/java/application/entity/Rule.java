@@ -18,11 +18,11 @@ public class Rule {
     @Column(name = "rule", nullable = false)
     private String rule;
 
-    @Column(name = "lowest_value", nullable = false)
-    private Integer lowestValue;
+    @Column(name = "value", nullable = false)
+    private Double value;
 
-    @Column(name = "highest_value", nullable = false)
-    private Integer highestValue;
+    @Column(name = "comparison", nullable = false)
+    private String comparison;
 
     @ManyToOne
     @JoinColumn(name = "device_id", foreignKey = @ForeignKey(name = "fk_rules_device_id"))
