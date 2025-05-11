@@ -1,9 +1,83 @@
+let deleteCallback = null;
+
 function closeModal() {
     document.getElementById('modal').style.display = 'none';
 }
 
 function closeRuleModal() {
     document.getElementById('rule-modal').style.display = 'none';
+}
+
+function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
+    deleteCallback = null;
+}
+
+async function openRulesListModal(device) {
+    const login = localStorage.getItem('login');
+
+    try {
+        const response = await fetch(`http://localhost:8091/device/${login}/rules/${device.deviceName}`);
+        if (!response.ok) throw new Error('Ошибка при получении правил');
+
+        const rules = await response.json();
+        const rulesList = document.getElementById('rules-list');
+        rulesList.innerHTML = '';
+
+        if (rules.length === 0) {
+            rulesList.innerHTML = '<div>Правил не найдено</div>';
+        } else {
+            rules.forEach(rule => {
+                const ruleLine = `${rule.rule} ${rule.comparison} ${rule.value}`;
+
+                const ruleDiv = document.createElement('div');
+                ruleDiv.className = 'rule-entry';
+
+                const ruleText = document.createElement('span');
+                ruleText.innerText = ruleLine;
+
+                const deleteBtn = document.createElement('span');
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.className = 'delete-rule-btn';
+                deleteBtn.onclick = async () => {
+                    await deleteRule({ login, deviceName: device.deviceName, ...rule });
+                    await openRulesListModal(device);
+                };
+
+                ruleDiv.appendChild(ruleText);
+                ruleDiv.appendChild(deleteBtn);
+                rulesList.appendChild(ruleDiv);
+            });
+        }
+
+        document.getElementById('rules-list-modal').style.display = 'flex';
+    } catch (err) {
+        console.error(err);
+        alert('Не удалось получить правила устройства');
+    }
+}
+
+async function deleteRule(ruleData) {
+    try {
+        const response = await fetch('http://localhost:8091/rule/delete', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ...ruleData, updateRule: '' })
+        });
+
+        if (!response.ok) throw new Error('Ошибка при удалении');
+        console.log('Правило удалено');
+    } catch (error) {
+        console.error('Ошибка при удалении:', error);
+        alert('Не удалось удалить правило');
+    }
+}
+
+
+function closeRuleListModal() {
+    document.getElementById('rules-list-modal').style.display = 'none';
 }
 
 function getInputValue(id) {
@@ -16,6 +90,19 @@ function setInputValue(id, value, disabled = false) {
     el.disabled = disabled;
 }
 
+function openDeleteModal(callback) {
+    document.getElementById('delete-message').innerText = 'Вы уверены, что хотите удалить это устройство?';
+    document.getElementById('delete-modal').style.display = 'flex';
+    deleteCallback = callback;
+}
+
+function confirmDeletion() {
+    if (typeof deleteCallback === 'function') {
+        deleteCallback();
+    }
+    closeDeleteModal();
+}
+
 function openModal(device = null, editable = false) {
     const modal = document.getElementById('modal');
     modal.style.display = 'flex';
@@ -25,14 +112,12 @@ function openModal(device = null, editable = false) {
         setInputValue('device-uuid', device.uuid, !editable);
         setInputValue('device-type', device.type, !editable);
 
-        document.querySelector('h2').innerText = '';
-        document.querySelector('.confirm_addition').innerText = '';
+        document.querySelector('h2').innerText = 'Информация об устройстве';
+        document.getElementById('device-confirm').style.display = 'none';
     } else {
         ['device-name', 'device-uuid', 'device-type'].forEach(id => setInputValue(id, '', false));
-
-        const confirmBtn = document.getElementById('device-confirm');
-        confirmBtn.innerText = 'Добавить';
-        confirmBtn.onclick = saveDevice;
+        document.querySelector('h2').innerText = 'Добавьте новое устройство';
+        document.getElementById('device-confirm').style.display = 'block';
     }
 }
 
@@ -78,9 +163,10 @@ function createDeviceElement(device) {
     info.innerHTML = `<span>${device.deviceName}</span>`;
 
     const buttons = [
-        {class: 'settings', title: 'Настройки', handler: () => openRuleModal(device)},
-        {class: 'info', title: 'Инфо', handler: () => openModal(device, false)},
-        {class: 'trash', title: 'Удалить', handler: () => deleteDevice(device, item)}
+        {class: 'settings', title: 'Добавить правило', handler: () => openRuleModal(device)},
+        {class: 'rules', title: 'Посмотреть правила', handler: () => openRulesListModal(device)},
+        {class: 'info', title: 'Информация об устройстве', handler: () => openModal(device, false)},
+        {class: 'trash', title: 'Удалить устройство', handler: () => openDeleteModal(() => deleteDevice(device, item))}
     ];
 
     item.appendChild(info);
@@ -126,17 +212,17 @@ function openRuleModal(device) {
     const modal = document.getElementById('rule-modal');
     modal.style.display = 'flex';
 
-    const ruleInput = document.getElementById('rule');
+    const ruleSelect = document.getElementById('rule');
     const valueInput = document.getElementById('rule-value');
     const operatorSelect = document.getElementById('operator');
     const confirmButton = document.getElementById('rule-confirm');
 
-    ruleInput.value = '';
+    ruleSelect.value = 'Temperature';
     valueInput.value = '';
     operatorSelect.value = '=';
 
     confirmButton.onclick = async () => {
-        const rule = ruleInput.value.trim();
+        const rule = ruleSelect.value;
         const value = parseFloat(valueInput.value.trim());
         const comparison = operatorSelect.value;
         const login = localStorage.getItem('login');
