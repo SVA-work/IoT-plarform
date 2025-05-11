@@ -1,5 +1,6 @@
 package application.controller.userapi;
 
+import application.dto.DeviceIdDto;
 import application.dto.request.DeviceRequest;
 import application.dto.response.DeviceResponse;
 import application.dto.response.RuleResponse;
@@ -39,12 +40,11 @@ public class DevicesController {
         return deviceService.getDeviceRules(deviceRequest);
     }
 
-    @GetMapping("/{login}/{deviceName}/telemetry")
-    public List<RuleResponse> deviceTelemetry(@PathVariable String login, @PathVariable String deviceName) {
-        log.info("Получен запрос на получение телеметрии устройства");
+    @GetMapping("/{login}/{deviceName}")
+    public DeviceIdDto deviceId(@PathVariable String login, @PathVariable String deviceName) {
         DeviceRequest deviceRequest = new DeviceRequest();
-        deviceRequest.setLogin(login);
         deviceRequest.setDeviceName(deviceName);
-        return deviceService.getDeviceRules(deviceRequest);
+        deviceRequest.setLogin(login);
+        return deviceService.getDeviceId(deviceRequest);
     }
 }

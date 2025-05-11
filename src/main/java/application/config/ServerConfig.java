@@ -9,11 +9,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Configuration
 public class ServerConfig {
 
-    public static String BOT_TOKEN;
     public static int SERVER_TOKEN;
 
-    public ServerConfig(@Value("${bot.token}") String token, @Value("${server.port}") int port) {
-        BOT_TOKEN = token;
+    public ServerConfig(@Value("${server.port}") int port) {
         SERVER_TOKEN = 8092;
     }
 

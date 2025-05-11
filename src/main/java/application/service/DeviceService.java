@@ -1,20 +1,18 @@
 package application.service;
 
+import application.dto.DeviceIdDto;
 import application.dto.request.DeviceRequest;
 import application.dto.response.DeviceResponse;
 import application.dto.response.RuleResponse;
-import application.dto.response.TelemetryResponse;
 import application.entity.Device;
 import application.entity.Rule;
-import application.entity.Telemetry;
 import application.entity.User;
 import application.repository.DeviceRepository;
+import application.repository.UserRepository;
 
 import jakarta.validation.constraints.NotNull;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,7 +28,6 @@ public class DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final RuleService ruleService;
-    private final TelemetryService telemetryService;
 
     public DeviceResponse addDevice(DeviceRequest deviceRequest) {
         User user = ruleService.getUserByLogin(deviceRequest.getLogin());
