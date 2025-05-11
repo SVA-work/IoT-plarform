@@ -43,6 +43,7 @@ public class TelemetryService {
         return new String(decodedBytes, StandardCharsets.UTF_8);
     }
 
+    @Transactional
     public void reportProcessingAndSend(MicroclimateSensor message) throws JsonProcessingException {
         MicroclimateSensor infoAboutDevice = getMicroclimateSensorInfoPackage(message);
         infoAboutDevice.setUuid(message.getUuid());

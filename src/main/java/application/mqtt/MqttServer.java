@@ -1,14 +1,15 @@
 package application.mqtt;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -18,10 +19,16 @@ import javax.annotation.PreDestroy;
 public class MqttServer {
 
     private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
-    private final ChannelGroup channelGroup;
-    private final MqttServerInitializer mqttServerInitializer;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+    private final ChannelGroup channelGroup;
+    private final MqttServerInitializer mqttServerInitializer;
+
+    @Value("${mqtt.server.port}")
+    private int mqttPort;
+
+    @Value("${mqtt.server.backlog}")
+    private int backlog;
 
     public MqttServer(ChannelGroup channelGroup, MqttServerInitializer mqttServerInitializer) {
         this.channelGroup = channelGroup;
@@ -37,14 +44,14 @@ public class MqttServer {
             try {
                 ServerBootstrap bootstrap = new ServerBootstrap();
                 bootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(mqttServerInitializer)
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+                        .channel(NioServerSocketChannel.class)
+                        .childHandler(mqttServerInitializer)
+                        .option(ChannelOption.SO_BACKLOG, backlog)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-                Channel channel = bootstrap.bind(1884).sync().channel();
+                Channel channel = bootstrap.bind(mqttPort).sync().channel();
                 channelGroup.add(channel);
-                logger.info("MQTT сервер стартовал на сервере 1884");
+                logger.info("MQTT сервер стартовал на порту {}", mqttPort);
                 channel.closeFuture().sync();
             } catch (InterruptedException e) {
                 logger.error("Старт MQTT сервера прерван", e);
