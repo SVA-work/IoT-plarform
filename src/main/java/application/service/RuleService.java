@@ -65,7 +65,7 @@ public class RuleService {
 
     private Rule getRuleForDevice(RuleRequest ruleRequest, Device device) {
         Optional<Rule> optionalRule = ruleRepository.findByRuleAndValueAndComparisonAndDevice(ruleRequest.getRule(), ruleRequest.getValue(), ruleRequest.getComparison(), device);
-        if (!optionalRule.isPresent()) {
+        if (optionalRule.isEmpty()) {
             log.error("У устройства \"{}\" отсутствует правило \"{}\"", device.getDeviceName(), ruleRequest.getRule());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Правило с таким названием не найдено");
         }
@@ -74,7 +74,7 @@ public class RuleService {
 
     public User getUserByLogin(String login) {
         Optional<User> optionalUser = userRepository.findByLogin(login);
-        if (!optionalUser.isPresent()) {
+        if (optionalUser.isEmpty()) {
             log.error("Пользователь \"{}\" не найден в базе данных", login);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         } else {
@@ -85,7 +85,7 @@ public class RuleService {
 
     public Device getDeviceByUserAndName(User user, String deviceName) {
         Optional<Device> optionalDevice = deviceRepository.findByDeviceNameAndUserId(deviceName, user.getId());
-        if (!optionalDevice.isPresent()) {
+        if (optionalDevice.isEmpty()) {
             log.error("Устройство \"{}\" не найдено в базе данных", deviceName);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Устройство с таким названием не найдено");
         }

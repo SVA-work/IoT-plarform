@@ -3,18 +3,13 @@ package application.service;
 import application.dto.request.DeviceRequest;
 import application.dto.response.DeviceResponse;
 import application.dto.response.RuleResponse;
-import application.dto.response.TelemetryResponse;
 import application.entity.Device;
 import application.entity.Rule;
-import application.entity.Telemetry;
 import application.entity.User;
 import application.repository.DeviceRepository;
-
 import jakarta.validation.constraints.NotNull;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,7 +25,6 @@ public class DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final RuleService ruleService;
-    private final TelemetryService telemetryService;
 
     public DeviceResponse addDevice(DeviceRequest deviceRequest) {
         User user = ruleService.getUserByLogin(deviceRequest.getLogin());
@@ -71,21 +65,6 @@ public class DeviceService {
 
         DeviceResponse deviceResponse = buildDeviceResponse(device);
         return deviceResponse.getRules();
-    }
-
-    public List<TelemetryResponse> getDeviceTelemetry(DeviceRequest deviceRequest) {
-        User user = ruleService.getUserByLogin(deviceRequest.getLogin());
-
-        Device device = ruleService.getDeviceByUserAndName(user, deviceRequest.getDeviceName());
-
-        List<TelemetryResponse> telemetryResponse = new ArrayList<>();
-        List<Telemetry> telemetryy = device.getTelemetry();
-        if (telemetryy != null) {
-            for (Telemetry telemetry : telemetryy) {
-                telemetryResponse.add(telemetryService.buildTelemetryResponse(telemetry));
-            }
-        }
-        return telemetryResponse;
     }
 
     public DeviceResponse buildDeviceResponse(@NotNull Device device) {
