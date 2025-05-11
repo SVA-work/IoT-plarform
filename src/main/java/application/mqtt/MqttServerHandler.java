@@ -49,7 +49,7 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<MqttMessage> 
                 handleConnect(ctx, (MqttConnectMessage) msg);
                 break;
             case SUBSCRIBE:
-                handleSubscribe(ctx, (MqttSubscribeMessage) msg);
+                logger.info("Получен запрос на подписку", msg.fixedHeader().messageType());
                 break;
             case PUBLISH:
                 handlePublish(ctx, (MqttPublishMessage) msg);
@@ -75,23 +75,6 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<MqttMessage> 
         );
         ctx.writeAndFlush(connAckMessage);
         logger.info("Соединение успешно установлено");
-    }
-
-    private void handleSubscribe(ChannelHandlerContext ctx, MqttSubscribeMessage msg) {
-        logger.info("Получен запрос на подписку");
-
-        for (MqttTopicSubscription subscription : msg.payload().topicSubscriptions()) {
-            String topic = subscription.topicName();
-            logger.info("Клиент подписался на тему: {}", topic);
-        }
-
-        MqttSubAckMessage subAckMessage = new MqttSubAckMessage(
-                new MqttFixedHeader(MqttMessageType.SUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-                MqttMessageIdVariableHeader.from(msg.variableHeader().messageId()),
-                new MqttSubAckPayload(MqttQoS.AT_MOST_ONCE.value())
-        );
-        ctx.writeAndFlush(subAckMessage);
-        logger.info("Успешное подключение к подписке");
     }
 
     private void handlePublish(ChannelHandlerContext ctx, MqttPublishMessage msg) {

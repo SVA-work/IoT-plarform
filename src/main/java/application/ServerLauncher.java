@@ -19,6 +19,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -39,6 +40,15 @@ public class ServerLauncher {
     private final TelemetryService telemetryService;
     private final MeterRegistry meterRegistry;
 
+    @Value("${http.server.port}")
+    private int httpPort;
+
+    @Value("${http.server.max-content-length}")
+    private int maxContentLength;
+
+    @Value("${http.server.backlog}")
+    private int backlog;
+
     @Bean
     public Channel serverBootstrap() {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -58,18 +68,18 @@ public class ServerLauncher {
                     channel.pipeline()
                         .addLast("HttpServerCodec", new HttpServerCodec())
                         .addLast("HttpServerKeepAlive", new HttpServerKeepAliveHandler())
-                        .addLast("HttpObjectAggregator", new HttpObjectAggregator(10 * 1024 * 102, true))
+                        .addLast("HttpObjectAggregator", new HttpObjectAggregator(maxContentLength, true))
                         .addLast("HttpChunkedWrite", new ChunkedWriteHandler())
                         .addLast("User HttpHandler", telemetryHttpController);
                 }
             })
-            .option(ChannelOption.SO_BACKLOG, 128)
+            .option(ChannelOption.SO_BACKLOG, backlog)
             .childOption(ChannelOption.SO_KEEPALIVE, true);
 
         new Thread(() -> {
             try {
-                ChannelFuture future = boot.bind(8083).sync();
-                log.info("Netty server started on port 8083");
+                ChannelFuture future = boot.bind(httpPort).sync();
+                log.info("Netty server started on port {}", httpPort);
                 future.channel().closeFuture().sync();
             } catch (InterruptedException e) {
                 log.error("Netty failed to start", e);

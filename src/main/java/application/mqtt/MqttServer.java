@@ -5,8 +5,11 @@ import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +23,12 @@ public class MqttServer {
     private EventLoopGroup workerGroup;
     private final ChannelGroup channelGroup;
     private final MqttServerInitializer mqttServerInitializer;
+
+    @Value("${mqtt.server.port}")
+    private int mqttPort;
+
+    @Value("${mqtt.server.backlog}")
+    private int backlog;
 
     public MqttServer(ChannelGroup channelGroup, MqttServerInitializer mqttServerInitializer) {
         this.channelGroup = channelGroup;
@@ -37,12 +46,12 @@ public class MqttServer {
                 bootstrap.group(bossGroup, workerGroup)
                         .channel(NioServerSocketChannel.class)
                         .childHandler(mqttServerInitializer)
-                        .option(ChannelOption.SO_BACKLOG, 128)
+                        .option(ChannelOption.SO_BACKLOG, backlog)
                         .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-                Channel channel = bootstrap.bind(1884).sync().channel();
+                Channel channel = bootstrap.bind(mqttPort).sync().channel();
                 channelGroup.add(channel);
-                logger.info("MQTT сервер стартовал на сервере 1884");
+                logger.info("MQTT сервер стартовал на порту {}", mqttPort);
                 channel.closeFuture().sync();
             } catch (InterruptedException e) {
                 logger.error("Старт MQTT сервера прерван", e);
