@@ -104,11 +104,11 @@ public class TelemetryService {
         }
         if (deviceTemperature > value && (compare.equals("<") || compare.equals("="))) {
             log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
-            iotServiceBot.sendHighTempNotification(token, device.getUuid(), device.getType(), parts[2]);
+            iotServiceBot.sendHighTempNotification(token, device.getUuid(), device.getType(), parts[1]);
         }
         if (deviceTemperature == value && (compare.equals("!="))) {
             log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
-            iotServiceBot.sendForbiddenValueTempNotification(token, device.getUuid(), device.getType(), parts[2]);
+            iotServiceBot.sendForbiddenValueTempNotification(token, device.getUuid(), device.getType(), parts[1]);
         }
     }
 
