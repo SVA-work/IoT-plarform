@@ -1,152 +1,137 @@
 package controller.userapi;
 
-import config.ServerConfig;
+import application.ServerLauncher;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class RulesHttpHandlerTest extends BaseHttpHandlerTest {
+@Slf4j
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = ServerLauncher.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Testcontainers
+class RulesHttpHandlerTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Container
+    public static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:13");
+
+    static {
+        POSTGRES.start();
+    }
+
+    @DynamicPropertySource
+    static void configureDataSource(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES::getUsername);
+        registry.add("spring.datasource.password", POSTGRES::getPassword);
+    }
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void beforeEach() {
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate("DELETE FROM rules");
-            statement.executeUpdate("DELETE FROM devices");
-            statement.executeUpdate("insert into devices (device_id, user_id, uuid, type) VALUES ('0', '0', 'testDevice', 'temp')");
-            statement.executeUpdate("DELETE FROM users");
-            statement.executeUpdate("insert into users (user_id, login, password) VALUES ('0', 'testUser', '123')");
-        } catch (SQLException e) {
-            LOG.error("Соединение не удалось", e);
+            jdbcTemplate.update("DELETE FROM rules");
+            jdbcTemplate.update("DELETE FROM devices");
+            jdbcTemplate.update("DELETE FROM users");
+            jdbcTemplate.update("INSERT INTO users (id, login, password) VALUES ('1', 'testUser ', '123')");
+            jdbcTemplate.update("INSERT INTO devices (id, user_id, device_name, type, uuid) VALUES ('1', '1', 'testDevice', 'temp', '55')");
+        } catch (Exception e) {
+            log.error("Соединение не удалось", e);
         }
-    }
-
-    @Test
-    void deviceRulesEmpty() throws IOException, InterruptedException {
-        HttpResponse<String> getRuleResponse = HttpClient.newHttpClient()
-                .send(HttpRequest.newBuilder()
-                                .GET()
-                                .uri(URI.create(ServerConfig.LINK_DEVICE_RULES + "?login=testUser&uuid=testDevice"))
-                                .build(),
-                        HttpResponse.BodyHandlers.ofString(UTF_8)
-                );
-        assertEquals(200, getRuleResponse.statusCode());
-
-        String responseText = getRuleResponse.body();
-        assertEquals("У данного устройства нет правил.", responseText);
-    }
-
-    @Test
-    void deviceRules() throws IOException, InterruptedException {
-        String sqlCreateUserInfo = "insert into rules (rule_id, device_id, rule) VALUES ('0', '0', 'testRule')";
-        try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(sqlCreateUserInfo);
-        } catch (SQLException e) {
-            LOG.error("Соединение не удалось", e);
-        }
-        HttpResponse<String> getDeviceResponse = HttpClient.newHttpClient()
-                .send(HttpRequest.newBuilder()
-                                .GET()
-                                .uri(URI.create(ServerConfig.LINK_DEVICE_RULES + "?login=testUser&uuid=testDevice"))
-                                .build(),
-                        HttpResponse.BodyHandlers.ofString(UTF_8)
-                );
-        assertEquals(200, getDeviceResponse.statusCode());
-
-        String responseText = getDeviceResponse.body();
-        assertEquals("testRule", responseText);
     }
 
     @Test
     void applyRule() throws IOException, InterruptedException {
         HttpResponse<String> addRuleResponse = HttpClient.newHttpClient()
-                .send(
-                        HttpRequest.newBuilder()
-                                .POST(
-                                        HttpRequest.BodyPublishers.ofString(
-                                                """
-                                                            {
-                                                              "login": "testUser",
-                                                              "uuid": "testDevice",
-                                                              "rule": "Temperature/1/2"
-                                                            }
-                                                        """
-                                        )
-                                )
-                                .uri(URI.create(ServerConfig.LINK_APPLY_RULE))
-                                .build(),
-                        HttpResponse.BodyHandlers.ofString(UTF_8)
-                );
+            .send(
+                HttpRequest.newBuilder()
+                    .POST(
+                        HttpRequest.BodyPublishers.ofString(
+                            """
+                                {
+                                    "login": "testUser ",
+                                    "deviceName": "testDevice",
+                                    "rule": "Temperature",
+                                    "value": 10,
+                                    "comparison": ">"
+                                }
+                                """
+                        )
+                    )
+                    .uri(URI.create("http://localhost:" + port + "/rule/apply"))
+                    .header("Content-Type", "application/json")
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(UTF_8)
+            );
+
         assertEquals(200, addRuleResponse.statusCode());
+        assertEquals("{\"rule\":\"Temperature\",\"value\":10.0,\"comparison\":\">\",\"deviceName\":\"testDevice\"}", addRuleResponse.body());
 
-        String responseText = addRuleResponse.body();
-        assertEquals("Правила успешно добавлены.", responseText);
-
-        String sqlGetUserInfo = "Select * FROM rules";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlGetUserInfo);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                assertEquals("Temperature/1/2", resultSet.getString("rule"));
-            }
-        } catch (SQLException e) {
-            LOG.error("Соединение не удалось", e);
-        }
+        var rules = jdbcTemplate.queryForList("SELECT * FROM rules");
+        assertEquals(1, rules.size());
+        assertEquals("Temperature", rules.get(0).get("rule"));
     }
 
     @Test
     void deleteDeviceRule() throws IOException, InterruptedException {
-        String sqlCreateUserInfo = "insert into rules (rule_id, device_id, rule) VALUES ('0', '0', 'testRule/1/2')";
-        try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(sqlCreateUserInfo);
-        } catch (SQLException e) {
-            LOG.error("Соединение не удалось", e);
-        }
-        HttpResponse<String> deleteDeviceResponse = HttpClient.newHttpClient()
-                .send(
-                        HttpRequest.newBuilder()
-                                .POST(
-                                        HttpRequest.BodyPublishers.ofString(
-                                                """
-                                                            {
-                                                              "login": "testUser",
-                                                              "uuid": "testDevice",
-                                                              "rule": "testRule/1/2"
-                                                            }
-                                                        """
-                                        )
-                                )
-                                .uri(URI.create(ServerConfig.LINK_DELETE_DEVICE_RULE))
-                                .build(),
-                        HttpResponse.BodyHandlers.ofString(UTF_8)
-                );
-        assertEquals(200, deleteDeviceResponse.statusCode());
+        jdbcTemplate.update("INSERT INTO rules (id, device_id, rule, value, comparison) VALUES ('1', '1', 'testRule', 10, '>')");
 
-        String responseText = deleteDeviceResponse.body();
-        assertEquals("Правило успешно удалено.", responseText);
+        HttpResponse<String> deleteRuleResponse = HttpClient.newHttpClient()
+            .send(
+                HttpRequest.newBuilder()
+                    .method("DELETE",
+                        HttpRequest.BodyPublishers.ofString(
+                            """
+                                {
+                                    "login": "testUser ",
+                                    "deviceName": "testDevice",
+                                    "rule": "testRule",
+                                    "value": 10,
+                                    "comparison": ">"
+                                }
+                                """
+                        )
+                    )
+                    .uri(URI.create("http://localhost:" + port + "/rule/delete"))
+                    .header("Content-Type", "application/json")
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(UTF_8)
+            );
 
-        String sqlGetUserInfo = "Select * FROM rules";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlGetUserInfo);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            assertFalse(resultSet.next());
-        } catch (SQLException e) {
-            LOG.error("Соединение не удалось", e);
-        }
+        assertEquals(200, deleteRuleResponse.statusCode());
+        assertEquals("{\"rule\":\"testRule\",\"value\":10.0,\"comparison\":\">\",\"deviceName\":\"testDevice\"}", deleteRuleResponse.body());
+
+        var rules = jdbcTemplate.queryForList("SELECT * FROM rules");
+        assertEquals(0, rules.size());
+    }
+
+    @AfterAll
+    static void stopContainer() {
+        POSTGRES.stop();
     }
 }

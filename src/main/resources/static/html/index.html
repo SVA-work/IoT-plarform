@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<link href="https://fonts.googleapis.com/css2?family=Ysabeau+Infant:wght@700&display=swap" rel="stylesheet">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UpHome - управление умным домом</title>
+    <link rel="stylesheet" href="../css/main_page.css">
+</head>
+<body onload="preloadDevices()">
+
+<header>
+    <button class="logo" onclick=""></button>
+    <span class="site-name">UpHome</span>
+    <button class="profile" onclick="location.href='login_page.html'"></button>
+</header>
+
+<main>
+    <div class="device-list">
+        <div id="list">
+        </div>
+        <button class="add-button" onclick="openModal()"></button>
+    </div>
+</main>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2></h2>
+
+        <label for="device-name">Название устройства:</label>
+        <input type="text" id="device-name" class="input_field" placeholder="">
+
+        <label for="device-uuid">UUID устройства:</label>
+        <input type="text" id="device-uuid" class="input_field" placeholder="">
+
+        <label for="device-type">Тип устройства:</label>
+        <input type="text" id="device-type" class="input_field" placeholder="">
+
+        <button id="device-confirm" class="confirm_addition" onclick="saveDevice()">Добавить</button>
+    </div>
+</div>
+
+<div id="rule-modal" class="modal">
+    <div class="modal-content rule-modal-content">
+        <span class="close" onclick="closeRuleModal()">&times;</span>
+        <h2>Добавьте новое правило для устройства</h2>
+
+        <label for="rule">Выберите правило:</label>
+        <select id="rule" class="rule_field">
+            <option value="Temperature">Temperature</option>
+        </select>
+
+        <label for="operator">Выберите оператор:</label>
+        <select id="operator" class="operator_field">
+            <option value="=">=</option>
+            <option value="!=">≠</option>
+            <option value="<=">≤</option>
+            <option value=">=">≥</option>
+            <option value="<"><</option>
+            <option value=">">></option>
+        </select>
+        <label for="rule-value">Введите значение:</label>
+        <input type="text" id="rule-value" class="input_field" placeholder="">
+
+        <button id="rule-confirm" class="confirm_addition">Добавить</button>
+    </div>
+</div>
+
+<div id="delete-modal" class="modal">
+    <div class="modal-content">
+        <h2 id="delete-message"></h2>
+        <div class="modal-buttons">
+            <button class="confirm_addition" onclick="confirmDeletion()">Удалить</button>
+            <button class="confirm_addition" onclick="closeDeleteModal()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<div id="rules-list-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeRuleListModal()">&times;</span>
+        <h2>Правила устройства</h2>
+        <div id="rules-list" class="rules-list">
+        </div>
+    </div>
+</div>
+
+<script src="../js/script.js"></script>
+</body>
+</html>

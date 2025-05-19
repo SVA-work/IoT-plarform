@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<link href="https://fonts.googleapis.com/css2?family=Ysabeau+Infant:wght@700&display=swap" rel="stylesheet">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in</title>
+    <link rel="stylesheet" href="../css/login_page.css">
+</head>
+<body>
+
+<header>
+    <button class="logo" onclick="location.href='home.html'"></button>
+</header>
+
+<main>
+    <div class="login_window">
+        <label for="login">Логин</label>
+        <input type="text" id="login" class="input_field" placeholder="">
+
+        <label for="password">Пароль</label>
+        <input type="password" id="password" class="input_field" placeholder="">
+
+        <button class="login_button" onclick="signUpUser()">Вход</button>
+    </div>
+    <button class="no_account-button" onclick="location.href='registration_page.html'">Еще нет аккаунта?</button>
+</main>
+
+<script src="../js/login.js"></script>
+</body>
+</html>

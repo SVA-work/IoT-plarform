@@ -1,0 +1,385 @@
+body {
+    font-family: "Ysabeau Infant", sans serif;
+    background: url("../images/BACKGROUND.svg");
+    text-align: center;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 181px 0 95px 0;
+}
+
+main {
+    font-family: "Ysabeau Infant", sans serif;
+    color: #375D89;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 40px;
+}
+
+input {
+    font-size: 26px;
+}
+
+label {
+    font-size: 26px;
+}
+
+
+.logo {
+    background-image: url("../images/LOGO.svg");
+    width: 65px;
+    height: 74px;
+    border: none;
+    cursor: pointer;
+    background-size: contain;
+    background-color: #FFFFFF;
+}
+
+.site-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #375D89;
+    font-size: 30px;
+    font-weight: bold;
+    color: #FFFFFF;
+    width: 272px;
+    height: 74px;
+    border-radius: 20px;
+    margin: 0 40px 0 40px;
+}
+
+.device-list {
+    background-color: #375D89;
+    padding: 20px;
+    border-radius: 40px;
+    width: 998px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.device {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border-radius: 20px 0 0 20px;
+    width: 398px;
+    height: 74px;
+    margin-right: 10px;
+    margin-bottom: 20px;
+}
+
+/* PLUS */
+.add-button {
+    width: 126px;
+    height: 74px;
+    border: none;
+    cursor: pointer;
+    border-radius: 20px;
+    background-color: white;
+    position: relative;
+    transition: background-color 0.3s ease, transform 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-button::before {
+    content: '';
+    width: 36px;
+    height: 7px;
+    border-radius: 20px;
+    background-color: #375D89;
+    position: absolute;
+}
+
+.add-button::after {
+    content: '';
+    width: 7px;
+    height: 36px;
+    border-radius: 20px;
+    background-color: #375D89;
+    position: absolute;
+}
+
+.add-button:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
+}
+
+/* INFO */
+.info {
+    width: 125px;
+    height: 74px;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+    position: relative;
+    transition: background-color 0.3s ease, transform 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.info::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #375D89;
+    position: absolute;
+    top: 17px;
+}
+
+.info::after {
+    content: '';
+    width: 7px;
+    height: 25px;
+    border-radius: 20px;
+    background-color: #375D89;
+    position: absolute;
+    top: 30px;
+}
+
+.info:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
+}
+
+
+/* SETTINGS */
+.settings {
+    background-image: url("../images/SETTINGS.svg");
+    width: 125px;
+    height: 74px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 43px 43px;
+    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+
+.settings:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
+}
+
+/* DELETE */
+.trash {
+    background-image: url("../images/TRASH.svg");
+    width: 125px;
+    height: 74px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 37px 43px;
+    border-radius: 0 20px 20px 0;
+    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+
+
+.trash:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
+}
+
+/* PROFILE */
+.profile {
+    background-image: url("../images/PROFILE1.svg");
+    width: 62px;
+    height: 74px;
+    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    border: none;
+    cursor: pointer;
+    border-radius: 30px;
+    background-color: white;
+}
+
+.profile:hover {
+    background-image: url("../images/PROFILE2.svg");
+}
+
+/* RULES */
+.rules {
+    background-image: url("../images/LIST.svg");
+    width: 125px;
+    height: 74px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 35px 25px;
+    transition: background-image 0.3s ease, transform 0.3s ease-in-out;
+    margin-right: 10px;
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+
+
+.rules:hover {
+    background-color: #E2EDFA;
+    transform: scale(0.98);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    color: #FFFFFF;
+    background-color: #375D89;
+    padding: 30px;
+    border-radius: 40px;
+    width: auto;
+    height: auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.input_field {
+    width: 400px;
+    height: 50px;
+    border-radius: 20px;
+    border: none;
+    font-size: 26px;
+    color: black;
+    text-align: center;
+}
+
+.confirm_addition {
+    font-family: "Ysabeau Infant", sans-serif;
+    font-weight: bold;
+    font-size: 26px;
+    text-decoration: underline;
+    color: #FFFFFF;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.3s ease, transform 0.3s ease-in-out;
+}
+
+.confirm_addition:hover {
+    color: #E2EDFA;
+}
+
+.rule-modal-content {
+    width: 440px;
+    height: auto;
+    border-radius: 50px;
+}
+
+.operator_field {
+    width: 100px;
+    height: 50px;
+    border: none;
+    font-size: 26px;
+    text-align: center;
+    color: black;
+    background-color: #FFFFFF;
+    margin-top: 10px;
+}
+
+.rule_field {
+    width: 200px;
+    height: 50px;
+    border-radius: 20px;
+    border: none;
+    font-size: 26px;
+    text-align: center;
+    color: black;
+    background-color: #FFFFFF;
+    margin-top: 10px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    gap: 10px;
+}
+
+.rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    width: 100%;
+    text-align: left;
+}
+
+.rules-list div {
+    background-color: #4A76A8;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 30px;
+    color: #fff;
+}
+
+.rule-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #4A76A8;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 30px;
+    color: #fff;
+}
+
+.delete-rule-btn {
+    font-size: 32px;
+    cursor: pointer;
+    margin-left: 12px;
+    color: #fff;
+    transition: color 0.3s ease-in-out;
+}
+
+.delete-rule-btn:hover {
+    color: #ff6b6b;
+}
+
