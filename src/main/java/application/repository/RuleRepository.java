@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface RuleRepository extends JpaRepository<Rule, Integer> {
 
-    Optional<Rule> findByRuleAndValueAndComparisonAndDevice(
+    Optional<Rule> findByRuleTypeAndValueAndComparisonAndDevice(
         String rule,
         Double value,
         String comparison,

@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +25,7 @@ public class DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final UserService userService;
-    private final RuleService ruleService;
+    private final BuildService buildService;
 
     public DeviceResponse addDevice(DeviceRequest deviceRequest) {
         User user = userService.getUserByLogin(deviceRequest.getLogin());
@@ -47,14 +46,14 @@ public class DeviceService {
 
         Device device = buildDeviceRequest(deviceRequest, user);
         deviceRepository.save(device);
-        return buildDeviceResponse(device);
+        return buildService.buildDeviceResponse(device);
     }
 
     public DeviceResponse deleteDevice(DeviceRequest deviceRequest) {
         User user = userService.getUserByLogin(deviceRequest.getLogin());
         Device device = getDeviceByUserAndName(user, deviceRequest.getDeviceName());
 
-        DeviceResponse deviceResponse = buildDeviceResponse(device);
+        DeviceResponse deviceResponse = buildService.buildDeviceResponse(device);
         deviceRepository.delete(device);
         return deviceResponse;
     }
@@ -63,7 +62,7 @@ public class DeviceService {
         User user = userService.getUserByLogin(deviceRequest.getLogin());
         Device device = getDeviceByUserAndName(user, deviceRequest.getDeviceName());
 
-        DeviceResponse deviceResponse = buildDeviceResponse(device);
+        DeviceResponse deviceResponse = buildService.buildDeviceResponse(device);
         return deviceResponse.getRules();
     }
 
@@ -87,26 +86,6 @@ public class DeviceService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Устройство принадлежит не этому пользователю");
         }
         return device;
-    }
-
-    public DeviceResponse buildDeviceResponse(@NotNull Device device) {
-        DeviceResponse deviceResponse = new DeviceResponse();
-        deviceResponse.setUuid(device.getUuid());
-        deviceResponse.setType(device.getType());
-        deviceResponse.setDeviceName(device.getDeviceName());
-        deviceResponse.setLogin(device.getUser().getLogin());
-
-        List<RuleResponse> rulesResponse = new ArrayList<>();
-        List<Rule> rules = device.getRules();
-
-        if (rules != null) {
-            for (Rule rule : rules) {
-                rulesResponse.add(ruleService.buildRuleResponse(rule));
-            }
-        }
-        deviceResponse.setRules(rulesResponse);
-
-        return deviceResponse;
     }
 
     private Device buildDeviceRequest(@NotNull DeviceRequest request, User user) {

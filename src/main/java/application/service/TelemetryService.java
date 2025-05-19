@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -99,11 +100,11 @@ public class TelemetryService {
         }
         if (deviceTemperature > value && (compare.equals("<") || compare.equals("="))) {
             log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
-            saveNotification(NotificationCommand.HIGH_TEMPERATURE, token, device.getUuid(), device.getType(), parts[2]);
+            saveNotification(NotificationCommand.HIGH_TEMPERATURE, token, device.getUuid(), device.getType(), parts[1]);
         }
         if (deviceTemperature == value && (compare.equals("!="))) {
             log.info("Правило температуры сработало для устройства \"" + device.getUuid() + "\"");
-            saveNotification(NotificationCommand.EQUAL_TEMPERATURE, token, device.getUuid(), device.getType(), parts[2]);
+            saveNotification(NotificationCommand.EQUAL_TEMPERATURE, token, device.getUuid(), device.getType(), parts[1]);
         }
     }
 

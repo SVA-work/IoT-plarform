@@ -24,14 +24,14 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final DeviceService deviceService;
+    private final BuildService buildService;
 
     public UserResponse registration(@NotNull UserRequest request) {
         User user = buildUserRequest(request);
         if (!checkUserExistence(user)) {
             userRepository.save(user);
             log.info("Пользователь \"" + request.getLogin() + "\" сохранен");
-            return buildUserResponse(user);
+            return buildService.buildUserResponse(user);
         } else {
             log.error("Пользователь \"" + request.getLogin() + "\" уже существует в базе данных");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Пользователь уже существует");
@@ -41,7 +41,7 @@ public class UserService {
     public UserResponse entry(@NotNull UserRequest request) {
         User user = buildUserRequest(request);
         if (checkUserExistence(user)) {
-            return buildUserResponse(user);
+            return buildService.buildUserResponse(user);
         } else {
             log.error("Пользователь \"" + request.getLogin() + "\" не найден в базе данных");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
@@ -51,7 +51,7 @@ public class UserService {
     public List<DeviceResponse> listOfDevicesOfUser(@NotNull UserRequest request) {
         User user = getUserByLogin(request.getLogin());
 
-        UserResponse userResponse = buildUserResponse(user);
+        UserResponse userResponse = buildService.buildUserResponse(user);
         return userResponse.getDevices();
     }
 
@@ -64,24 +64,6 @@ public class UserService {
             log.info("Получен пользователь \"{}\" из базы данных", login);
         }
         return optionalUser.get();
-    }
-
-    private UserResponse buildUserResponse(@NotNull User user) {
-        UserResponse userResponse = new UserResponse();
-        userResponse.setLogin(user.getLogin());
-        userResponse.setPassword(user.getPassword());
-        userResponse.setTelegramToken(user.getTelegramToken().getToken());
-
-        List<DeviceResponse> devicesResponse = new ArrayList<>();
-        List<Device> devices = user.getDevices();
-
-        if (devices != null) {
-            for (Device device : devices) {
-                devicesResponse.add(deviceService.buildDeviceResponse(device));
-            }
-        }
-        userResponse.setDevices(devicesResponse);
-        return userResponse;
     }
 
     private User buildUserRequest(@NotNull UserRequest request) {
