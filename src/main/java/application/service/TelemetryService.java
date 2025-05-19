@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -112,7 +111,7 @@ public class TelemetryService {
         NotificationDto notificationDto = new NotificationDto(token, deviceUuid, deviceType, value);
 
         SendNotificationDto sendNotificationDto =
-            new SendNotificationDto(command, notificationDto);
+                new SendNotificationDto(command, notificationDto);
 
         kafkaProducerService.sendNotification(sendNotificationDto);
     }
@@ -123,7 +122,7 @@ public class TelemetryService {
         telemetry.setDeviceId(device.getId().toString());
 
         SaveTelemetryDto saveTelemetryDto =
-            new SaveTelemetryDto(TelemetryCommand.WRITE_TELEMETRY, telemetry);
+                new SaveTelemetryDto(TelemetryCommand.WRITE_TELEMETRY, telemetry);
 
         kafkaProducerService.sendMessageWriteTelemetry(saveTelemetryDto);
     }

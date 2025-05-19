@@ -3,7 +3,6 @@ package application.service;
 import application.dto.request.UserRequest;
 import application.dto.response.DeviceResponse;
 import application.dto.response.UserResponse;
-import application.entity.Device;
 import application.entity.TelegramToken;
 import application.entity.User;
 import application.repository.UserRepository;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

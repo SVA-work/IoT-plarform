@@ -22,7 +22,8 @@ public class TelemetryHttpController extends AbstractHttpMappingHandler {
     @Autowired
     private final TelemetryService telemetryService;
 
-    public TelemetryHttpController(JsonParserDefault parser, TelemetryService telemetryService) {
+    public TelemetryHttpController(JsonParserDefault parser,
+                                   TelemetryService telemetryService) {
         super(parser);
         this.telemetryService = telemetryService;
     }
@@ -33,14 +34,14 @@ public class TelemetryHttpController extends AbstractHttpMappingHandler {
         try {
             telemetryService.reportProcessingAndSend(message);
             return new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1,
-                HttpResponseStatus.OK
+                    HttpVersion.HTTP_1_1,
+                    HttpResponseStatus.OK
             );
         } catch (Exception e) {
             return new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1,
-                HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                Unpooled.wrappedBuffer(e.getMessage().getBytes())
+                    HttpVersion.HTTP_1_1,
+                    HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                    Unpooled.wrappedBuffer(e.getMessage().getBytes())
             );
         }
     }

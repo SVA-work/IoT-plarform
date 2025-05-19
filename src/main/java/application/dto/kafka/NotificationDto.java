@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class NotificationDto {
-    String chatId;
-    String deviceToken;
-    String deviceType;
-    String value;
+    private String chatId;
+    private String deviceToken;
+    private String deviceType;
+    private String value;
 }

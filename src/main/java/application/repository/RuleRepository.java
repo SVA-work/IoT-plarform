@@ -9,9 +9,9 @@ import java.util.Optional;
 public interface RuleRepository extends JpaRepository<Rule, Integer> {
 
     Optional<Rule> findByRuleTypeAndValueAndComparisonAndDevice(
-        String rule,
-        Double value,
-        String comparison,
-        Device device
+            String rule,
+            Double value,
+            String comparison,
+            Device device
     );
 }

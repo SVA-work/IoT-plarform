@@ -27,11 +27,13 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class ServerConfig {
 
-    public final int serverPort;
+    private final int serverPort;
     private final MeterRegistry meterRegistry;
     private final TelemetryService telemetryService;
 
-    public ServerConfig(@Value("${server.port}") int port, MeterRegistry meterRegistry, TelemetryService telemetryService) {
+    public ServerConfig(@Value("${server.port}") int port,
+                        MeterRegistry meterRegistry,
+                        TelemetryService telemetryService) {
         this.serverPort = port;
         this.meterRegistry = meterRegistry;
         this.telemetryService = telemetryService;
@@ -47,22 +49,22 @@ public class ServerConfig {
 
         ServerBootstrap boot = new ServerBootstrap();
         boot.group(bossGroup, workerGroup)
-            .channel(NioServerSocketChannel.class)
-            .childHandler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(SocketChannel channel) {
-                    JsonParserDefault parser = new JsonParserDefault();
-                    TelemetryHttpController telemetryHttpController = new TelemetryHttpController(parser, telemetryService);
-                    channel.pipeline()
-                        .addLast("HttpServerCodec", new HttpServerCodec())
-                        .addLast("HttpServerKeepAlive", new HttpServerKeepAliveHandler())
-                        .addLast("HttpObjectAggregator", new HttpObjectAggregator(10 * 1024 * 102, true))
-                        .addLast("HttpChunkedWrite", new ChunkedWriteHandler())
-                        .addLast("User HttpHandler", telemetryHttpController);
-                }
-            })
-            .option(ChannelOption.SO_BACKLOG, 128)
-            .childOption(ChannelOption.SO_KEEPALIVE, true);
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel channel) {
+                        JsonParserDefault parser = new JsonParserDefault();
+                        TelemetryHttpController telemetryHttpController = new TelemetryHttpController(parser, telemetryService);
+                        channel.pipeline()
+                                .addLast("HttpServerCodec", new HttpServerCodec())
+                                .addLast("HttpServerKeepAlive", new HttpServerKeepAliveHandler())
+                                .addLast("HttpObjectAggregator", new HttpObjectAggregator(10 * 1024 * 102, true))
+                                .addLast("HttpChunkedWrite", new ChunkedWriteHandler())
+                                .addLast("User HttpHandler", telemetryHttpController);
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 128)
+                .childOption(ChannelOption.SO_KEEPALIVE, true);
 
         new Thread(() -> {
             try {

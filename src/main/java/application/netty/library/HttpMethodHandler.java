@@ -16,7 +16,7 @@ public class HttpMethodHandler {
     private static final String URL_QUERY_STRING_REGEX = "(?:\\?.*?)?$";
     private static final String URL_PARAM_REGEX = "\\{(\\w*?)\\}";
     private static final String URL_PARAM_MATCH_REGEX =
-        "\\([%\\\\w-.\\\\~!\\$&'\\\\(\\\\)\\\\*\\\\+,;=:\\\\[\\\\]@]+?\\)";
+            "\\([%\\\\w-.\\\\~!\\$&'\\\\(\\\\)\\\\*\\\\+,;=:\\\\[\\\\]@]+?\\)";
 
     private final HttpMethod httpMethod;
     private final String path;
@@ -31,7 +31,7 @@ public class HttpMethodHandler {
         this.httpMethod = httpMethod;
         this.path = path;
         this.pathPattern = Pattern.compile(path.replaceFirst(URL_FORMAT_REGEX, URL_FORMAT_MATCH_REGEX)
-            .replaceAll(URL_PARAM_REGEX, URL_PARAM_MATCH_REGEX) + URL_QUERY_STRING_REGEX);
+                .replaceAll(URL_PARAM_REGEX, URL_PARAM_MATCH_REGEX) + URL_QUERY_STRING_REGEX);
         this.pathParamNames = pathParamNames;
         this.method = method;
         this.handler = handler;

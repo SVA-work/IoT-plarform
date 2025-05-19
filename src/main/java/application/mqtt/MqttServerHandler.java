@@ -1,20 +1,24 @@
 package application.mqtt;
 
+import application.dto.request.devices.MicroclimateSensor;
+import application.service.TelemetryService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
-import io.netty.handler.codec.mqtt.*;
-
+import io.netty.handler.codec.mqtt.MqttConnAckMessage;
+import io.netty.handler.codec.mqtt.MqttConnAckVariableHeader;
+import io.netty.handler.codec.mqtt.MqttConnectMessage;
+import io.netty.handler.codec.mqtt.MqttConnectReturnCode;
+import io.netty.handler.codec.mqtt.MqttFixedHeader;
+import io.netty.handler.codec.mqtt.MqttMessage;
+import io.netty.handler.codec.mqtt.MqttMessageType;
+import io.netty.handler.codec.mqtt.MqttPublishMessage;
+import io.netty.handler.codec.mqtt.MqttQoS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import application.dto.request.devices.MicroclimateSensor;
-import application.service.TelemetryService;
 
 import java.nio.charset.StandardCharsets;
 
@@ -80,7 +84,7 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<MqttMessage> 
     private void handlePublish(ChannelHandlerContext ctx, MqttPublishMessage msg) {
         String topic = msg.variableHeader().topicName();
         String message = msg.payload().toString(StandardCharsets.UTF_8);
-    
+
         logger.info("Получено сообщение");
         logger.info("Тема: {}", topic);
         logger.info("Сообщение: {}", message);
@@ -95,10 +99,10 @@ public class MqttServerHandler extends SimpleChannelInboundHandler<MqttMessage> 
 
     private void handlePingreq(ChannelHandlerContext ctx) {
         MqttMessage pingRespMessage = new MqttMessage(
-        new MqttFixedHeader(MqttMessageType.PINGRESP, false, MqttQoS.AT_MOST_ONCE, false, 0)
-    );
-    ctx.writeAndFlush(pingRespMessage);
-    logger.info("Отправлен PINGRESP");
+                new MqttFixedHeader(MqttMessageType.PINGRESP, false, MqttQoS.AT_MOST_ONCE, false, 0)
+        );
+        ctx.writeAndFlush(pingRespMessage);
+        logger.info("Отправлен PINGRESP");
     }
 
     private void handleDisconnect(ChannelHandlerContext ctx) {

@@ -15,50 +15,50 @@ import java.util.List;
 @Service
 public class BuildService {
 
-  public DeviceResponse buildDeviceResponse(@NotNull Device device) {
-    DeviceResponse deviceResponse = new DeviceResponse();
-    deviceResponse.setUuid(device.getUuid());
-    deviceResponse.setType(device.getType());
-    deviceResponse.setDeviceName(device.getDeviceName());
-    deviceResponse.setLogin(device.getUser().getLogin());
+    public DeviceResponse buildDeviceResponse(@NotNull Device device) {
+        DeviceResponse deviceResponse = new DeviceResponse();
+        deviceResponse.setUuid(device.getUuid());
+        deviceResponse.setType(device.getType());
+        deviceResponse.setDeviceName(device.getDeviceName());
+        deviceResponse.setLogin(device.getUser().getLogin());
 
-    List<RuleResponse> rulesResponse = new ArrayList<>();
-    List<Rule> rules = device.getRules();
+        List<RuleResponse> rulesResponse = new ArrayList<>();
+        List<Rule> rules = device.getRules();
 
-    if (rules != null) {
-      for (Rule rule : rules) {
-        rulesResponse.add(buildRuleResponse(rule));
-      }
+        if (rules != null) {
+            for (Rule rule : rules) {
+                rulesResponse.add(buildRuleResponse(rule));
+            }
+        }
+        deviceResponse.setRules(rulesResponse);
+
+        return deviceResponse;
     }
-    deviceResponse.setRules(rulesResponse);
 
-    return deviceResponse;
-  }
-
-  public RuleResponse buildRuleResponse(@NotNull Rule rule) {
-    RuleResponse ruleResponse = new RuleResponse();
-    ruleResponse.setRule(rule.getRuleType());
-    ruleResponse.setValue(rule.getValue());
-    ruleResponse.setComparison(rule.getComparison());
-    ruleResponse.setDeviceName(rule.getDevice().getDeviceName());
-    return ruleResponse;
-  }
-
-  public UserResponse buildUserResponse(@NotNull User user) {
-    UserResponse userResponse = new UserResponse();
-    userResponse.setLogin(user.getLogin());
-    userResponse.setPassword(user.getPassword());
-    userResponse.setTelegramToken(user.getTelegramToken().getToken());
-
-    List<DeviceResponse> devicesResponse = new ArrayList<>();
-    List<Device> devices = user.getDevices();
-
-    if (devices != null) {
-      for (Device device : devices) {
-        devicesResponse.add(buildDeviceResponse(device));
-      }
+    public RuleResponse buildRuleResponse(@NotNull Rule rule) {
+        RuleResponse ruleResponse = new RuleResponse();
+        ruleResponse.setRule(rule.getRuleType());
+        ruleResponse.setValue(rule.getValue());
+        ruleResponse.setComparison(rule.getComparison());
+        ruleResponse.setDeviceName(rule.getDevice().getDeviceName());
+        return ruleResponse;
     }
-    userResponse.setDevices(devicesResponse);
-    return userResponse;
-  }
+
+    public UserResponse buildUserResponse(@NotNull User user) {
+        UserResponse userResponse = new UserResponse();
+        userResponse.setLogin(user.getLogin());
+        userResponse.setPassword(user.getPassword());
+        userResponse.setTelegramToken(user.getTelegramToken().getToken());
+
+        List<DeviceResponse> devicesResponse = new ArrayList<>();
+        List<Device> devices = user.getDevices();
+
+        if (devices != null) {
+            for (Device device : devices) {
+                devicesResponse.add(buildDeviceResponse(device));
+            }
+        }
+        userResponse.setDevices(devicesResponse);
+        return userResponse;
+    }
 }

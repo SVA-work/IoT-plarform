@@ -31,8 +31,8 @@ public class KafkaProducerService {
         String message;
         try {
             KafkaMessage kafkaMessage =
-                new KafkaMessage(dtoMessage.getTelemetryCommand(),
-                    objectMapper.writeValueAsString(dtoMessage.getMessage()));
+                    new KafkaMessage(dtoMessage.getTelemetryCommand(),
+                            objectMapper.writeValueAsString(dtoMessage.getMessage()));
             message = objectMapper.writeValueAsString(kafkaMessage);
         } catch (JsonProcessingException e) {
             throw new JsonParseException(e);
@@ -45,8 +45,8 @@ public class KafkaProducerService {
         String message;
         try {
             KafkaMessage kafkaMessage =
-                new KafkaMessage(dtoMessage.getCommand(),
-                    objectMapper.writeValueAsString(dtoMessage.getMessage()));
+                    new KafkaMessage(dtoMessage.getCommand(),
+                            objectMapper.writeValueAsString(dtoMessage.getMessage()));
             message = objectMapper.writeValueAsString(kafkaMessage);
         } catch (JsonProcessingException e) {
             throw new JsonParseException(e);

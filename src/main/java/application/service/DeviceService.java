@@ -5,7 +5,6 @@ import application.dto.request.DeviceRequest;
 import application.dto.response.DeviceResponse;
 import application.dto.response.RuleResponse;
 import application.entity.Device;
-import application.entity.Rule;
 import application.entity.User;
 import application.repository.DeviceRepository;
 import jakarta.validation.constraints.NotNull;
